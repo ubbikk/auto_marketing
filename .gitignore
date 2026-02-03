@@ -1,1 +1,30 @@
 .env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Generated outputs
+data/carousels/*.pdf
+data/output/runs/
+data/output/carousels/*.pdf
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local tooling
+.claude/
+.playwright-mcp/
+tmp.txt

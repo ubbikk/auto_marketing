@@ -1,0 +1,89 @@
+# Hook templates for LinkedIn content generation
+# Based on TASTE_IN_MARKETING.md research
+
+hooks:
+  contrarian_opening:
+    description: "Challenge a common belief, then explain"
+    examples:
+      - "Everyone says you need 10,000 hours. They're wrong."
+      - "I stopped posting daily. My engagement doubled."
+      - "The best e-commerce tool isn't Shopify. Here's why."
+      - "Automation isn't saving you time. It's hiding problems."
+    templates:
+      - "{Common wisdom}. Wrong."
+      - "Everyone says {advice}. Here's why that's BS."
+      - "I stopped {common practice}. Results surprised me."
+    anti_patterns:
+      - "Unpopular opinion: [extremely popular opinion]"
+      - "Hot take: [lukewarm take]"
+
+  specificity_hook:
+    description: "Lead with specific numbers that prove credibility"
+    examples:
+      - "I spent $47,000 on LinkedIn ads last year. Here's what worked."
+      - "I reviewed 200 cold emails. 3 patterns separated winners."
+      - "70% of e-commerce operators waste 3+ hours daily on this."
+    templates:
+      - "I spent ${amount} on {thing}. Here's what actually worked."
+      - "I analyzed {number} {items}. {N} patterns emerged."
+      - "{X}% of {audience} make this mistake."
+    anti_patterns:
+      - "I've learned SO much about marketing!"
+      - "Many businesses struggle with this."
+
+  open_loop:
+    description: "Hint at payoff without revealing it"
+    examples:
+      - "I discovered something about e-commerce that changes everything."
+      - "One pattern separates failing stores from thriving ones."
+      - "This approach shouldn't work. But it does."
+    templates:
+      - "I discovered something about {topic} that changes everything."
+      - "One thing separates {losers} from {winners}..."
+      - "This {approach} shouldn't work. But it does."
+    anti_patterns:
+      - "Here's why X works: [immediate explanation]"
+      - "The secret to success is: [answer immediately]"
+
+  identity_callout:
+    description: "Name your specific audience directly"
+    examples:
+      - "E-commerce operators: stop doing this."
+      - "If you're still managing inventory in spreadsheets, read this."
+      - "DIY automation survivor? Same."
+      - "Shopify store owners drowning in orders: this is for you."
+    templates:
+      - "{Specific audience}: stop doing this."
+      - "If you're still {pain point}, read this."
+      - "{Specific situation}? Same."
+    anti_patterns:
+      - "For everyone out there..."
+      - "People often ask me..."
+
+  story_drop:
+    description: "Start in the middle of action, skip context"
+    examples:
+      - "There I was at 2 AM, manually updating 200 SKUs."
+      - "The spreadsheet had 2,847 rows. I had 3 hours."
+      - "I'd just watched my third Zapier workflow fail when..."
+    templates:
+      - "There I was at {time}, {doing something painful}."
+      - "The {thing} had {specific number}. I had {constraint}."
+      - "I'd just {failed at something} when..."
+    anti_patterns:
+      - "So I wanted to share something I learned recently..."
+      - "Let me tell you about a time when..."
+
+  bold_statement:
+    description: "Make a claim that demands attention"
+    examples:
+      - "Zapier is killing your business. Here's why."
+      - "You're doing customer support wrong."
+      - "The best e-commerce investment isn't ads."
+    templates:
+      - "{Popular tool} is killing your business."
+      - "You're doing {thing} wrong."
+      - "The best {thing} isn't {obvious answer}."
+    anti_patterns:
+      - "I think maybe possibly this could be..."
+      - "Some might say..."

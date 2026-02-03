@@ -1,0 +1,91 @@
+# Banned words for AI slop detection
+# Words with 700-1500% increase post-ChatGPT release
+# Source: Academic research on 14 million PubMed abstracts + community consensus
+
+# Highest offenders (1000%+ increase)
+delve
+tapestry
+testament
+realm
+underscore
+intricate
+
+# High frequency AI words (700%+ increase)
+leverage
+harness
+unlock
+embark
+robust
+seamless
+pivotal
+comprehensive
+furthermore
+moreover
+elevate
+foster
+landscape
+paradigm
+synergy
+navigate
+multifaceted
+nuanced
+dynamic
+holistic
+
+# Corporate buzzwords overused by AI
+streamline
+optimize
+empower
+innovative
+cutting-edge
+game-changer
+revolutionary
+transformative
+impactful
+actionable
+proactive
+scalable
+ecosystem
+stakeholder
+bandwidth
+synergize
+incentivize
+operationalize
+
+# Vague intensifiers
+significant
+substantial
+considerable
+tremendous
+remarkable
+exceptional
+outstanding
+unprecedented
+
+# Empty modifiers
+truly
+really
+actually
+literally
+absolutely
+definitely
+certainly
+incredibly
+extremely
+
+# Overused transitions
+additionally
+consequently
+subsequently
+nonetheless
+nevertheless
+accordingly
+hence
+thus
+therefore
+
+# AI tell-tale phrases (in phrase form in code)
+# "In today's fast-paced world"
+# "It's worth noting that"
+# "Let's dive in"
+# etc.

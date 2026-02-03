@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFTA Marketing for LinkedIn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --surface: #060918;
+  --surface-muted: #0d1128;
+  --surface-highlight: #141938;
+  --surface-border: #1a1f3c;
+  --surface-foreground: #e8eaf6;
+  --primary-50: #e6fbff;
+  --primary-100: #b3f3ff;
+  --primary-200: #80ebff;
+  --primary-300: #4de3ff;
+  --primary-400: #1adbff;
+  --primary-500: #00d4ff;
+  --primary-600: #00a8cc;
+  --primary-700: #007c99;
+  --accent: #f59e0b;
+  --accent-light: #fbbf24;
+  --electric-purple: #8b5cf6;
+  --electric-pink: #ec4899;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--surface);
+  color: var(--surface-foreground);
+  font-family: var(--font-body);
+  font-feature-settings: "ss01", "ss02", "cv01";
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::selection { background: rgba(0, 212, 255, 0.4); color: #fff; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-700); }
+
+/* ===== NOISE + GRID ===== */
+.noise-overlay {
+  position: fixed; inset: 0; pointer-events: none; opacity: 0.015; z-index: 100;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.grid-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(26, 31, 60, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 31, 60, 0.35) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ===== GLOW ORBS ===== */
+.glow-orb {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
+  filter: blur(80px);
+}
+.glow-orb--cyan { background: radial-gradient(circle, rgba(0,212,255,0.4) 0%, transparent 70%); }
+.glow-orb--purple { background: radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%); }
+.glow-orb--accent { background: radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%); }
+
+/* ===== LAYOUT ===== */
+.shell { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+@media (min-width: 640px) { .shell { padding: 0 32px; } }
+@media (min-width: 1024px) { .shell { padding: 0 48px; } }
+
+section { position: relative; z-index: 1; }
+
+/* ===== TYPOGRAPHY ===== */
+.heading-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.heading-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, var(--primary-200) 40%, var(--primary-400) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-glow { text-shadow: 0 0 40px rgba(0, 212, 255, 0.5); }
+
+/* ===== BADGE ===== */
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid rgba(0,212,255,0.3); background: rgba(0,212,255,0.08);
+  border-radius: 999px; padding: 8px 20px;
+  font-size: 12px; font-weight: 600; color: var(--primary-300);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.badge__dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--primary-500);
+  box-shadow: 0 0 12px rgba(0,212,255,0.6);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ===== DIVIDER ===== */
+.section-divider {
+  height: 1px; width: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.3) 50%, transparent 100%);
+}
+
+/* ===== CARDS ===== */
+.card {
+  position: relative; border-radius: 16px;
+  border: 1px solid rgba(26,31,60,0.5);
+  background: linear-gradient(145deg, rgba(13,17,40,0.8) 0%, rgba(6,9,24,0.9) 100%);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  transition: all 0.4s ease;
+}
+.card:hover {
+  border-color: rgba(0,212,255,0.2);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 40px rgba(0,212,255,0.05);
+}
+.card--glow {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 60px rgba(0,212,255,0.1);
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  border-radius: 999px; padding: 14px 32px;
+  font-family: var(--font-body); font-size: 15px; font-weight: 600;
+  color: var(--surface); border: none; cursor: pointer;
+  background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
+  box-shadow: 0 4px 20px rgba(0,212,255,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.3s ease; text-decoration: none;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,212,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled {
+  opacity: 0.5; cursor: not-allowed; transform: none !important;
+}
+.btn-primary--lg { padding: 18px 48px; font-size: 17px; font-weight: 700; }
+.btn-primary--full { width: 100%; }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 999px; padding: 12px 24px;
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  color: var(--surface-foreground); cursor: pointer;
+  border: 1px solid rgba(26,31,60,0.6);
+  background: rgba(13,17,40,0.3); backdrop-filter: blur(8px);
+  transition: all 0.3s ease; text-decoration: none;
+}
+.btn-ghost:hover {
+  border-color: rgba(0,212,255,0.4); color: var(--primary-300);
+  background: rgba(0,212,255,0.08);
+  box-shadow: 0 0 20px rgba(0,212,255,0.1);
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-label {
+  display: block; font-size: 13px; font-weight: 600;
+  color: var(--surface-foreground); margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.form-hint {
+  font-size: 12px; color: rgba(232,234,246,0.4); margin-top: 4px;
+}
+
+.form-input, .form-textarea {
+  width: 100%; padding: 14px 18px;
+  border: 1px solid var(--surface-border); border-radius: 12px;
+  background: rgba(13,17,40,0.5);
+  color: var(--surface-foreground); font-family: var(--font-body); font-size: 15px;
+  transition: all 0.3s ease; outline: none;
+}
+.form-input::placeholder, .form-textarea::placeholder {
+  color: rgba(232,234,246,0.3);
+}
+.form-input:focus, .form-textarea:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.15);
+}
+.form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+/* ===== URL INPUT WITH LOGO ===== */
+.url-input-wrap {
+  position: relative; display: flex; align-items: center; gap: 12px;
+}
+.url-input-wrap .form-input { flex: 1; }
+.logo-preview {
+  width: 44px; height: 44px; border-radius: 10px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-muted);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.logo-preview img {
+  width: 100%; height: 100%; object-fit: contain; padding: 4px;
+}
+.logo-preview--loading {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* ===== SOURCE TOGGLE ===== */
+.source-toggle {
+  display: flex; border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--surface-border);
+  background: rgba(13,17,40,0.5);
+}
+.source-toggle__btn {
+  flex: 1; padding: 10px 16px; border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  color: rgba(232,234,246,0.5); background: transparent;
+  transition: all 0.3s ease;
+}
+.source-toggle__btn--active {
+  color: var(--primary-300);
+  background: rgba(0,212,255,0.1);
+  box-shadow: inset 0 -2px 0 var(--primary-500);
+}
+
+/* ===== PERSONA CARDS ===== */
+.persona-grid {
+  display: grid; grid-template-columns: 1fr; gap: 12px;
+}
+@media (min-width: 640px) { .persona-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px) { .persona-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.persona-card {
+  padding: 20px; border-radius: 14px; cursor: pointer;
+  border: 1px solid rgba(26,31,60,0.5);
+  background: linear-gradient(145deg, rgba(13,17,40,0.6) 0%, rgba(6,9,24,0.8) 100%);
+  transition: all 0.3s ease;
+}
+.persona-card:hover {
+  border-color: rgba(0,212,255,0.2);
+  transform: translateY(-2px);
+}
+.persona-card--selected {
+  border-color: rgba(0,212,255,0.5) !important;
+  box-shadow: 0 0 30px rgba(0,212,255,0.12), inset 0 1px 0 rgba(0,212,255,0.1);
+  background: linear-gradient(145deg, rgba(0,212,255,0.06) 0%, rgba(13,17,40,0.8) 100%);
+}
+.persona-card__name {
+  font-family: var(--font-display); font-weight: 700; font-size: 16px;
+  color: #fff; margin-bottom: 6px;
+}
+.persona-card__desc {
+  font-size: 13px; color: rgba(232,234,246,0.55); line-height: 1.45; margin-bottom: 10px;
+}
+.persona-card__opener {
+  font-size: 12px; color: rgba(232,234,246,0.35); font-style: italic;
+  line-height: 1.4; border-top: 1px solid rgba(26,31,60,0.5); padding-top: 10px;
+}
+
+/* ===== STAT CARDS (results) ===== */
+.stat-card {
+  position: relative; overflow: hidden; border-radius: 12px;
+  border: 1px solid rgba(26,31,60,0.3); padding: 16px; text-align: center;
+  background: linear-gradient(145deg, rgba(13,17,40,0.6) 0%, rgba(6,9,24,0.8) 100%);
+}
+.stat-card__value {
+  font-family: var(--font-display); font-size: 28px; font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-300) 0%, var(--primary-400) 50%, var(--accent) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.stat-card__label {
+  font-size: 11px; color: rgba(232,234,246,0.5); margin-top: 4px;
+  font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.stat-card__weight {
+  font-size: 10px; color: rgba(232,234,246,0.25); margin-top: 2px;
+}
+
+/* ===== WINNER CARD ===== */
+.winner-card {
+  position: relative; padding: 32px; border-radius: 16px;
+  border: 1px solid rgba(0,212,255,0.2);
+  background: linear-gradient(145deg, rgba(0,212,255,0.04) 0%, rgba(6,9,24,0.95) 100%);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3), 0 0 60px rgba(0,212,255,0.08);
+}
+.winner-card__header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+}
+.winner-card__content {
+  font-size: 15px; line-height: 1.7; color: rgba(232,234,246,0.85);
+  white-space: pre-wrap; word-wrap: break-word;
+}
+.copy-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px; border: 1px solid var(--surface-border);
+  background: var(--surface-muted); color: var(--surface-foreground);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-body); transition: all 0.2s ease;
+}
+.copy-btn:hover {
+  border-color: rgba(0,212,255,0.3); color: var(--primary-300);
+}
+.copy-btn--copied { border-color: #10b981; color: #10b981; }
+
+/* ===== SCORE CIRCLE ===== */
+.score-circle {
+  width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 18px; font-weight: 800;
+  background: linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(139,92,246,0.1) 100%);
+  border: 2px solid rgba(0,212,255,0.3);
+  color: var(--primary-300);
+}
+
+/* ===== COLLAPSIBLE ===== */
+.collapsible__trigger {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 14px 0; font-size: 14px; font-weight: 600;
+  color: rgba(232,234,246,0.6); transition: color 0.2s; border: none; background: none;
+  font-family: var(--font-body); width: 100%; text-align: left;
+}
+.collapsible__trigger:hover { color: var(--primary-300); }
+.collapsible__trigger svg { transition: transform 0.3s; }
+.collapsible__trigger--open svg { transform: rotate(180deg); }
+.collapsible__body {
+  max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+}
+.collapsible__body--open { max-height: 5000px; }
+
+/* ===== AUTO-FETCH CARD ===== */
+.auto-fetch-card {
+  padding: 20px; border-radius: 12px;
+  border: 1px dashed rgba(0,212,255,0.2);
+  background: rgba(0,212,255,0.03);
+  display: flex; align-items: center; gap: 14px;
+}
+.auto-fetch-card__icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(0,212,255,0.1); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ===== VIDEO PLACEHOLDER ===== */
+.video-placeholder {
+  position: relative; width: 100%; padding-top: 56.25%;
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(26,31,60,0.5);
+  background: linear-gradient(145deg, rgba(13,17,40,0.6) 0%, rgba(6,9,24,0.9) 100%);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 60px rgba(0,212,255,0.06);
+}
+.video-placeholder__inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+}
+.video-placeholder__play {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+}
+.video-placeholder__play:hover {
+  background: rgba(0,212,255,0.2);
+  box-shadow: 0 0 40px rgba(0,212,255,0.2);
+  transform: scale(1.05);
+}
+
+/* ===== LOADING ===== */
+.loading-overlay {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 32px; padding: 80px 24px; text-align: center;
+}
+.loading-orb {
+  width: 120px; height: 120px; border-radius: 50%; position: relative;
+}
+.loading-orb::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,212,255,0.4) 0%, transparent 70%);
+  animation: loading-pulse 2s ease-in-out infinite;
+}
+.loading-orb::after {
+  content: ''; position: absolute; inset: 8px; border-radius: 50%;
+  border: 2px solid transparent; border-top-color: var(--primary-500);
+  animation: spin 1.2s linear infinite;
+}
+
+/* ===== VARIANT MINI CARD ===== */
+.variant-card {
+  padding: 16px; border-radius: 12px;
+  border: 1px solid rgba(26,31,60,0.4);
+  background: rgba(13,17,40,0.4);
+  font-size: 13px; line-height: 1.5; color: rgba(232,234,246,0.6);
+}
+.variant-card__meta {
+  display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+}
+.variant-card__tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 6px;
+  background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.15);
+  color: var(--primary-300); font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+@keyframes loading-pulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.anim-fade-up { animation: fade-up 0.6s ease-out both; }
+.anim-delay-1 { animation-delay: 100ms; }
+.anim-delay-2 { animation-delay: 200ms; }
+.anim-delay-3 { animation-delay: 300ms; }
+.anim-delay-4 { animation-delay: 400ms; }
+.anim-delay-5 { animation-delay: 500ms; }
+
+/* ===== HIDE/SHOW ===== */
+.hidden { display: none !important; }
+
+/* ===== RESPONSIVE HELPERS ===== */
+.scores-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+}
+@media (max-width: 700px) {
+  .scores-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 440px) {
+  .scores-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.results-grid {
+  display: grid; grid-template-columns: 1fr 340px; gap: 24px;
+}
+@media (max-width: 800px) {
+  .results-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== FOOTER ===== */
+footer {
+  padding: 48px 0; text-align: center;
+  font-size: 13px; color: rgba(232,234,246,0.25);
+}
+footer a {
+  color: var(--primary-400); text-decoration: none;
+  transition: color 0.2s;
+}
+footer a:hover { color: var(--primary-300); }
+</style>
+</head>
+<body>
+
+<!-- Texture layers -->
+<div class="noise-overlay"></div>
+<div class="grid-bg"></div>
+
+<!-- ===== HEADER ===== -->
+<header style="position:sticky;top:0;z-index:50;padding:16px 0;background:rgba(6,9,24,0.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(26,31,60,0.4);">
+  <div class="shell" style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:baseline;gap:10px;">
+      <span style="font-family:var(--font-display);font-weight:800;font-size:22px;color:#fff;letter-spacing:-0.02em;">AFTA</span>
+      <span style="font-size:13px;font-weight:500;color:rgba(232,234,246,0.4);">Marketing for LinkedIn</span>
+    </div>
+    <a href="https://afta.systems" target="_blank" class="btn-ghost" style="padding:8px 16px;font-size:12px;">
+      afta.systems
+      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section style="padding:80px 0 60px;position:relative;overflow:hidden;">
+  <div class="glow-orb glow-orb--cyan" style="width:600px;height:600px;top:-200px;right:-200px;opacity:0.25;"></div>
+  <div class="glow-orb glow-orb--purple" style="width:400px;height:400px;bottom:-100px;left:-150px;opacity:0.15;"></div>
+
+  <div class="shell" style="position:relative;z-index:1;">
+    <div class="badge anim-fade-up" style="margin-bottom:24px;">
+      <span class="badge__dot"></span>
+      AI-Powered Content Engine
+    </div>
+
+    <h1 class="heading-display anim-fade-up anim-delay-1" style="font-size:clamp(36px,6vw,64px);color:#fff;margin-bottom:20px;max-width:700px;">
+      Create LinkedIn Content That
+      <span class="heading-gradient">Stops the Scroll</span>
+    </h1>
+
+    <p class="anim-fade-up anim-delay-2" style="font-size:18px;line-height:1.6;color:rgba(232,234,246,0.6);max-width:540px;margin-bottom:40px;">
+      AI-powered post generation and branded carousel creation.
+      Your voice. Your brand. Zero slop.
+    </p>
+
+    <!-- Video placeholder -->
+    <div class="video-placeholder anim-fade-up anim-delay-3" style="max-width:720px;">
+      <div class="video-placeholder__inner">
+        <div class="video-placeholder__play">
+          <svg width="28" height="28" fill="var(--primary-400)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <span style="font-size:13px;font-weight:500;color:rgba(232,234,246,0.3);">Promo Video Coming Soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="shell"><div class="section-divider"></div></div>
+
+<!-- ===== FORM SECTION ===== -->
+<section id="generate" style="padding:60px 0 40px;">
+  <div class="shell">
+    <div id="form-section">
+      <h2 class="heading-display" style="font-size:28px;color:#fff;margin-bottom:32px;">
+        Generate Marketing Materials
+      </h2>
+
+      <div class="card" style="padding:32px;">
+        <div style="display:flex;flex-direction:column;gap:28px;">
+
+          <!-- Target URL -->
+          <div>
+            <label class="form-label">Target Website</label>
+            <div class="url-input-wrap">
+              <input id="target-url" type="url" class="form-input" placeholder="https://your-website.com" autocomplete="url">
+              <div id="logo-preview" class="logo-preview">
+                <svg width="20" height="20" fill="none" stroke="rgba(232,234,246,0.2)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+              </div>
+            </div>
+            <p class="form-hint">We'll extract the logo and use it in your carousel slides</p>
+          </div>
+
+          <!-- Message -->
+          <div>
+            <label class="form-label">Message</label>
+            <textarea id="message" class="form-textarea" rows="2" placeholder="What message should be conveyed? Leave empty for auto-summary"></textarea>
+          </div>
+
+          <!-- Source -->
+          <div>
+            <label class="form-label">Source Content</label>
+            <div class="source-toggle" style="margin-bottom:12px;">
+              <button id="source-auto-btn" class="source-toggle__btn source-toggle__btn--active" type="button" onclick="setSourceMode('auto')">Auto-fetch News</button>
+              <button id="source-paste-btn" class="source-toggle__btn" type="button" onclick="setSourceMode('paste')">Paste Text</button>
+            </div>
+            <div id="source-auto" class="auto-fetch-card">
+              <div class="auto-fetch-card__icon">
+                <svg width="20" height="20" fill="none" stroke="var(--primary-400)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:rgba(232,234,246,0.8);margin-bottom:2px;">Automatic Source</div>
+                <div style="font-size:12px;color:rgba(232,234,246,0.4);">We'll find the most relevant recent news article and use it as source material</div>
+              </div>
+            </div>
+            <textarea id="source-paste" class="form-textarea hidden" rows="5" placeholder="Paste your blog post, news article, or any text here..."></textarea>
+          </div>
+
+          <!-- Persona -->
+          <div>
+            <label class="form-label">Choose Your Voice</label>
+            <div id="persona-grid" class="persona-grid">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button id="generate-btn" class="btn-primary btn-primary--lg btn-primary--full" onclick="handleGenerate()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Generate Content
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- LOADING STATE -->
+    <div id="loading-section" class="hidden">
+      <div class="loading-overlay">
+        <div class="loading-orb"></div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">Generating your content...</div>
+          <div id="loading-persona" style="font-size:14px;color:rgba(232,234,246,0.4);"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS SECTION -->
+    <div id="results-section" class="hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <h2 class="heading-display" style="font-size:28px;color:#fff;">Results</h2>
+        <button class="btn-ghost" onclick="resetToForm()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Generate Again
+        </button>
+      </div>
+
+      <div class="results-grid">
+        <!-- LEFT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:24px;">
+
+          <!-- Winner post -->
+          <div class="winner-card">
+            <div class="winner-card__header">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div class="badge">
+                  <span class="badge__dot"></span>
+                  Winning Post
+                </div>
+                <div id="result-score" class="score-circle"></div>
+              </div>
+              <button id="copy-btn" class="copy-btn" onclick="copyWinner()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="1.5"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="1.5"/></svg>
+                Copy
+              </button>
+            </div>
+            <div id="result-post" class="winner-card__content"></div>
+          </div>
+
+          <!-- Source info -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span id="result-source-title" style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--accent-light);"></span>
+            <span id="result-persona-name" style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);color:var(--electric-purple);"></span>
+          </div>
+
+          <!-- Score breakdown -->
+          <div>
+            <div style="font-size:13px;font-weight:600;color:rgba(232,234,246,0.5);margin-bottom:10px;">Score Breakdown</div>
+            <div id="scores-grid" class="scores-grid"></div>
+          </div>
+
+          <!-- Judge reasoning -->
+          <div>
+            <button class="collapsible__trigger" onclick="toggleCollapsible('judge-reasoning')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              Judge's Reasoning
+            </button>
+            <div id="judge-reasoning" class="collapsible__body">
+              <div id="result-reasoning" style="font-size:14px;line-height:1.6;color:rgba(232,234,246,0.55);padding-bottom:16px;"></div>
+              <div id="result-improvements" style="font-size:13px;line-height:1.5;color:rgba(232,234,246,0.35);padding-bottom:16px;"></div>
+            </div>
+          </div>
+
+          <!-- All variants -->
+          <div>
+            <button class="collapsible__trigger" onclick="toggleCollapsible('all-variants')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              <span id="variants-count">View All Variants</span>
+            </button>
+            <div id="all-variants" class="collapsible__body">
+              <div id="variants-list" style="display:flex;flex-direction:column;gap:10px;padding-bottom:16px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Carousel -->
+        <div>
+          <div class="card" style="padding:24px;position:sticky;top:80px;">
+            <div style="font-family:var(--font-display);font-weight:700;font-size:16px;color:#fff;margin-bottom:4px;">LinkedIn Carousel</div>
+            <div style="font-size:12px;color:rgba(232,234,246,0.35);margin-bottom:16px;">5-slide branded PDF</div>
+            <div id="carousel-preview" style="width:100%;aspect-ratio:1;border-radius:12px;background:var(--surface-muted);border:1px solid var(--surface-border);margin-bottom:16px;overflow:hidden;">
+              <iframe id="carousel-iframe" style="width:100%;height:100%;border:none;" title="Carousel preview"></iframe>
+            </div>
+            <a id="carousel-download" class="btn-primary btn-primary--full" href="#" download style="text-decoration:none;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Download PDF
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div id="result-stats" style="margin-top:32px;padding:16px 20px;border-radius:12px;background:rgba(13,17,40,0.4);border:1px solid rgba(26,31,60,0.3);display:flex;flex-wrap:wrap;gap:24px;font-size:12px;color:rgba(232,234,246,0.3);"></div>
+    </div>
+  </div>
+</section>
+
+<div class="shell"><div class="section-divider"></div></div>
+
+<footer>
+  <div class="shell">
+    Powered by <a href="https://afta.systems" target="_blank">AFTA Systems</a> &middot; AI Automation for E-commerce
+  </div>
+</footer>
+
+<script>
+// ===== STATE =====
+let selectedPersona = 'professional';
+let sourceMode = 'auto';
+let personas = [];
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('/api/personas');
+    personas = await res.json();
+    renderPersonas();
+  } catch (e) {
+    // Fallback personas if API not available
+    personas = [
+      { id: 'professional', name: 'Professional', description: 'Confident peer sharing discoveries with specific data', example_openers: ['I analyzed 47 failed automation projects. One pattern showed up in 43 of them.'] },
+      { id: 'witty', name: 'Witty', description: 'Friend who happens to know stuff, uses observational humor', example_openers: ['Me at 2 AM: \'I\'ll just manually update these 200 SKUs real quick.\''] },
+      { id: 'ai_meta', name: 'AI-Meta', description: 'Self-aware AI persona with clever irony and fourth-wall breaks', example_openers: ['I processed 50,000 LinkedIn posts to write this one.'] },
+      { id: 'storyteller', name: 'Storyteller', description: 'Narrative-driven content with before/after transformations', example_openers: ['At 11 PM on a Tuesday, Sarah was manually updating 340 product prices.'] },
+      { id: 'provocateur', name: 'Provocateur', description: 'Blunt contrarian who challenges industry orthodoxy with data', example_openers: ['Your Zapier setup isn\'t automation. It\'s a Rube Goldberg machine with a monthly fee.'] },
+    ];
+    renderPersonas();
+  }
+});
+
+// ===== PERSONA RENDERING =====
+function renderPersonas() {
+  const grid = document.getElementById('persona-grid');
+  grid.innerHTML = personas.map(p => `
+    <div class="persona-card ${p.id === selectedPersona ? 'persona-card--selected' : ''}"
+         onclick="selectPersona('${p.id}')" data-persona="${p.id}">
+      <div class="persona-card__name">${p.name}</div>
+      <div class="persona-card__desc">${p.description}</div>
+      <div class="persona-card__opener">"${p.example_openers[0]}"</div>
+    </div>
+  `).join('');
+}
+
+function selectPersona(id) {
+  selectedPersona = id;
+  document.querySelectorAll('.persona-card').forEach(c => {
+    c.classList.toggle('persona-card--selected', c.dataset.persona === id);
+  });
+}
+
+// ===== SOURCE TOGGLE =====
+function setSourceMode(mode) {
+  sourceMode = mode;
+  document.getElementById('source-auto-btn').classList.toggle('source-toggle__btn--active', mode === 'auto');
+  document.getElementById('source-paste-btn').classList.toggle('source-toggle__btn--active', mode === 'paste');
+  document.getElementById('source-auto').classList.toggle('hidden', mode !== 'auto');
+  document.getElementById('source-paste').classList.toggle('hidden', mode !== 'paste');
+}
+
+// ===== LOGO PREVIEW =====
+let logoTimeout;
+document.getElementById('target-url').addEventListener('blur', async function() {
+  const url = this.value.trim();
+  if (!url) return;
+  const preview = document.getElementById('logo-preview');
+  preview.classList.add('logo-preview--loading');
+  try {
+    const res = await fetch(`/api/scrape-logo?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    if (data.logo_data_url) {
+      preview.innerHTML = `<img src="${data.logo_data_url}" alt="Logo">`;
+    }
+  } catch (e) {}
+  preview.classList.remove('logo-preview--loading');
+});
+
+// ===== GENERATE =====
+async function handleGenerate() {
+  const targetUrl = document.getElementById('target-url').value.trim();
+  if (!targetUrl) {
+    document.getElementById('target-url').focus();
+    document.getElementById('target-url').style.borderColor = 'rgba(236,72,153,0.5)';
+    setTimeout(() => document.getElementById('target-url').style.borderColor = '', 2000);
+    return;
+  }
+
+  const message = document.getElementById('message').value.trim();
+  const sourceText = sourceMode === 'paste'
+    ? document.getElementById('source-paste').value.trim() || 'auto'
+    : 'auto';
+
+  const personaName = personas.find(p => p.id === selectedPersona)?.name || selectedPersona;
+
+  // Show loading
+  document.getElementById('form-section').classList.add('hidden');
+  document.getElementById('results-section').classList.add('hidden');
+  document.getElementById('loading-section').classList.remove('hidden');
+  document.getElementById('loading-persona').textContent = `Using ${personaName} voice`;
+  document.getElementById('generate-btn').disabled = true;
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        target_url: targetUrl,
+        message: message,
+        source_text: sourceText,
+        persona: selectedPersona,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Generation failed');
+    }
+
+    const data = await res.json();
+    showResults(data);
+  } catch (e) {
+    alert('Error: ' + e.message);
+    document.getElementById('loading-section').classList.add('hidden');
+    document.getElementById('form-section').classList.remove('hidden');
+  } finally {
+    document.getElementById('generate-btn').disabled = false;
+  }
+}
+
+// ===== SHOW RESULTS =====
+function showResults(data) {
+  document.getElementById('loading-section').classList.add('hidden');
+  document.getElementById('results-section').classList.remove('hidden');
+
+  // Winner post
+  document.getElementById('result-post').textContent = data.winning_post;
+
+  // Score
+  const score = data.score != null ? data.score.toFixed(1) : '—';
+  document.getElementById('result-score').textContent = score;
+
+  // Source + persona tags
+  document.getElementById('result-source-title').textContent = data.source_title || 'Source';
+  const pName = personas.find(p => p.id === data.persona_used)?.name || data.persona_used;
+  document.getElementById('result-persona-name').textContent = pName;
+
+  // Score breakdown
+  if (data.score_breakdown) {
+    const sb = data.score_breakdown;
+    const scores = [
+      { label: 'Hook', value: sb.hook_strength, weight: '30%' },
+      { label: 'Anti-Slop', value: sb.anti_slop, weight: '25%' },
+      { label: 'Distinct', value: sb.distinctiveness, weight: '20%' },
+      { label: 'Relevance', value: sb.relevance, weight: '15%' },
+      { label: 'Persona', value: sb.persona_fit, weight: '10%' },
+    ];
+    document.getElementById('scores-grid').innerHTML = scores.map(s => `
+      <div class="stat-card">
+        <div class="stat-card__value">${s.value.toFixed(1)}</div>
+        <div class="stat-card__label">${s.label}</div>
+        <div class="stat-card__weight">${s.weight}</div>
+      </div>
+    `).join('');
+  }
+
+  // Judge reasoning
+  document.getElementById('result-reasoning').textContent = data.judge_reasoning || '';
+  const improvements = document.getElementById('result-improvements');
+  if (data.improvement_notes) {
+    improvements.textContent = 'Improvements: ' + data.improvement_notes;
+    improvements.style.display = '';
+  } else {
+    improvements.style.display = 'none';
+  }
+
+  // Carousel
+  document.getElementById('carousel-iframe').src = data.carousel_pdf_url;
+  document.getElementById('carousel-download').href = data.carousel_pdf_url;
+
+  // Variants
+  const variants = data.all_variants || [];
+  document.getElementById('variants-count').textContent = `View All ${variants.length} Variants`;
+  document.getElementById('variants-list').innerHTML = variants.map((v, i) => `
+    <div class="variant-card">
+      <div style="max-height:100px;overflow:hidden;">${escapeHtml(v.content.substring(0, 200))}${v.content.length > 200 ? '...' : ''}</div>
+      <div class="variant-card__meta">
+        <span class="variant-card__tag">${v.hook_type}</span>
+        <span class="variant-card__tag">${v.framework_used}</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Stats bar
+  const stats = data.stats || {};
+  document.getElementById('result-stats').innerHTML = [
+    `Generators: ${stats.total_generators || '—'}`,
+    `Total variants: ${stats.total_variants || '—'}`,
+    `Slop filtered: ${stats.slop_violations || 0}`,
+    `Duration: ${stats.duration_seconds ? stats.duration_seconds.toFixed(1) + 's' : '—'}`,
+  ].map(s => `<span>${s}</span>`).join('');
+
+  // Scroll to top of results
+  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===== UTILS =====
+function resetToForm() {
+  document.getElementById('results-section').classList.add('hidden');
+  document.getElementById('form-section').classList.remove('hidden');
+  document.getElementById('generate').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyWinner() {
+  const text = document.getElementById('result-post').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('copy-btn--copied');
+    btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copy-btn--copied');
+      btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="1.5"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="1.5"/></svg> Copy';
+    }, 2000);
+  });
+}
+
+function toggleCollapsible(id) {
+  const body = document.getElementById(id);
+  const trigger = body.previousElementSibling;
+  body.classList.toggle('collapsible__body--open');
+  trigger.classList.toggle('collapsible__trigger--open');
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>

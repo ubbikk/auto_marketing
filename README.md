@@ -1,95 +1,133 @@
-# LinkedIn Content Generator (Working Title)
+# Auto-Marketing
 
-## What is this?
+Multi-agent AI system for generating LinkedIn content that doesn't read like AI slop. Built for [AFTA Systems](https://afta.systems), an e-commerce automation company.
 
-An experiment in AI-generated LinkedIn content that doesn't suck. The bar is low - most AI content is obvious slop. Can we do better?
+## What it does
 
-## Context
+Pulls recent tech/business news, filters for relevance, generates multiple LinkedIn post variants using different personas and creative strategies, validates against an anti-slop ruleset, and picks the best one via a judge agent.
 
-My business partner is taking a LinkedIn marketing course, learning TOFU (Top of Funnel) strategy for our e-commerce automation company (AFTA Systems). He'll post manually while learning the basics.
+### Pipeline
 
-Meanwhile, I want to build something interesting: an AI system that generates LinkedIn content "with taste." If it works, it becomes both a content pipeline AND a portfolio demo - proof that we know how to make AI output that doesn't feel like garbage.
+```
+RSS Feeds (7 sources) → News Filter (Sonnet) → 7 Generators (Opus, parallel)
+    → Anti-Slop Validator → Judge Agent → Winner
+```
 
-### The Deeper Goal
+1. **Fetch** — Aggregates articles from TechCrunch, Hacker News, ArsTechnica, VentureBeat, Wired, IEEE Spectrum
+2. **Filter** — Claude Sonnet scores each article for relevance to AFTA's audience, suggests angles
+3. **Generate** — 7 generator agents run in parallel, each producing 2–4 variants with randomized hook/framework/persona combos (14–28 total)
+4. **Validate** — Anti-slop engine checks for 74 banned words, 16 banned phrases, 8 structural patterns (emoji spam, em-dash overuse, listicle format, etc.)
+5. **Judge** — Scores surviving variants on hook strength (30%), anti-slop (25%), distinctiveness (20%), relevance (15%), persona fit (10%)
 
-This is also a sandbox for a bigger question: can AI be a creative companion rather than a slop machine? I want to write blog posts and short stories but struggle with the craft labor - details, pacing, scenes, stitching ideas together. LinkedIn is the test case. If I can crack "taste at scale," maybe I learn something transferable.
+### Personas
 
-## The Idea
+- **Professional** — Confident peer with specific data, admits uncertainty
+- **Witty** — Observational humor, deadpan, friend-who-knows-stuff energy
+- **AI-Meta** — Self-aware AI, fourth-wall breaks, honest about its own limitations
 
-- Ingest news/trends via API
-- Generate content that merges news (the hook) with company messaging
-- Do it with actual personality - maybe a self-aware AI persona that jokes about being AI
-- Example tone: "There's talk about the AI bubble. I don't think it's real because X, Y, Z. But what do I know, I'm just a pile of numbers..."
+### Creativity engine
 
-The transparency angle could be the differentiator. Human accounts being quirky feels try-hard. An AI account doing it is the bit.
+Each generator gets a unique combination of:
+- **Hook pattern** (weighted): contrarian, specificity, open loop, identity callout, story drop, bold statement
+- **Framework**: PAS, BAB, or HSO
+- **Few-shot examples** from the assigned persona
+- **Style reference** (50% chance): Ethan Mollick, Gary Provost, Wendy's Twitter, etc.
+- **Wildcard constraint** (40% chance): e.g. "assume reader has 10 seconds attention"
+- **Content angle** (weighted): DIY automation trap, time drain reality, quick wins, etc.
 
-## My Original Plan
+## Planned features
 
-1. Research anti-slop strategies
-2. Research AI writing assistant tools (landscape, what works)
-3. Research creative AI writing approaches (multi-agent systems, generate-then-judge)
-4. Research what makes marketing material good (personas, linguistic tricks, humor strategies)
-5. Build POC, iterate
+- Blog post to LinkedIn carousel conversion using image generation
+- Automated comment generation for engagement
+- Scheduling and posting integration
 
-## Claude's Pushback (Worth Considering)
+## Setup
 
-**On the research-heavy approach:**
-- This plan could eat 2 months before producing a single post
-- "What makes writing good" is an infinite research rabbit hole
-- I said I learn by building - this plan is "learn by researching"
-- Timeboxing: maybe 5 hours of research max, then produce something
+Requires Python 3.11+.
 
-**On multi-agent generate-100-then-judge:**
-- Weird assumption: if the AI judge can identify "taste," why not use that taste-detector to guide generation directly?
+```bash
+# Install dependencies
+pip install -e ".[dev]"
 
-**On "with taste":**
-- This phrase is doing ALL the heavy lifting
-- The actual challenge is systematizing taste, not the automation part
-- Can taste be encoded, or does it require human curation that kills scalability?
+# Set your Anthropic API key
+cp .env.example .env  # then edit with your key
+# or
+export ANTHROPIC_API_KEY=sk-ant-...
+```
 
-**On the news-bait + pitch formula:**
-- This is the most hated LinkedIn pattern ("Elon just did X, here's what it means for YOUR business")
-- People scroll past reflexively - the format is strip-mined
+## Usage
 
-**Alternative approach suggested:**
-1. Week 1-2: Manually craft 10 posts with Claude. No automation. Iterate on voice.
-2. Week 3: Analyze what worked. NOW you know what to systematize.
-3. Then build the pipeline.
+### CLI
 
-## What "Taste" Might Actually Mean
+```bash
+# Full pipeline
+python -m src.main
 
-- NOT starting with "🚀 Big news in AI!"
-- NOT the fake-humble "Here's what I learned..."
-- Consistent voice that feels like a person
-- Saying something non-obvious about the news
-- Unexpected structure (slop always follows the same arc)
+# Quick mode (fewer feeds, faster)
+python -m src.main --quick
 
-### Anti-patterns to explicitly ban
-- "Let's dive in"
-- Emoji spam
-- "Here's the thing"
-- The 5-point listicle format
-- Starting with a question you immediately answer
+# Fetch news only (no generation)
+python -m src.main --news-only
 
-## Target Audience (from Partner's Course)
+# Custom settings
+python -m src.main --generators 5 --hours-back 24 --news-index 1
+```
 
-Priority ICPs:
-1. **DIY Attempt Survivor** - tried automation themselves, failed (highest conversion)
-2. **Struggling E-commerce Operator** - drowning in manual tasks (largest market)
+### Streamlit UI
 
-## Practical Considerations
+```bash
+streamlit run src/ui.py
+```
 
-- LinkedIn hunts for coordinated inauthentic behavior - multiple fake accounts = ban risk
-- Safest approach: use my real account, be transparent that it's AI-assisted
-- Could even be the hook: "I build AI tools. This post was written by one. Can you tell?"
+Interactive interface with news browsing, configurable generation, variant explorer, and score breakdowns.
 
-## Open Questions
+### Output
 
-- Can taste be systematized without human-in-the-loop?
-- What's the actual conversion path? Post → engagement → DM → ???
-- Whose account does this live on for the demo?
-- Should partner finish his course first so we know what actually converts before automating?
+Each run saves to `output/runs/{timestamp}/`:
+- `winner.json` / `winner.md` — Best post with scores and reasoning
+- `all_variants.json` — Every generated variant
+- `run_log.json` — Execution stats
+- `news_input.json` — Source article data
 
-## Status
+## Project structure
 
-Not started. Debating whether to do more research or just start generating posts manually first.
+```
+src/
+├── agents/
+│   ├── base_agent.py        # Claude API wrapper with extended thinking
+│   ├── generator_agent.py   # Content variant generation
+│   ├── judge_agent.py       # Scoring and selection
+│   └── orchestrator.py      # Pipeline coordination
+├── config/
+│   ├── settings.py          # Runtime configuration
+│   ├── personas.yaml        # Persona definitions and voice traits
+│   └── creativity.yaml      # Hooks, frameworks, wildcards, angles
+├── creativity/
+│   ├── engine.py            # Randomized creativity context generation
+│   └── anti_slop.py         # Banned words/phrases/patterns validation
+├── news/
+│   ├── fetcher.py           # RSS feed aggregation
+│   ├── filter.py            # Relevance scoring via Sonnet
+│   └── models.py            # Data structures
+├── output/
+│   └── formatter.py         # Multi-format result export
+├── main.py                  # CLI entry point
+└── ui.py                    # Streamlit web interface
+
+data/
+├── examples/                # Few-shot examples per persona
+├── hooks/                   # Hook pattern templates
+└── anti_slop/               # Banned words database
+
+tests/                       # Pytest suite
+```
+
+## Cost
+
+Roughly ~$0.15 per generator (Opus) + ~$0.30 for judging + minor Sonnet costs for filtering. A full run with 7 generators costs approximately $1.30–$1.50.
+
+## Background
+
+This started as a question: can taste in content be systematized? Most AI-generated LinkedIn posts are immediately recognizable — the emoji openers, the "let's dive in," the listicle structure. The anti-slop detection here is based on research showing certain words (delve, tapestry, leverage, etc.) increased 700–1500% in frequency post-ChatGPT.
+
+The multi-agent approach generates diversity (different personas, hooks, frameworks), while the judge agent acts as a taste filter. It's not perfect — the best output still benefits from human editing — but it's a step toward content that doesn't make people reflexively scroll past.

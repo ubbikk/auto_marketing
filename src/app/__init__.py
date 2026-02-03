@@ -1,0 +1,1 @@
+"""AFTA Marketing web application."""

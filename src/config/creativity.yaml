@@ -1,0 +1,164 @@
+# Creativity Engine Configuration
+# Controls randomization, hook selection, framework weights, and mutation settings
+
+creativity_engine:
+  # Mutation settings for prompt variability
+  mutation:
+    enabled: true
+    mutation_rate: 0.3  # 30% of elements get mutated per generation
+
+  # Hook pattern weights (from TASTE_IN_MARKETING.md)
+  # These control which hook pattern each generator uses
+  hook_patterns:
+    contrarian_opening:
+      weight: 0.25
+      description: "Challenge a belief, then explain"
+      templates:
+        - "Everyone says {common_advice}. They're wrong."
+        - "{Conventional wisdom}? Not anymore."
+        - "I stopped {common_practice}. Here's what happened."
+      anti_pattern: "Unpopular opinion: {extremely popular opinion}"
+
+    specificity_hook:
+      weight: 0.20
+      description: "Specific numbers and details feel credible"
+      templates:
+        - "I spent ${amount} on {thing}. Here's what actually worked."
+        - "I reviewed {number} {items}. {N} patterns separated winners."
+        - "{Specific_number}% of {audience} are doing {thing} wrong."
+      anti_pattern: "I've learned SO much about marketing!"
+
+    open_loop:
+      weight: 0.15
+      description: "Start with payoff, make them read for explanation"
+      templates:
+        - "I discovered something about {topic} that changes everything."
+        - "The one thing that separates {winners} from {losers}..."
+        - "This {approach} shouldn't work. But it does."
+      anti_pattern: "Giving away the answer in the hook"
+
+    identity_callout:
+      weight: 0.15
+      description: "Name your audience directly"
+      templates:
+        - "E-commerce operators: stop doing this."
+        - "If you're still {pain_point}, read this."
+        - "DIY automation survivor? Same."
+      anti_pattern: "Addressing 'everyone' or 'people'"
+
+    story_drop:
+      weight: 0.15
+      description: "Start in the middle of action, not context"
+      templates:
+        - "There I was at {time}, {doing_painful_thing}."
+        - "I'd just {failed_at_something} when..."
+        - "The spreadsheet had 2,847 rows. I had 3 hours."
+      anti_pattern: "So I wanted to share something I learned recently..."
+
+    bold_statement:
+      weight: 0.10
+      description: "Make a claim that demands attention"
+      templates:
+        - "{Common_tool} is killing your business."
+        - "You're doing {thing} wrong."
+        - "The best {thing} in e-commerce isn't {obvious_answer}."
+      anti_pattern: "Hedging with 'I think maybe possibly...'"
+
+  # Copywriting frameworks (scaffolding, not templates)
+  frameworks:
+    - name: "PAS"
+      description: "Problem -> Agitate -> Solution"
+      weight: 0.40
+      structure:
+        - "State the problem clearly"
+        - "Agitate: show the pain, make it vivid"
+        - "Present the solution (AFTA's approach)"
+      best_for: "Pain-point focused content, when selling a solution"
+
+    - name: "BAB"
+      description: "Before -> After -> Bridge"
+      weight: 0.30
+      structure:
+        - "Paint the 'before' picture (current pain)"
+        - "Show the 'after' (desired outcome)"
+        - "Bridge: how to get there"
+      best_for: "Transformation stories, showing outcomes"
+
+    - name: "HSO"
+      description: "Hook -> Story -> Offer"
+      weight: 0.30
+      structure:
+        - "Hook: grab attention"
+        - "Story: share experience or insight"
+        - "Offer: what they can do/learn"
+      best_for: "Personal brand content, LinkedIn posts"
+
+  # Few-shot example selection
+  few_shot:
+    num_examples: 2  # 2-3 is optimal per research
+    include_anti_examples: true
+    randomize_selection: true
+
+  # Style reference injection (optional flavor)
+  style_references:
+    enabled: true
+    max_references: 1
+    authors:
+      - name: "Ethan Mollick"
+        style: "Practical AI insights, no hype, specific examples"
+        use_for: ["professional", "ai_meta"]
+
+      - name: "Gary Provost"
+        style: "Sentence rhythm variation - mix short punchy with complex"
+        use_for: ["professional", "witty"]
+
+      - name: "Wendy's Twitter"
+        style: "Sassy, confident, willing to roast"
+        use_for: ["witty"]
+
+      - name: "Dollar Shave Club"
+        style: "Deadpan humor, low production value, confident delivery"
+        use_for: ["witty", "ai_meta"]
+
+  # Wildcard constraints for additional variability
+  wildcards:
+    - "Assume the reader has exactly 10 seconds of attention"
+    - "Write as if slightly annoyed by the obvious"
+    - "Pretend you're writing to someone skeptical of automation"
+    - "Write as if the reader has tried and failed at DIY automation"
+    - "Channel the energy of someone who just saved 10 hours"
+    - "Write like you're revealing an industry secret"
+    - "Assume the reader is smart but busy"
+    - "Write as if this is the only post they'll read today"
+
+  # Content angles from marketing strategy (for news connection)
+  content_angles:
+    diy_automation_trap:
+      weight: 0.30
+      description: "Why DIY automation fails"
+      key_message: "You need business analysis first, not just tools"
+
+    time_drain_reality:
+      weight: 0.25
+      description: "Quantify the time waste"
+      key_message: "Calculate the real cost of manual tasks"
+
+    quick_wins:
+      weight: 0.20
+      description: "Fast results are possible"
+      key_message: "2-4 weeks to production, not months"
+
+    business_analysis_first:
+      weight: 0.10
+      description: "AFTA's differentiator"
+      key_message: "We discover before we build"
+
+    catch_up_and_win:
+      weight: 0.10
+      description: "Competitive urgency"
+      key_message: "Competitors are automating, don't fall behind"
+
+    no_technical_knowledge:
+      weight: 0.05
+      description: "Remove barriers"
+      key_message: "You don't need to understand the tech"

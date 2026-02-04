@@ -174,7 +174,7 @@ gcloud run deploy auto-marketing \
     --allow-unauthenticated \
     --memory 2Gi \
     --cpu 2 \
-    --timeout 300 \
+    --timeout 600 \
     --set-secrets="ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,GOOGLE_API_KEY=GOOGLE_API_KEY:latest,FIRECRAWL_API_KEY=FIRECRAWL_API_KEY:latest" \
     --port 8000 \
     --execution-environment gen2 \

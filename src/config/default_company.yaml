@@ -1,0 +1,38 @@
+# Default company context (AFTA Systems)
+# This is loaded as the default when no custom company is specified
+
+name: "AFTA Systems"
+tagline: "AI Automation for E-commerce"
+core_offering: "Business process discovery + production-ready n8n automation"
+differentiator: "We analyze your business first, then automate. No DIY fumbling."
+
+target_audience:
+  - "DIY Automation Survivors - tried Zapier/Make.com, failed, need expert help"
+  - "Struggling E-commerce Operators - drowning in manual tasks, 3+ hours/day wasted"
+  - "Growing E-commerce Businesses - ready to scale, need infrastructure"
+
+key_services:
+  - "Order processing automation"
+  - "Inventory management"
+  - "Customer support automation"
+  - "Marketing campaign automation"
+
+proof_points:
+  - "2-4 weeks to production"
+  - "No technical knowledge required from client"
+  - "n8n expertise (not generic Zapier)"
+
+pain_points_solved:
+  - "Manual data entry eating time"
+  - "Inventory sync failures"
+  - "Customer response delays"
+  - "Marketing campaign management overhead"
+
+industry_keywords:
+  - "e-commerce"
+  - "automation"
+  - "n8n"
+  - "inventory"
+  - "order processing"
+  - "customer support"
+  - "marketing automation"

@@ -18,6 +18,8 @@ dependencies = [
     "playwright>=1.40.0",
     "Pillow>=10.0.0",
     "numpy>=1.24.0",
+    "litellm>=1.76.0",
+    "firecrawl-py>=0.0.16",
 ]
 
 [project.optional-dependencies]

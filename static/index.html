@@ -464,6 +464,37 @@ section { position: relative; z-index: 1; }
   .results-grid { grid-template-columns: 1fr; }
 }
 
+/* ===== COST TABLE ===== */
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 12px;
+}
+.cost-table th, .cost-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(26,31,60,0.4);
+}
+.cost-table th {
+  color: rgba(232,234,246,0.5);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+.cost-table td {
+  color: rgba(232,234,246,0.7);
+}
+.cost-table tbody tr:hover {
+  background: rgba(0,212,255,0.03);
+}
+.cost-table tfoot td {
+  border-top: 2px solid rgba(0,212,255,0.2);
+  border-bottom: none;
+  color: var(--primary-300);
+}
+
 /* ===== FOOTER ===== */
 footer {
   padding: 48px 0; text-align: center;
@@ -501,24 +532,24 @@ footer a:hover { color: var(--primary-300); }
   <div class="glow-orb glow-orb--cyan" style="width:600px;height:600px;top:-200px;right:-200px;opacity:0.25;"></div>
   <div class="glow-orb glow-orb--purple" style="width:400px;height:400px;bottom:-100px;left:-150px;opacity:0.15;"></div>
 
-  <div class="shell" style="position:relative;z-index:1;">
+  <div class="shell" style="position:relative;z-index:1;text-align:center;">
     <div class="badge anim-fade-up" style="margin-bottom:24px;">
       <span class="badge__dot"></span>
       AI-Powered Content Engine
     </div>
 
-    <h1 class="heading-display anim-fade-up anim-delay-1" style="font-size:clamp(36px,6vw,64px);color:#fff;margin-bottom:20px;max-width:700px;">
+    <h1 class="heading-display anim-fade-up anim-delay-1" style="font-size:clamp(36px,6vw,64px);color:#fff;margin-bottom:20px;max-width:700px;margin-left:auto;margin-right:auto;">
       Create LinkedIn Content That
       <span class="heading-gradient">Stops the Scroll</span>
     </h1>
 
-    <p class="anim-fade-up anim-delay-2" style="font-size:18px;line-height:1.6;color:rgba(232,234,246,0.6);max-width:540px;margin-bottom:40px;">
+    <p class="anim-fade-up anim-delay-2" style="font-size:18px;line-height:1.6;color:rgba(232,234,246,0.6);max-width:540px;margin-bottom:40px;margin-left:auto;margin-right:auto;">
       AI-powered post generation and branded carousel creation.
       Your voice. Your brand. Zero slop.
     </p>
 
     <!-- Video placeholder -->
-    <div class="video-placeholder anim-fade-up anim-delay-3" style="max-width:720px;">
+    <div class="video-placeholder anim-fade-up anim-delay-3" style="max-width:720px;margin-left:auto;margin-right:auto;">
       <div class="video-placeholder__inner">
         <div class="video-placeholder__play">
           <svg width="28" height="28" fill="var(--primary-400)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -554,10 +585,96 @@ footer a:hover { color: var(--primary-300); }
             <p class="form-hint">We'll extract the logo and use it in your carousel slides</p>
           </div>
 
+          <!-- Company Profile -->
+          <div>
+            <label class="form-label">Company Profile</label>
+            <div class="source-toggle" style="margin-bottom:12px;">
+              <button id="company-default-btn" class="source-toggle__btn source-toggle__btn--active" type="button" onclick="setCompanyMode('default')">Use Default (AFTA)</button>
+              <button id="company-custom-btn" class="source-toggle__btn" type="button" onclick="setCompanyMode('custom')">Generate from URL</button>
+            </div>
+
+            <!-- Default company card -->
+            <div id="company-default" class="auto-fetch-card">
+              <div class="auto-fetch-card__icon">
+                <svg width="20" height="20" fill="none" stroke="var(--primary-400)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              </div>
+              <div>
+                <div id="default-company-name" style="font-size:14px;font-weight:600;color:rgba(232,234,246,0.8);margin-bottom:2px;">AFTA Systems</div>
+                <div id="default-company-tagline" style="font-size:12px;color:rgba(232,234,246,0.4);">AI Automation for E-commerce</div>
+              </div>
+            </div>
+
+            <!-- Custom company generator -->
+            <div id="company-custom" class="hidden">
+              <div class="url-input-wrap" style="margin-bottom:12px;">
+                <input id="company-url" type="url" class="form-input" placeholder="https://company-to-generate-for.com">
+                <button id="generate-profile-btn" class="btn-ghost" onclick="generateCompanyProfile()" style="white-space:nowrap;">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  Generate
+                </button>
+              </div>
+
+              <!-- Loading state -->
+              <div id="company-loading" class="hidden auto-fetch-card" style="border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.03);">
+                <div class="auto-fetch-card__icon logo-preview--loading" style="background:rgba(139,92,246,0.1);">
+                  <svg width="20" height="20" fill="none" stroke="var(--electric-purple)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:rgba(232,234,246,0.8);margin-bottom:2px;">Analyzing website...</div>
+                  <div style="font-size:12px;color:rgba(232,234,246,0.4);">Scraping content and generating company profile</div>
+                </div>
+              </div>
+
+              <!-- Generated profile preview -->
+              <div id="company-profile-preview" class="hidden">
+                <div class="card" style="padding:16px;background:linear-gradient(145deg, rgba(139,92,246,0.06) 0%, rgba(13,17,40,0.4) 100%);border:1px solid rgba(139,92,246,0.15);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--electric-purple);flex-shrink:0;">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div style="font-size:11px;font-weight:600;color:rgba(139,92,246,0.7);text-transform:uppercase;letter-spacing:0.05em;">Generated Profile</div>
+                  </div>
+                  <div id="profile-name" style="font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;"></div>
+                  <div id="profile-tagline" style="font-size:13px;color:rgba(232,234,246,0.5);margin-bottom:12px;"></div>
+
+                  <button class="collapsible__trigger" onclick="toggleCollapsible('profile-details')" style="padding:8px 0;">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    View Full Profile
+                  </button>
+                  <div id="profile-details" class="collapsible__body">
+                    <div style="display:flex;flex-direction:column;gap:10px;padding:8px 0;font-size:12px;color:rgba(232,234,246,0.6);">
+                      <div><strong style="color:rgba(232,234,246,0.8);">Core Offering:</strong> <span id="profile-offering"></span></div>
+                      <div><strong style="color:rgba(232,234,246,0.8);">Differentiator:</strong> <span id="profile-diff"></span></div>
+                      <div><strong style="color:rgba(232,234,246,0.8);">Target Audience:</strong> <span id="profile-audience"></span></div>
+                      <div><strong style="color:rgba(232,234,246,0.8);">Key Services:</strong> <span id="profile-services"></span></div>
+                      <div><strong style="color:rgba(232,234,246,0.8);">Proof Points:</strong> <span id="profile-proof"></span></div>
+                      <div><strong style="color:rgba(232,234,246,0.8);">Pain Points Solved:</strong> <span id="profile-pains"></span></div>
+                      <div><strong style="color:rgba(232,234,246,0.8);">Industry Keywords:</strong> <span id="profile-keywords"></span></div>
+                    </div>
+                  </div>
+                  <!-- Generation stats -->
+                  <div id="profile-stats" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(139,92,246,0.15);display:flex;gap:16px;font-size:11px;color:rgba(232,234,246,0.4);">
+                    <span><span style="color:rgba(139,92,246,0.6);">Model:</span> <span id="profile-model"></span></span>
+                    <span><span style="color:rgba(139,92,246,0.6);">Tokens:</span> <span id="profile-tokens"></span></span>
+                    <span><span style="color:rgba(139,92,246,0.6);">Cost:</span> $<span id="profile-cost"></span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="form-hint">Content will be tailored to this company's audience and messaging</p>
+          </div>
+
           <!-- Message -->
           <div>
             <label class="form-label">Message</label>
-            <textarea id="message" class="form-textarea" rows="2" placeholder="What message should be conveyed? Leave empty for auto-summary"></textarea>
+            <textarea id="message" class="form-textarea" rows="2" placeholder="What message should be conveyed? Leave empty to use source summary"></textarea>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+              <input type="checkbox" id="auto-summarize" checked
+                     style="width:16px;height:16px;accent-color:var(--primary-500);cursor:pointer;">
+              <label for="auto-summarize" style="font-size:12px;color:rgba(232,234,246,0.5);cursor:pointer;">
+                Auto-summarize when empty <span style="color:rgba(232,234,246,0.3);">(uses Claude Sonnet to extract key message)</span>
+              </label>
+            </div>
           </div>
 
           <!-- Source -->
@@ -584,6 +701,30 @@ footer a:hover { color: var(--primary-300); }
             <label class="form-label">Choose Your Voice</label>
             <div id="persona-grid" class="persona-grid">
               <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Advanced Settings Row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <!-- Number of Generators -->
+            <div>
+              <label class="form-label">Number of Samples</label>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <input type="range" id="num-generators" min="3" max="10" value="5"
+                       style="flex:1;accent-color:var(--primary-500);height:6px;cursor:pointer;"
+                       oninput="document.getElementById('num-gen-value').textContent = this.value">
+                <span id="num-gen-value" style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--primary-300);min-width:24px;text-align:center;">5</span>
+              </div>
+              <p class="form-hint">More samples = better results, but slower (3-10)</p>
+            </div>
+
+            <!-- Model Selection -->
+            <div>
+              <label class="form-label">Generation Model</label>
+              <select id="generation-model" class="form-input" style="cursor:pointer;">
+                <!-- Populated by JS -->
+              </select>
+              <p class="form-hint">Used for both generation and judging. Note: Gemini falls back to Claude Opus for judging.</p>
             </div>
           </div>
 
@@ -640,10 +781,22 @@ footer a:hover { color: var(--primary-300); }
             <div id="result-post" class="winner-card__content"></div>
           </div>
 
-          <!-- Source info -->
+          <!-- Source info tags -->
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <span id="result-source-title" style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--accent-light);"></span>
+            <span id="result-source-tag" style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--accent-light);"></span>
             <span id="result-persona-name" style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);color:var(--electric-purple);"></span>
+          </div>
+
+          <!-- Source Article Card -->
+          <div id="source-article-card" class="card" style="padding:16px 20px;background:linear-gradient(145deg, rgba(245,158,11,0.06) 0%, rgba(13,17,40,0.4) 100%);border:1px solid rgba(245,158,11,0.15);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--accent-light);flex-shrink:0;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+              </svg>
+              <div style="font-size:11px;font-weight:600;color:rgba(245,158,11,0.7);text-transform:uppercase;letter-spacing:0.05em;">Source Article</div>
+            </div>
+            <div id="result-source-title" style="font-family:var(--font-display);font-size:15px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:8px;"></div>
+            <div id="result-source-summary" style="font-size:13px;line-height:1.5;color:rgba(232,234,246,0.5);"></div>
           </div>
 
           <!-- Score breakdown -->
@@ -694,6 +847,15 @@ footer a:hover { color: var(--primary-300); }
 
       <!-- Stats -->
       <div id="result-stats" style="margin-top:32px;padding:16px 20px;border-radius:12px;background:rgba(13,17,40,0.4);border:1px solid rgba(26,31,60,0.3);display:flex;flex-wrap:wrap;gap:24px;font-size:12px;color:rgba(232,234,246,0.3);"></div>
+
+      <!-- Cost Breakdown -->
+      <div id="cost-breakdown" class="hidden" style="margin-top:16px;">
+        <button class="collapsible__trigger" onclick="toggleCollapsible('cost-details')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          Cost Breakdown
+        </button>
+        <div id="cost-details" class="collapsible__body" style="overflow-x:auto;"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -710,10 +872,16 @@ footer a:hover { color: var(--primary-300); }
 // ===== STATE =====
 let selectedPersona = 'professional';
 let sourceMode = 'auto';
+let companyMode = 'default';
 let personas = [];
+let models = [];
+let selectedModel = 'claude-opus-4-5-20251101';
+let defaultCompanyProfile = null;
+let customCompanyProfile = null;
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
+  // Fetch personas
   try {
     const res = await fetch('/api/personas');
     personas = await res.json();
@@ -728,6 +896,41 @@ document.addEventListener('DOMContentLoaded', async () => {
       { id: 'provocateur', name: 'Provocateur', description: 'Blunt contrarian who challenges industry orthodoxy with data', example_openers: ['Your Zapier setup isn\'t automation. It\'s a Rube Goldberg machine with a monthly fee.'] },
     ];
     renderPersonas();
+  }
+
+  // Fetch models
+  try {
+    const modelsRes = await fetch('/api/models');
+    models = await modelsRes.json();
+    renderModels();
+  } catch (e) {
+    // Fallback models if API not available
+    models = [
+      { id: 'claude-opus-4-5-20251101', name: 'Claude Opus 4.5', provider: 'anthropic' },
+      { id: 'gemini/gemini-3-pro-preview', name: 'Gemini 3 Pro', provider: 'google' },
+    ];
+    renderModels();
+  }
+
+  // Fetch default company profile
+  try {
+    const companyRes = await fetch('/api/default-company');
+    defaultCompanyProfile = await companyRes.json();
+    document.getElementById('default-company-name').textContent = defaultCompanyProfile.name;
+    document.getElementById('default-company-tagline').textContent = defaultCompanyProfile.tagline;
+  } catch (e) {
+    // Fallback if API not available
+    defaultCompanyProfile = {
+      name: 'AFTA Systems',
+      tagline: 'AI Automation for E-commerce',
+      core_offering: 'Business process discovery + production-ready n8n automation',
+      differentiator: 'We analyze your business first, then automate.',
+      target_audience: ['DIY Automation Survivors', 'Struggling E-commerce Operators', 'Growing E-commerce Businesses'],
+      key_services: ['Order processing', 'Inventory management', 'Customer support', 'Marketing automation'],
+      proof_points: ['2-4 weeks to production'],
+      pain_points_solved: ['Manual data entry', 'Inventory sync failures'],
+      industry_keywords: ['e-commerce', 'automation', 'n8n'],
+    };
   }
 });
 
@@ -751,6 +954,15 @@ function selectPersona(id) {
   });
 }
 
+// ===== MODEL RENDERING =====
+function renderModels() {
+  const select = document.getElementById('generation-model');
+  select.innerHTML = models.map(m =>
+    `<option value="${m.id}" ${m.id === selectedModel ? 'selected' : ''}>${m.name}</option>`
+  ).join('');
+  select.addEventListener('change', (e) => { selectedModel = e.target.value; });
+}
+
 // ===== SOURCE TOGGLE =====
 function setSourceMode(mode) {
   sourceMode = mode;
@@ -758,6 +970,72 @@ function setSourceMode(mode) {
   document.getElementById('source-paste-btn').classList.toggle('source-toggle__btn--active', mode === 'paste');
   document.getElementById('source-auto').classList.toggle('hidden', mode !== 'auto');
   document.getElementById('source-paste').classList.toggle('hidden', mode !== 'paste');
+}
+
+// ===== COMPANY PROFILE TOGGLE =====
+function setCompanyMode(mode) {
+  companyMode = mode;
+  document.getElementById('company-default-btn').classList.toggle('source-toggle__btn--active', mode === 'default');
+  document.getElementById('company-custom-btn').classList.toggle('source-toggle__btn--active', mode === 'custom');
+  document.getElementById('company-default').classList.toggle('hidden', mode !== 'default');
+  document.getElementById('company-custom').classList.toggle('hidden', mode !== 'custom');
+}
+
+async function generateCompanyProfile() {
+  const url = document.getElementById('company-url').value.trim();
+  if (!url) {
+    document.getElementById('company-url').focus();
+    document.getElementById('company-url').style.borderColor = 'rgba(236,72,153,0.5)';
+    setTimeout(() => document.getElementById('company-url').style.borderColor = '', 2000);
+    return;
+  }
+
+  // Show loading state
+  document.getElementById('generate-profile-btn').disabled = true;
+  document.getElementById('company-loading').classList.remove('hidden');
+  document.getElementById('company-profile-preview').classList.add('hidden');
+
+  try {
+    const res = await fetch('/api/generate-company-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Failed to generate profile');
+    }
+
+    const data = await res.json();
+    customCompanyProfile = data.profile;
+
+    // Show profile preview - all fields
+    document.getElementById('profile-name').textContent = customCompanyProfile.name;
+    document.getElementById('profile-tagline').textContent = customCompanyProfile.tagline;
+    document.getElementById('profile-offering').textContent = customCompanyProfile.core_offering;
+    document.getElementById('profile-diff').textContent = customCompanyProfile.differentiator;
+    document.getElementById('profile-audience').textContent = customCompanyProfile.target_audience.join(', ');
+    document.getElementById('profile-services').textContent = customCompanyProfile.key_services.join(', ');
+    document.getElementById('profile-proof').textContent = customCompanyProfile.proof_points.join(', ');
+    document.getElementById('profile-pains').textContent = customCompanyProfile.pain_points_solved.join(', ');
+    document.getElementById('profile-keywords').textContent = customCompanyProfile.industry_keywords.join(', ');
+
+    // Show generation stats
+    const modelShort = data.model.split('/').pop().replace('gemini-', '').replace('-preview', '');
+    document.getElementById('profile-model').textContent = modelShort;
+    document.getElementById('profile-tokens').textContent = `${data.input_tokens.toLocaleString()} in / ${data.output_tokens.toLocaleString()} out`;
+    document.getElementById('profile-cost').textContent = data.cost_usd.toFixed(4);
+
+    document.getElementById('company-loading').classList.add('hidden');
+    document.getElementById('company-profile-preview').classList.remove('hidden');
+
+  } catch (e) {
+    alert('Error generating company profile: ' + e.message);
+    document.getElementById('company-loading').classList.add('hidden');
+  } finally {
+    document.getElementById('generate-profile-btn').disabled = false;
+  }
 }
 
 // ===== LOGO PREVIEW =====
@@ -791,15 +1069,24 @@ async function handleGenerate() {
   const sourceText = sourceMode === 'paste'
     ? document.getElementById('source-paste').value.trim() || 'auto'
     : 'auto';
+  const numGenerators = parseInt(document.getElementById('num-generators').value);
+  const generationModel = document.getElementById('generation-model').value;
+  const autoSummarize = document.getElementById('auto-summarize').checked;
 
   const personaName = personas.find(p => p.id === selectedPersona)?.name || selectedPersona;
+  const modelName = models.find(m => m.id === generationModel)?.name || generationModel;
 
   // Show loading
   document.getElementById('form-section').classList.add('hidden');
   document.getElementById('results-section').classList.add('hidden');
   document.getElementById('loading-section').classList.remove('hidden');
-  document.getElementById('loading-persona').textContent = `Using ${personaName} voice`;
+  document.getElementById('loading-persona').textContent = `Using ${personaName} voice with ${modelName} (${numGenerators} samples)`;
   document.getElementById('generate-btn').disabled = true;
+
+  // Determine which company profile to use
+  const companyProfile = companyMode === 'custom' && customCompanyProfile
+    ? customCompanyProfile
+    : null;  // null = use default on server
 
   try {
     const res = await fetch('/api/generate', {
@@ -810,6 +1097,10 @@ async function handleGenerate() {
         message: message,
         source_text: sourceText,
         persona: selectedPersona,
+        num_generators: numGenerators,
+        generation_model: generationModel,
+        auto_summarize: autoSummarize,
+        company_profile: companyProfile,
       }),
     });
 
@@ -842,9 +1133,13 @@ function showResults(data) {
   document.getElementById('result-score').textContent = score;
 
   // Source + persona tags
-  document.getElementById('result-source-title').textContent = data.source_title || 'Source';
+  document.getElementById('result-source-tag').textContent = data.source_title ? 'Auto-fetched' : 'Custom';
   const pName = personas.find(p => p.id === data.persona_used)?.name || data.persona_used;
   document.getElementById('result-persona-name').textContent = pName;
+
+  // Source article card
+  document.getElementById('result-source-title').textContent = data.source_title || 'Custom Source';
+  document.getElementById('result-source-summary').textContent = data.source_summary || '';
 
   // Score breakdown
   if (data.score_breakdown) {
@@ -875,8 +1170,9 @@ function showResults(data) {
     improvements.style.display = 'none';
   }
 
-  // Carousel
-  document.getElementById('carousel-iframe').src = data.carousel_pdf_url;
+  // Carousel - show HTML preview in iframe, PDF download button
+  const carouselPreviewUrl = `/api/carousel/preview/${data.carousel_id}`;
+  document.getElementById('carousel-iframe').src = carouselPreviewUrl;
   document.getElementById('carousel-download').href = data.carousel_pdf_url;
 
   // Variants
@@ -894,12 +1190,73 @@ function showResults(data) {
 
   // Stats bar
   const stats = data.stats || {};
+  const costs = data.costs || {};
+  const modelDisplayName = stats.generation_model
+    ? (models.find(m => m.id === stats.generation_model)?.name || stats.generation_model.split('/').pop())
+    : '—';
+
+  // Format cost with dollar sign
+  const formatCost = (cost) => cost != null ? `$${cost.toFixed(4)}` : '—';
+
   document.getElementById('result-stats').innerHTML = [
+    `Model: ${modelDisplayName}`,
     `Generators: ${stats.total_generators || '—'}`,
     `Total variants: ${stats.total_variants || '—'}`,
     `Slop filtered: ${stats.slop_violations || 0}`,
     `Duration: ${stats.duration_seconds ? stats.duration_seconds.toFixed(1) + 's' : '—'}`,
-  ].map(s => `<span>${s}</span>`).join('');
+    costs.total_cost_usd != null ? `<strong style="color:var(--primary-300);">Total Cost: ${formatCost(costs.total_cost_usd)}</strong>` : '',
+  ].filter(Boolean).map(s => `<span>${s}</span>`).join('');
+
+  // Cost breakdown
+  const costBreakdown = document.getElementById('cost-breakdown');
+  if (costs.steps && Object.keys(costs.steps).length > 0) {
+    costBreakdown.classList.remove('hidden');
+    const stepNames = {
+      'news_filter': 'News Filter',
+      'source_analysis': 'Source Analysis',
+      'auto_summarize': 'Auto-Summarize',
+      'generation': 'Generation',
+      'judge': 'Judge',
+      'carousel': 'Carousel',
+    };
+    const stepRows = Object.entries(costs.steps).map(([name, step]) => `
+      <tr>
+        <td>${stepNames[name] || name}</td>
+        <td>${step.model ? step.model.split('/').pop().split('-').slice(0,2).join('-') : '—'}</td>
+        <td>${step.input_tokens?.toLocaleString() || 0}</td>
+        <td>${step.output_tokens?.toLocaleString() || 0}</td>
+        <td>${step.call_count || 1}</td>
+        <td>${formatCost(step.cost_usd)}</td>
+      </tr>
+    `).join('');
+
+    document.getElementById('cost-details').innerHTML = `
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Model</th>
+            <th>Input</th>
+            <th>Output</th>
+            <th>Calls</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tbody>${stepRows}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2"><strong>Total</strong></td>
+            <td><strong>${costs.total_input_tokens?.toLocaleString() || 0}</strong></td>
+            <td><strong>${costs.total_output_tokens?.toLocaleString() || 0}</strong></td>
+            <td></td>
+            <td><strong>${formatCost(costs.total_cost_usd)}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+  } else {
+    costBreakdown.classList.add('hidden');
+  }
 
   // Scroll to top of results
   document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });

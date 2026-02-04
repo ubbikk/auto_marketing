@@ -20,6 +20,7 @@ dependencies = [
     "numpy>=1.24.0",
     "litellm>=1.76.0",
     "firecrawl-py>=0.0.16",
+    "google-generativeai>=0.3.0",
 ]
 
 [project.optional-dependencies]

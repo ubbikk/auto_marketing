@@ -39,7 +39,15 @@ Uses `pytest-asyncio` with `asyncio_mode = "auto"`.
 
 ## Architecture
 
-**Pipeline**: News Fetch → Sonnet Filter → Parallel Generation (Opus) → Anti-Slop Validation → Judge → Winner
+**Pipeline**: News Fetch → Embedding Pre-Filter → AI Filter → Parallel Generation → Anti-Slop Validation → Judge → Winner
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Parallel Fetch │ ──▶ │ Embedding Filter│ ──▶ │ AI Filter       │ ──▶ │ Generation      │
+│  (news + blogs) │     │ (top K by sim)  │     │ (Gemini Flash)  │     │ (Gemini Pro)    │
+│  ~300 articles  │     │ 300 → 20        │     │ 20 → 5          │     │                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
+```
 
 Key directories:
 - `src/app/` — FastAPI web application (main.py, pipeline.py, scraper.py)
@@ -48,9 +56,10 @@ Key directories:
 - `src/carousel/` — Carousel PDF generation (extractor, renderer, service)
 - `src/config/` — Settings, personas.yaml, creativity.yaml
 - `src/creativity/` — Creativity engine (randomized context) and anti-slop validator
-- `src/news/` — RSS fetcher and relevance filter
+- `src/news/` — RSS fetcher, OPML parser, embedding filter, batch filter
 - `src/output/` — Result formatter (CLI output)
 - `data/` — Few-shot examples, hook templates, banned words list
+- `docs/` — News sources documentation, OPML blog feeds
 - `static/` — Web UI static files (HTML, CSS, JS)
 - `output/runs/` — Timestamped run outputs (gitignored content)
 
@@ -84,9 +93,43 @@ The system supports dynamic company profiles for any website via Firecrawl + Gem
 - `src/company/profile.py` — `CompanyContext` dataclass, `generate_company_profile()` function
 - `src/config/default_company.yaml` — Default AFTA company context
 
+## Embedding Pre-Filter
+
+The system uses an embedding-based pre-filter to efficiently narrow down articles before the expensive AI filter. This allows fetching from many sources (92 blog feeds + 7 news feeds) while keeping costs low.
+
+**How it works:**
+1. Fetches articles from news feeds (48h lookback) and blog feeds (14 days lookback) in parallel
+2. Uses Vertex AI `text-embedding-005` via LiteLLM to embed company profile and all articles
+3. Calculates cosine similarity between company embedding and each article
+4. Keeps top K (default: 20) most relevant articles
+5. Passes filtered articles to Gemini Flash AI filter for final selection
+
+**Configuration** (`src/config/settings.py`):
+```python
+blog_days_back: int = 14              # Days to look back for blog posts
+include_blog_feeds: bool = True       # Enable OPML blog feeds
+embedding_enabled: bool = True        # Enable embedding pre-filter
+embedding_model: str = "vertex_ai/text-embedding-005"
+embedding_top_k: int = 20             # Articles to pass to AI filter
+embedding_batch_size: int = 100       # Max embeddings per API call
+```
+
+**CLI flags:**
+- `--include-blogs` — Include blog feeds from OPML file
+- `--blog-days N` — Days back for blog posts (default: 14)
+- `--no-embedding` — Disable embedding pre-filter
+- `--embedding-top-k N` — Articles to keep after embedding filter (default: 20)
+
+**Files:**
+- `src/news/opml_parser.py` — Parses `docs/hn-popular-blogs-2025.opml` (92 feeds)
+- `src/news/embedding_filter.py` — `EmbeddingPreFilter` class using Vertex AI embeddings
+- `src/news/fetcher.py` — Extended to support dual time windows (news vs blogs)
+
+**Cost:** ~$0.003 per 300 articles (10x cheaper than AI filter alone)
+
 ## Config files that matter
 
-- `src/config/settings.py` — Model names, generator count, lookback hours
+- `src/config/settings.py` — Model names, generator count, lookback hours, embedding settings
 - `src/config/default_company.yaml` — Default company context (AFTA Systems)
 - `src/config/personas.yaml` — Five personas (professional, witty, ai_meta, storyteller, provocateur) with voice traits, anti-patterns, example openers
 - `src/config/creativity.yaml` — Hook patterns (weighted), organic structures (not frameworks), style references with author samples, tone wildcards, structural breaks, content angles

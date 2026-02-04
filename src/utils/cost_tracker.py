@@ -139,6 +139,27 @@ def extract_usage_from_anthropic_response(
     return input_tokens, output_tokens, cost
 
 
+def calculate_embedding_cost(model: str, input_tokens: int) -> float:
+    """Calculate cost for embedding API call.
+
+    Args:
+        model: Embedding model name (e.g., "text-embedding-004")
+        input_tokens: Number of input tokens
+
+    Returns:
+        Cost in USD
+    """
+    # Gemini embedding pricing (as of 2024)
+    # text-embedding-004: $0.00001 per 1K input tokens ($0.01 per 1M tokens)
+    EMBEDDING_PRICES = {
+        "text-embedding-004": 0.00001,
+        "text-embedding-005": 0.00001,
+    }
+
+    price_per_1k = EMBEDDING_PRICES.get(model, 0.00001)
+    return (input_tokens / 1000) * price_per_1k
+
+
 def extract_usage_from_litellm_response(response: Any) -> tuple[int, int, float]:
     """Extract tokens and cost from LiteLLM response object.
 

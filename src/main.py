@@ -23,7 +23,9 @@ import anthropic
 from .agents.orchestrator import Orchestrator
 from .config.settings import settings
 from .news.fetcher import NewsFetcher
-from .news.filter import NewsFilter
+from .news.batch_filter import BatchNewsFilter
+from .news.embedding_filter import EmbeddingPreFilter
+from .company.profile import load_default_context
 from .output.formatter import OutputFormatter
 
 
@@ -66,6 +68,33 @@ def parse_args() -> argparse.Namespace:
         help=f"Hours back to fetch news (default: {settings.news_hours_back})",
     )
 
+    parser.add_argument(
+        "--blog-days",
+        type=int,
+        default=settings.blog_days_back,
+        help=f"Days back for blog posts (default: {settings.blog_days_back})",
+    )
+
+    parser.add_argument(
+        "--include-blogs",
+        action="store_true",
+        default=settings.include_blog_feeds,
+        help="Include blog feeds from OPML file",
+    )
+
+    parser.add_argument(
+        "--no-embedding",
+        action="store_true",
+        help="Disable embedding pre-filter",
+    )
+
+    parser.add_argument(
+        "--embedding-top-k",
+        type=int,
+        default=settings.embedding_top_k,
+        help=f"Articles to keep after embedding filter (default: {settings.embedding_top_k})",
+    )
+
     return parser.parse_args()
 
 
@@ -75,19 +104,34 @@ async def fetch_news(args: argparse.Namespace, client: anthropic.Anthropic) -> l
 
     fetcher = NewsFetcher(
         hours_back=args.hours_back,
+        blog_days_back=args.blog_days,
         quick_mode=args.quick,
+        include_blogs=args.include_blogs,
     )
 
     articles = await fetcher.fetch_all()
-    print(f"   Found {len(articles)} articles from last {args.hours_back} hours")
+    print(f"   Found {len(articles)} articles from last {args.hours_back} hours (news) / {args.blog_days} days (blogs)")
 
     if not articles:
-        print("   No articles found. Try increasing --hours-back")
+        print("   No articles found. Try increasing --hours-back or --blog-days")
         return []
 
-    print("\n🔍 Filtering for relevance...")
-    news_filter = NewsFilter(client)
-    filtered = await news_filter.filter_articles(articles, max_results=5)
+    # Embedding pre-filter (if enabled and enough articles)
+    if not args.no_embedding and len(articles) > args.embedding_top_k:
+        print(f"\n🔮 Embedding pre-filter: {len(articles)} -> top {args.embedding_top_k}...")
+        company_context = load_default_context()
+        embedding_filter = EmbeddingPreFilter(
+            model=settings.embedding_model,
+            top_k=args.embedding_top_k,
+        )
+        embedding_result = await embedding_filter.filter_articles(articles, company_context)
+        articles = embedding_result.articles
+        print(f"   Pre-filtered to {len(articles)} articles (cost: ${embedding_result.cost_usd:.4f})")
+
+    print("\n🔍 AI filtering for relevance...")
+    news_filter = BatchNewsFilter()
+    filter_result = await news_filter.filter_articles(articles, max_results=5)
+    filtered = filter_result.articles
 
     print(f"   {len(filtered)} relevant articles found\n")
 

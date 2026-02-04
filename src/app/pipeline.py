@@ -24,8 +24,10 @@ from ..creativity.anti_slop import AntiSlopValidator
 from ..creativity.engine import CreativityEngine
 from ..news.fetcher import NewsFetcher
 from ..news.batch_filter import BatchNewsFilter
+from ..news.embedding_filter import EmbeddingPreFilter
 from ..utils.cost_tracker import PipelineCosts, calculate_cost
 from ..company.profile import CompanyContext, load_default_context
+from ..config.settings import settings
 from .scraper import WebsiteMetadata, scrape_website_metadata
 
 _PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -167,6 +169,12 @@ class AutoSourceResult:
     filter_input_tokens: int = 0
     filter_output_tokens: int = 0
     filter_model: str = ""
+    # Embedding pre-filter stats
+    embedding_input_tokens: int = 0
+    embedding_model: str = ""
+    embedding_cost_usd: float = 0.0
+    total_articles_fetched: int = 0
+    articles_after_embedding: int = 0
 
 
 async def fetch_auto_source(
@@ -179,11 +187,21 @@ async def fetch_auto_source(
         client: Anthropic client (unused but kept for API consistency)
         company_context: Company context for relevance filtering (default: AFTA)
     """
+    # Load default company context if not provided
+    if company_context is None:
+        company_context = load_default_context()
+
+    # Step 1: Fetch all articles (news + blogs if enabled)
     t0 = time.time()
-    logger.info("[NEWS] Fetching RSS feeds...")
-    fetcher = NewsFetcher(quick_mode=True)
+    logger.info("[NEWS] Fetching RSS feeds (include_blogs=%s)...", settings.include_blog_feeds)
+    fetcher = NewsFetcher(
+        quick_mode=False,
+        include_blogs=settings.include_blog_feeds,
+        blog_days_back=settings.blog_days_back,
+    )
     articles = await fetcher.fetch_all()
-    logger.info("[NEWS] Fetched %d articles in %.1fs", len(articles), time.time() - t0)
+    total_fetched = len(articles)
+    logger.info("[NEWS] Fetched %d articles in %.1fs", total_fetched, time.time() - t0)
 
     if not articles:
         return AutoSourceResult(
@@ -197,12 +215,46 @@ async def fetch_auto_source(
             )
         )
 
-    # Use batch filter to pick the most relevant article (single API call via Gemini Flash)
-    t1 = time.time()
-    logger.info("[NEWS] Batch filtering %d articles with Gemini Flash...", len(articles))
+    # Step 2: Embedding pre-filter (if enabled and enough articles)
+    embedding_input_tokens = 0
+    embedding_model = ""
+    embedding_cost_usd = 0.0
+    articles_after_embedding = len(articles)
+
+    if settings.embedding_enabled and len(articles) > settings.embedding_top_k:
+        t1 = time.time()
+        logger.info(
+            "[EMBEDDING] Pre-filtering %d articles to top %d...",
+            len(articles),
+            settings.embedding_top_k,
+        )
+        embedding_filter = EmbeddingPreFilter(
+            model=settings.embedding_model,
+            top_k=settings.embedding_top_k,
+            batch_size=settings.embedding_batch_size,
+        )
+        embedding_result = await embedding_filter.filter_articles(articles, company_context)
+        articles = embedding_result.articles
+        embedding_input_tokens = embedding_result.input_tokens
+        embedding_model = embedding_result.model
+        embedding_cost_usd = embedding_result.cost_usd
+        articles_after_embedding = len(articles)
+        logger.info(
+            "[EMBEDDING] Done in %.1fs — %d articles remaining",
+            time.time() - t1,
+            len(articles),
+        )
+
+    # Step 3: AI filter (Gemini Flash) to pick the most relevant article
+    t2 = time.time()
+    logger.info("[NEWS] AI filtering %d articles with Gemini Flash...", len(articles))
     news_filter = BatchNewsFilter(company_context=company_context)
     filter_result = await news_filter.filter_articles(articles, max_results=1)
-    logger.info("[NEWS] Filtered to %d articles in %.1fs", len(filter_result.articles), time.time() - t1)
+    logger.info(
+        "[NEWS] Filtered to %d articles in %.1fs",
+        len(filter_result.articles),
+        time.time() - t2,
+    )
 
     if filter_result.articles:
         item = filter_result.articles[0]
@@ -218,6 +270,11 @@ async def fetch_auto_source(
             filter_input_tokens=filter_result.input_tokens,
             filter_output_tokens=filter_result.output_tokens,
             filter_model=filter_result.model,
+            embedding_input_tokens=embedding_input_tokens,
+            embedding_model=embedding_model,
+            embedding_cost_usd=embedding_cost_usd,
+            total_articles_fetched=total_fetched,
+            articles_after_embedding=articles_after_embedding,
         )
 
     # Fallback to first article without filtering
@@ -234,6 +291,11 @@ async def fetch_auto_source(
         filter_input_tokens=filter_result.input_tokens,
         filter_output_tokens=filter_result.output_tokens,
         filter_model=filter_result.model,
+        embedding_input_tokens=embedding_input_tokens,
+        embedding_model=embedding_model,
+        embedding_cost_usd=embedding_cost_usd,
+        total_articles_fetched=total_fetched,
+        articles_after_embedding=articles_after_embedding,
     )
 
 
@@ -286,6 +348,15 @@ async def run_pipeline(
     if source_text.strip().lower() == "auto":
         auto_result = await fetch_auto_source(client, company_context=company_context)
         source = auto_result.content
+        # Track embedding pre-filter costs
+        if auto_result.embedding_model:
+            costs.add_usage(
+                "embedding_prefilter",
+                auto_result.embedding_model,
+                auto_result.embedding_input_tokens,
+                0,  # No output tokens for embeddings
+                auto_result.embedding_cost_usd,
+            )
         # Track news filter costs
         if auto_result.filter_model:
             cost = calculate_cost(

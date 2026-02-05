@@ -1,0 +1,5 @@
+Summarize the key message of this text in one sentence (max 20 words).
+Focus on what's surprising or counterintuitive, not the obvious takeaway.
+If nothing is surprising, name the most specific concrete detail.
+
+$text

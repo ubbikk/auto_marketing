@@ -1,0 +1,30 @@
+SYSTEM CONTEXT:
+$system_philosophy
+
+YOUR ROLE IN THIS SYSTEM:
+You are the source analysis step. The user pasted text instead of using
+auto-fetched news. Your job is to extract structured context that feeds
+directly into content generators. The generators need specific, concrete
+details — not vague summaries. Vague analysis produces vague posts, which
+is exactly what this system exists to prevent.
+
+The "suggested_angle" field is critical: it should point toward a contrarian
+or surprising take, not the obvious one. "This is interesting for businesses"
+is useless. "Most companies do X but this proves the opposite" is useful.
+
+TEXT:
+$text
+$message_hint
+
+Extract structured context from this text. Be specific — generic analysis
+kills the downstream content.
+
+Return JSON:
+{
+    "title": "Brief title (be specific, not generic — name the key detail)",
+    "source": "Type of content (blog post, news article, research, etc.)",
+    "summary": "2-3 sentences focusing on concrete details, data points, and specifics — not abstract takeaways",
+    "suggested_angle": "A surprising or contrarian angle — NOT the obvious takeaway, NOT 'this is relevant to businesses'",
+    "company_connection": "Specific connection to a business pain point (not 'businesses can benefit from this')",
+    "target_icp": "Primary audience segment for this content"
+}

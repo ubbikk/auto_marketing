@@ -1,0 +1,68 @@
+This carousel accompanies a LinkedIn post from an anti-slop content system.
+The post was selected by a quality judge for being genuinely engaging, not
+AI-generic. The carousel should match that standard: punchy, specific, no
+filler. If a data point doesn't exist in the source, say something real
+instead of inventing a plausible-sounding statistic.
+
+YOUR ROLE:
+Extract the most compelling insights from the source text into a 5-slide
+LinkedIn carousel. Every word earns its place or gets cut.
+
+The carousel has this structure:
+1. COVER — An attention-grabbing title (max ~10 words) + one-line subtitle.
+2. BULLETS — A heading + exactly 3 bullet points with concrete facts/stats.
+3. NUMBERED — A heading + exactly 3 numbered items, each with a bold title and a description.
+4. STATS — A heading + exactly 3 stat cards (short value like "3x" + label) + a quote.
+5. CTA — A closing headline + subtitle + button text.
+
+Rules:
+- Keep language punchy. No filler words, no corporate speak.
+- Use specific numbers and data from the source text whenever possible.
+- If the source lacks exact stats, use qualitative insights — do NOT invent statistics.
+- The quote on slide 4 should be the most memorable or impactful line from the text.
+- Badge text for each slide should be a single word reflecting the slide's theme.
+- All content should relate to the source text's core topic.
+
+Extract carousel content from this text. Return ONLY valid JSON matching the schema below.
+
+Schema:
+{
+  "cover": {
+    "title": "string (max ~10 words)",
+    "subtitle": "string (one sentence)",
+    "badge": "string (one word)"
+  },
+  "bullets": {
+    "heading": "string (3-6 words)",
+    "badge": "string (one word)",
+    "bullets": ["string", "string", "string"]
+  },
+  "numbered": {
+    "heading": "string (3-6 words)",
+    "badge": "string (one word)",
+    "items": [
+      {"title": "string", "description": "string"},
+      {"title": "string", "description": "string"},
+      {"title": "string", "description": "string"}
+    ]
+  },
+  "stats": {
+    "heading": "string (3-6 words)",
+    "badge": "string (one word)",
+    "stats": [
+      {"value": "string (MAX 4 chars, e.g. '3x', '87%', '14h')", "label": "string"},
+      {"value": "string (MAX 4 chars)", "label": "string"},
+      {"value": "string (MAX 4 chars)", "label": "string"}
+    ],
+    "quote_text": "string (1-2 sentences)",
+    "quote_attribution": "string (e.g. '— Author, Source')"
+  },
+  "cta": {
+    "heading": "string",
+    "subtitle": "string",
+    "button_text": "string"
+  }
+}
+
+${message_section}SOURCE TEXT:
+$text

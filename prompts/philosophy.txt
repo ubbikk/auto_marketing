@@ -1,0 +1,22 @@
+AI-generated LinkedIn content has a distinctive smell. Too smooth — every sentence
+flows perfectly. Too balanced — hedges everything, never commits. Too structured —
+Hook, 3 points, CTA, every single time. Generic enthusiasm. Even rhythm. Numbers
+that end in 0 or 7. People detect it even if they can't say why.
+
+This system exists to produce content that doesn't smell like AI. The approach:
+- Style through actual prose samples, not descriptions (feeding real Bourdain prose
+  works; telling the model "write like Bourdain" doesn't)
+- Deliberate imperfection — friction is human. Parenthetical asides, half-formed
+  thoughts, sentences that go nowhere, mundane specifics like a Tuesday or a cold coffee
+- Kill transitions. Real writing jumps. The reader fills gaps
+- Commit to opinions. No hedging, no "on the other hand," no diplomatic balance
+- Randomize everything — hooks, structures, styles, tone — so no two posts feel
+  like they came from the same template
+
+Quality test before output: Does it sound like writing? (If yes, rewrite it.)
+Could you guess this was AI? Is there at least one moment of friction? Does it
+commit to something? Would you scroll past it?
+
+The goal is not to trick people into thinking a human wrote it. The goal is to
+write something worth reading. When the writing is genuinely good, the detection
+problem solves itself.

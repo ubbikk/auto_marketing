@@ -50,8 +50,10 @@ Uses `pytest-asyncio` with `asyncio_mode = "auto"`.
 ```
 
 Key directories:
+- `prompts/` — All AI prompt templates (string.Template `$variable` syntax), loaded by `src/prompts/loader.py`
 - `src/app/` — FastAPI web application (main.py, pipeline.py, scraper.py)
-- `src/agents/` — Base agent, generator, judge, orchestrator
+- `src/agents/` — Base agent, generator, judge, orchestrator, shared prompt helpers
+- `src/prompts/` — Prompt template loader (`render()` function)
 - `src/company/` — Company profile generation (Firecrawl + Gemini AI)
 - `src/carousel/` — Carousel PDF generation (extractor, renderer, service)
 - `src/config/` — Settings, personas.yaml, creativity.yaml
@@ -62,6 +64,10 @@ Key directories:
 - `docs/` — News sources documentation, OPML blog feeds
 - `static/` — Web UI static files (HTML, CSS, JS)
 - `output/runs/` — Timestamped run outputs (gitignored content)
+
+## Philosophy
+
+See [Project Philosophy: Anti-Slop Content Generation](Project%20Philosophy-%20Anti-Slop%20Content%20Generation.md) for the design principles behind persona selection, style injection via author samples, deliberate polish-breaking, and the anti-slop ruleset.
 
 ## Key conventions
 
@@ -161,6 +167,33 @@ echo $CLOUDSDK_ACTIVE_CONFIG_NAME  # should be "personal"
 gcloud config get-value project    # should be gen-lang-client-0463729029
 ```
 
+## Authentication
+
+The web UI requires Firebase Authentication (Google OAuth). Uses the same Firebase project as book_trailer.
+
+**Firebase Project:** `gen-lang-client-04637290-cffaa`
+**Auth Domain:** `gen-lang-client-04637290-cffaa.firebaseapp.com`
+
+**Protected endpoints** (require login):
+- `POST /api/generate` — Content generation
+- `POST /api/generate-company-profile` — Company profile generation
+- `GET /api/carousel/download/{id}` — Carousel PDF download
+- `GET /api/carousel/preview/{id}` — Carousel HTML preview
+
+**Public endpoints:**
+- `GET /` — Landing page
+- `GET /api/personas` — Persona list
+- `GET /api/models` — Model list
+- `GET /api/default-company` — Default company profile
+- `GET /api/auth/config` — Firebase config for frontend
+- `GET /api/auth/me` — Current user info
+- `POST /api/auth/firebase` — Firebase token verification
+- `POST /api/auth/logout` — Logout
+
+**Files:**
+- `src/app/auth/` — Auth module (firebase.py, firestore.py, dependencies.py)
+- User data stored in Firestore collection `auto_marketing_users`
+
 ## Cloud Run Deployment
 
 **Live URL:** https://auto-marketing-345011742806.us-central1.run.app
@@ -175,7 +208,8 @@ gcloud run deploy auto-marketing \
     --memory 2Gi \
     --cpu 2 \
     --timeout 600 \
-    --set-secrets="ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,GOOGLE_API_KEY=GOOGLE_API_KEY:latest,FIRECRAWL_API_KEY=FIRECRAWL_API_KEY:latest" \
+    --set-secrets="ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,GOOGLE_API_KEY=GOOGLE_API_KEY:latest,FIRECRAWL_API_KEY=FIRECRAWL_API_KEY:latest,SECRET_KEY=AUTO_MARKETING_SECRET_KEY:latest" \
+    --set-env-vars="GOOGLE_CLOUD_PROJECT=gen-lang-client-0463729029,FIREBASE_PROJECT_ID=gen-lang-client-04637290-cffaa,FIREBASE_API_KEY=AIzaSyBZZNu8Q2ngLxw37e8yraZcCw3_weSHqHw,FIREBASE_AUTH_DOMAIN=gen-lang-client-04637290-cffaa.firebaseapp.com" \
     --port 8000 \
     --execution-environment gen2 \
     --no-cpu-throttling

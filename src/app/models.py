@@ -61,7 +61,7 @@ class GenerateRequest(BaseModel):
     source_text: str = "auto"
     persona: str = "professional"
     num_generators: int = 5
-    generation_model: str = "claude-opus-4-5-20251101"
+    generation_model: str = "gemini/gemini-3-pro-preview"
     auto_summarize: bool = True
     company_profile: Optional[CompanyProfile] = None
 
@@ -136,3 +136,29 @@ class ModelInfo(BaseModel):
     id: str
     name: str
     provider: str
+
+
+# Auth Models
+
+
+class FirebaseAuthRequest(BaseModel):
+    """Request body for Firebase authentication."""
+
+    idToken: str
+
+
+class AuthResponse(BaseModel):
+    """Response for authentication endpoints."""
+
+    success: bool
+    redirect: Optional[str] = None
+    error: Optional[str] = None
+    user: Optional[dict] = None
+
+
+class UserInfo(BaseModel):
+    """User info for authenticated responses."""
+
+    name: str
+    email: str
+    photo_url: Optional[str] = None

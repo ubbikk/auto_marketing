@@ -14,17 +14,21 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 
+import os
 import uvicorn
 import yaml
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
 from .models import (
+    AuthResponse,
     CompanyProfile,
     CompanyProfileRequest,
     CompanyProfileResponse,
     CostBreakdown,
+    FirebaseAuthRequest,
     GenerateRequest,
     GenerateResponse,
     LogoPreview,
@@ -33,6 +37,14 @@ from .models import (
     ScoreData,
     StepCostData,
     VariantData,
+)
+from .auth import (
+    verify_firebase_token,
+    get_provider_from_token,
+    get_firestore,
+    User,
+    get_current_user,
+    require_auth,
 )
 from .pipeline import run_pipeline
 from .scraper import scrape_website_metadata
@@ -53,11 +65,118 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="AFTA Marketing for LinkedIn")
 
+# Session middleware for authentication
+# Detect Cloud Run production environment
+_is_production = os.getenv("K_SERVICE") is not None
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.secret_key,
+    session_cookie="auto_marketing_session",
+    max_age=30 * 24 * 60 * 60,  # 30 days
+    same_site="lax",
+    https_only=_is_production,
+)
+
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint for Cloud Run."""
     return {"status": "healthy"}
+
+
+# ============================================================================
+# Authentication Endpoints
+# ============================================================================
+
+
+@app.get("/api/auth/config")
+async def get_auth_config():
+    """Return Firebase config for frontend initialization."""
+    return {
+        "apiKey": settings.firebase_api_key,
+        "authDomain": settings.firebase_auth_domain,
+        "projectId": settings.firebase_project_id,
+    }
+
+
+@app.post("/api/auth/firebase", response_model=AuthResponse)
+async def firebase_auth(request: Request, auth_request: FirebaseAuthRequest):
+    """Authenticate with Firebase ID token."""
+    decoded = verify_firebase_token(auth_request.idToken)
+    if not decoded:
+        return AuthResponse(success=False, error="Invalid or expired token")
+
+    firestore = get_firestore()
+    if not firestore:
+        return AuthResponse(success=False, error="Service unavailable")
+
+    firebase_uid = decoded['uid']
+    email = decoded.get('email', '')
+    name = decoded.get('name')
+    picture = decoded.get('picture')
+    provider = get_provider_from_token(decoded)
+
+    # Get or create user
+    user_data = firestore.get_user_by_firebase_uid(firebase_uid)
+    if user_data:
+        firestore.update_user_login(user_data['id'], picture)
+    else:
+        user_data = firestore.create_user(
+            firebase_uid=firebase_uid,
+            email=email,
+            display_name=name,
+            photo_url=picture,
+            auth_provider=provider
+        )
+
+    # Store in session
+    request.session['user'] = {
+        'id': user_data['id'],
+        'firebase_uid': firebase_uid,
+        'email': email,
+        'display_name': user_data.get('display_name', email.split('@')[0]),
+        'photo_url': picture,
+        'auth_provider': provider
+    }
+
+    logger.info("User logged in: %s (%s)", email, provider)
+
+    return AuthResponse(
+        success=True,
+        redirect="/",
+        user={
+            "name": user_data.get('display_name'),
+            "email": email,
+            "photo_url": picture
+        }
+    )
+
+
+@app.get("/api/auth/me")
+async def get_me(user: User | None = Depends(get_current_user)):
+    """Get current user info."""
+    if not user:
+        return {"authenticated": False}
+    return {
+        "authenticated": True,
+        "user": {
+            "name": user.display_name,
+            "email": user.email,
+            "photo_url": user.photo_url
+        }
+    }
+
+
+@app.post("/api/auth/logout")
+async def logout(request: Request):
+    """Log out current user."""
+    request.session.clear()
+    return {"success": True}
+
+
+# ============================================================================
+# Public Endpoints
+# ============================================================================
 
 
 @app.get("/")
@@ -117,9 +236,12 @@ async def get_default_company():
 
 
 @app.post("/api/generate-company-profile", response_model=CompanyProfileResponse)
-async def generate_profile(request: CompanyProfileRequest):
+async def generate_profile(
+    request: CompanyProfileRequest,
+    user: User = Depends(require_auth)
+):
     """Generate a company profile from a website URL using Firecrawl + AI."""
-    logger.info("Generating company profile from URL: %s", request.url)
+    logger.info("Generating company profile from URL: %s (user: %s)", request.url, user.email)
     try:
         result = await generate_company_profile(request.url)
 
@@ -155,8 +277,9 @@ async def generate_profile(request: CompanyProfileRequest):
 
 
 @app.post("/api/generate", response_model=GenerateResponse)
-async def generate(request: GenerateRequest):
+async def generate(request: GenerateRequest, user: User = Depends(require_auth)):
     """Run the full generation pipeline."""
+    logger.info("Generation requested by user: %s", user.email)
     # Convert company_profile to CompanyContext if provided
     company_context = None
     if request.company_profile:
@@ -273,7 +396,7 @@ async def generate(request: GenerateRequest):
 
 
 @app.get("/api/carousel/download/{carousel_id}")
-async def download_carousel_pdf(carousel_id: str):
+async def download_carousel_pdf(carousel_id: str, user: User = Depends(require_auth)):
     """Generate and serve carousel PDF on-demand."""
     from ..carousel.service import render_carousel_pdf
 
@@ -299,7 +422,7 @@ async def download_carousel_pdf(carousel_id: str):
 
 
 @app.get("/api/carousel/preview/{carousel_id}")
-async def preview_carousel_html(carousel_id: str):
+async def preview_carousel_html(carousel_id: str, user: User = Depends(require_auth)):
     """Serve carousel HTML for preview with scaling and navigation."""
     from fastapi.responses import HTMLResponse
 

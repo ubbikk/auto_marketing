@@ -19,6 +19,12 @@ class Settings(BaseSettings):
     vertexai_project: str = os.getenv("VERTEXAI_PROJECT", "")
     vertexai_location: str = os.getenv("VERTEXAI_LOCATION", "us-central1")
 
+    # Firebase Authentication
+    firebase_project_id: str = os.getenv("FIREBASE_PROJECT_ID", "")
+    firebase_api_key: str = os.getenv("FIREBASE_API_KEY", "")
+    firebase_auth_domain: str = os.getenv("FIREBASE_AUTH_DOMAIN", "")
+    secret_key: str = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
+
     # Model Configuration
     model_id: str = "claude-opus-4-5-20251101"
     effort_level: str = "high"  # high for maximum quality

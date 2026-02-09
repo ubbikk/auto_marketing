@@ -278,6 +278,7 @@ section { position: relative; z-index: 1; }
 }
 .stat-card__value {
   font-family: var(--font-display); font-size: 28px; font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
   background: linear-gradient(135deg, var(--primary-300) 0%, var(--primary-400) 50%, var(--accent) 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
@@ -322,6 +323,7 @@ section { position: relative; z-index: 1; }
   width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-size: 18px; font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
   background: linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(139,92,246,0.1) 100%);
   border: 2px solid rgba(0,212,255,0.3);
   color: var(--primary-300);
@@ -495,6 +497,47 @@ section { position: relative; z-index: 1; }
   color: var(--primary-300);
 }
 
+/* ===== TIMING TABLE ===== */
+.timing-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-700) 100%);
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+.timing-bar--slow {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--electric-pink) 100%);
+}
+.timing-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 12px;
+}
+.timing-table th, .timing-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(26,31,60,0.4);
+}
+.timing-table th {
+  color: rgba(232,234,246,0.5);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+.timing-table td {
+  color: rgba(232,234,246,0.7);
+}
+.timing-table tbody tr:hover {
+  background: rgba(0,212,255,0.03);
+}
+.timing-table tfoot td {
+  border-top: 2px solid rgba(0,212,255,0.2);
+  border-bottom: none;
+  color: var(--primary-300);
+}
+
 /* ===== FOOTER ===== */
 footer {
   padding: 48px 0; text-align: center;
@@ -505,7 +548,365 @@ footer a {
   transition: color 0.2s;
 }
 footer a:hover { color: var(--primary-300); }
+
+/* ===== RESULTS SECTIONS ===== */
+.results-section-flow {
+  display: flex; flex-direction: column; gap: 24px;
+}
+
+.result-section {
+  position: relative;
+}
+
+.result-section__label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; color: rgba(232,234,246,0.35);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.result-section__label::before {
+  content: '';
+  width: 3px; height: 12px;
+  background: linear-gradient(180deg, var(--primary-500) 0%, var(--primary-700) 100%);
+  border-radius: 2px;
+}
+
+/* ===== CAROUSEL PREVIEW (larger) ===== */
+.carousel-preview-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.carousel-preview-container {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  background: var(--surface-muted);
+  border: 1px solid var(--surface-border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-preview-container:hover {
+  border-color: rgba(0,212,255,0.3);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 40px rgba(0,212,255,0.1);
+}
+
+.carousel-preview-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(6,9,24,0.6);
+  opacity: 0; transition: opacity 0.3s;
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+.carousel-preview-container:hover + .carousel-preview-overlay,
+.carousel-preview-wrap:hover .carousel-preview-overlay {
+  opacity: 1;
+}
+
+.expand-hint {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: 999px;
+  background: rgba(0,212,255,0.15);
+  border: 1px solid rgba(0,212,255,0.3);
+  color: var(--primary-300);
+  font-size: 13px; font-weight: 600;
+}
+
+/* ===== CAROUSEL MODAL ===== */
+.carousel-modal {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(6, 9, 24, 0.97);
+  backdrop-filter: blur(24px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.carousel-modal--open {
+  opacity: 1; visibility: visible;
+}
+
+.carousel-modal__header {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 32px;
+}
+
+.carousel-modal__close {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(232,234,246,0.7);
+  cursor: pointer; transition: all 0.2s;
+}
+
+.carousel-modal__close:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.carousel-modal__content {
+  display: flex; align-items: center; gap: 24px;
+  max-width: 90vw; max-height: 80vh;
+}
+
+.carousel-modal__nav {
+  display: flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(232,234,246,0.7);
+  cursor: pointer; transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.carousel-modal__nav:hover {
+  background: rgba(0,212,255,0.15);
+  border-color: rgba(0,212,255,0.3);
+  color: var(--primary-300);
+}
+
+.carousel-modal__nav:disabled {
+  opacity: 0.3; cursor: not-allowed;
+}
+
+.carousel-modal__slide-wrap {
+  width: min(70vw, 600px);
+  aspect-ratio: 1;
+  border-radius: 20px;
+  background: var(--surface-muted);
+  border: 1px solid var(--surface-border);
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+
+.carousel-modal__slide-wrap iframe {
+  width: 100%; height: 100%; border: none;
+}
+
+.carousel-modal__dots {
+  display: flex; gap: 10px;
+  margin-top: 24px;
+}
+
+.carousel-modal__dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: none; cursor: pointer;
+  transition: all 0.2s;
+}
+
+.carousel-modal__dot--active {
+  background: var(--primary-500);
+  box-shadow: 0 0 12px rgba(0,212,255,0.5);
+}
+
+.carousel-modal__dot:hover:not(.carousel-modal__dot--active) {
+  background: rgba(255,255,255,0.4);
+}
+
+/* ===== VARIANTS GRID ===== */
+.variants-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .variants-grid { grid-template-columns: 1fr; }
+}
+
+.variant-card--full {
+  position: relative;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(26,31,60,0.5);
+  background: linear-gradient(145deg, rgba(13,17,40,0.6) 0%, rgba(6,9,24,0.8) 100%);
+  transition: all 0.3s ease;
+}
+
+.variant-card--full:hover {
+  border-color: rgba(0,212,255,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.variant-card__header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; margin-bottom: 12px;
+}
+
+.variant-card__number {
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 700;
+  color: rgba(0,212,255,0.5);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.15);
+}
+
+.variant-card__copy {
+  display: flex; align-items: center; gap: 4px;
+  padding: 6px 12px; border-radius: 6px;
+  border: 1px solid rgba(26,31,60,0.6);
+  background: rgba(13,17,40,0.5);
+  color: rgba(232,234,246,0.5);
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.variant-card__copy:hover {
+  border-color: rgba(0,212,255,0.3);
+  color: var(--primary-300);
+}
+
+.variant-card__copy--copied {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.variant-card__content {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(232,234,246,0.75);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.variant-card__content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.variant-card__content::-webkit-scrollbar-thumb {
+  background: rgba(0,212,255,0.2);
+  border-radius: 2px;
+}
+
+.variant-card__footer {
+  display: flex; gap: 8px; margin-top: 14px;
+  padding-top: 14px; border-top: 1px solid rgba(26,31,60,0.4);
+  flex-wrap: wrap;
+}
+
+/* ===== CAROUSEL CARD IN FLOW ===== */
+.carousel-section-card {
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid rgba(26,31,60,0.5);
+  background: linear-gradient(145deg, rgba(13,17,40,0.6) 0%, rgba(6,9,24,0.8) 100%);
+}
+
+.carousel-section__header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+
+.carousel-section__title {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 18px;
+  color: #fff;
+}
+
+.carousel-section__subtitle {
+  font-size: 12px;
+  color: rgba(232,234,246,0.4);
+  margin-top: 2px;
+}
+
+.carousel-actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+
+/* Auth Modal */
+.auth-modal {
+  position: fixed; inset: 0; z-index: 100;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+.auth-modal--open { display: flex; }
+.auth-modal__card {
+  width: 100%; max-width: 400px; margin: 16px;
+  padding: 32px; border-radius: 16px;
+  background: linear-gradient(145deg, rgba(13,17,40,0.95) 0%, rgba(6,9,24,0.98) 100%);
+  border: 1px solid rgba(26,31,60,0.6);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+}
+.auth-modal__title {
+  font-family: var(--font-display); font-size: 24px; font-weight: 700;
+  color: #fff; margin-bottom: 8px; text-align: center;
+}
+.auth-modal__subtitle {
+  font-size: 14px; color: rgba(232,234,246,0.5);
+  text-align: center; margin-bottom: 24px;
+}
+.auth-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 14px 20px; margin-bottom: 12px;
+  border-radius: 12px; border: 1px solid var(--surface-border);
+  background: rgba(13,17,40,0.5);
+  color: var(--surface-foreground); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s ease;
+}
+.auth-btn:hover {
+  border-color: rgba(0,212,255,0.4);
+  background: rgba(0,212,255,0.08);
+}
+.auth-btn--google { background: #fff; color: #333; border-color: #ddd; }
+.auth-btn--google:hover { background: #f5f5f5; border-color: #ccc; }
+.auth-btn--microsoft { background: #2f2f2f; color: #fff; border-color: #444; }
+.auth-btn--microsoft:hover { background: #404040; border-color: #555; }
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 20px 0; color: rgba(232,234,246,0.3); font-size: 12px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232,234,246,0.2), transparent);
+}
+.auth-error {
+  display: none; padding: 12px; margin-top: 16px;
+  border-radius: 8px; background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #ef4444; font-size: 13px; text-align: center;
+}
+.auth-error--visible { display: block; }
+.user-badge {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 12px; border-radius: 999px;
+  background: rgba(13,17,40,0.5);
+  border: 1px solid rgba(26,31,60,0.6);
+}
+.user-badge__name {
+  font-size: 13px; color: rgba(232,234,246,0.7);
+  max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.user-badge__logout {
+  padding: 4px 10px; border-radius: 999px;
+  background: transparent; border: 1px solid rgba(232,234,246,0.2);
+  color: rgba(232,234,246,0.6); font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.user-badge__logout:hover {
+  border-color: rgba(236,72,153,0.5); color: #ec4899;
+}
 </style>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -516,14 +917,25 @@ footer a:hover { color: var(--primary-300); }
 <!-- ===== HEADER ===== -->
 <header style="position:sticky;top:0;z-index:50;padding:16px 0;background:rgba(6,9,24,0.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(26,31,60,0.4);">
   <div class="shell" style="display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:baseline;gap:10px;">
-      <span style="font-family:var(--font-display);font-weight:800;font-size:22px;color:#fff;letter-spacing:-0.02em;">AFTA</span>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img src="/static/logo.png" alt="AFTA" style="height:72px;width:auto;">
       <span style="font-size:13px;font-weight:500;color:rgba(232,234,246,0.4);">Marketing for LinkedIn</span>
     </div>
-    <a href="https://afta.systems" target="_blank" class="btn-ghost" style="padding:8px 16px;font-size:12px;">
-      afta.systems
-      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-    </a>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <!-- Auth button (shown when not logged in) -->
+      <button id="auth-btn" onclick="openAuthModal()" class="btn-ghost" style="padding:8px 16px;font-size:12px;display:none;">
+        Sign In
+      </button>
+      <!-- User badge (shown when logged in) -->
+      <div id="user-badge" class="user-badge" style="display:none;">
+        <span id="user-name" class="user-badge__name"></span>
+        <button onclick="handleLogout()" class="user-badge__logout">Sign Out</button>
+      </div>
+      <a href="https://afta.systems" target="_blank" class="btn-ghost" style="padding:8px 16px;font-size:12px;">
+        afta.systems
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
+    </div>
   </div>
 </header>
 
@@ -573,95 +985,48 @@ footer a:hover { color: var(--primary-300); }
       <div class="card" style="padding:32px;">
         <div style="display:flex;flex-direction:column;gap:28px;">
 
-          <!-- Target URL -->
+          <!-- Target Website -->
           <div>
             <label class="form-label">Target Website</label>
             <div class="url-input-wrap">
-              <input id="target-url" type="url" class="form-input" placeholder="https://your-website.com" autocomplete="url">
+              <input id="target-url" type="url" class="form-input" value="https://afta.systems" autocomplete="url">
               <div id="logo-preview" class="logo-preview">
                 <svg width="20" height="20" fill="none" stroke="rgba(232,234,246,0.2)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
               </div>
             </div>
-            <p class="form-hint">We'll extract the logo and use it in your carousel slides</p>
-          </div>
+            <p class="form-hint">We'll generate a company profile and tailor content to this company's audience.</p>
 
-          <!-- Company Profile -->
-          <div>
-            <label class="form-label">Company Profile</label>
-            <div class="source-toggle" style="margin-bottom:12px;">
-              <button id="company-default-btn" class="source-toggle__btn source-toggle__btn--active" type="button" onclick="setCompanyMode('default')">Use Default (AFTA)</button>
-              <button id="company-custom-btn" class="source-toggle__btn" type="button" onclick="setCompanyMode('custom')">Generate from URL</button>
-            </div>
-
-            <!-- Default company card -->
-            <div id="company-default" class="auto-fetch-card">
-              <div class="auto-fetch-card__icon">
-                <svg width="20" height="20" fill="none" stroke="var(--primary-400)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-              </div>
-              <div>
-                <div id="default-company-name" style="font-size:14px;font-weight:600;color:rgba(232,234,246,0.8);margin-bottom:2px;">AFTA Systems</div>
-                <div id="default-company-tagline" style="font-size:12px;color:rgba(232,234,246,0.4);">AI Automation for E-commerce</div>
-              </div>
-            </div>
-
-            <!-- Custom company generator -->
-            <div id="company-custom" class="hidden">
-              <div class="url-input-wrap" style="margin-bottom:12px;">
-                <input id="company-url" type="url" class="form-input" placeholder="https://company-to-generate-for.com">
-                <button id="generate-profile-btn" class="btn-ghost" onclick="generateCompanyProfile()" style="white-space:nowrap;">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                  Generate
+            <!-- Company profile card (shown after generation or for default) -->
+            <div id="company-profile-card" class="hidden" style="margin-top:12px;">
+              <div class="card" style="padding:14px 16px;background:linear-gradient(145deg, rgba(139,92,246,0.06) 0%, rgba(13,17,40,0.4) 100%);border:1px solid rgba(139,92,246,0.15);">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                  <svg width="14" height="14" fill="none" stroke="var(--electric-purple)" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <div id="profile-badge" style="font-size:10px;font-weight:600;color:rgba(139,92,246,0.7);text-transform:uppercase;letter-spacing:0.05em;">Company Profile</div>
+                </div>
+                <div id="profile-name" style="font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;"></div>
+                <div id="profile-tagline" style="font-size:12px;color:rgba(232,234,246,0.5);margin-bottom:10px;"></div>
+                <button class="collapsible__trigger" onclick="toggleCollapsible('profile-details')" style="padding:6px 0;font-size:11px;">
+                  <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                  Details
                 </button>
-              </div>
-
-              <!-- Loading state -->
-              <div id="company-loading" class="hidden auto-fetch-card" style="border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.03);">
-                <div class="auto-fetch-card__icon logo-preview--loading" style="background:rgba(139,92,246,0.1);">
-                  <svg width="20" height="20" fill="none" stroke="var(--electric-purple)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <div id="profile-details" class="collapsible__body">
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:6px 0;font-size:11px;color:rgba(232,234,246,0.6);">
+                    <div><strong style="color:rgba(232,234,246,0.8);">Core Offering:</strong> <span id="profile-offering"></span></div>
+                    <div><strong style="color:rgba(232,234,246,0.8);">Differentiator:</strong> <span id="profile-diff"></span></div>
+                    <div><strong style="color:rgba(232,234,246,0.8);">Target Audience:</strong> <span id="profile-audience"></span></div>
+                    <div><strong style="color:rgba(232,234,246,0.8);">Key Services:</strong> <span id="profile-services"></span></div>
+                    <div><strong style="color:rgba(232,234,246,0.8);">Proof Points:</strong> <span id="profile-proof"></span></div>
+                    <div><strong style="color:rgba(232,234,246,0.8);">Pain Points:</strong> <span id="profile-pains"></span></div>
+                    <div><strong style="color:rgba(232,234,246,0.8);">Keywords:</strong> <span id="profile-keywords"></span></div>
+                  </div>
                 </div>
-                <div>
-                  <div style="font-size:14px;font-weight:600;color:rgba(232,234,246,0.8);margin-bottom:2px;">Analyzing website...</div>
-                  <div style="font-size:12px;color:rgba(232,234,246,0.4);">Scraping content and generating company profile</div>
-                </div>
-              </div>
-
-              <!-- Generated profile preview -->
-              <div id="company-profile-preview" class="hidden">
-                <div class="card" style="padding:16px;background:linear-gradient(145deg, rgba(139,92,246,0.06) 0%, rgba(13,17,40,0.4) 100%);border:1px solid rgba(139,92,246,0.15);">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--electric-purple);flex-shrink:0;">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <div style="font-size:11px;font-weight:600;color:rgba(139,92,246,0.7);text-transform:uppercase;letter-spacing:0.05em;">Generated Profile</div>
-                  </div>
-                  <div id="profile-name" style="font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;"></div>
-                  <div id="profile-tagline" style="font-size:13px;color:rgba(232,234,246,0.5);margin-bottom:12px;"></div>
-
-                  <button class="collapsible__trigger" onclick="toggleCollapsible('profile-details')" style="padding:8px 0;">
-                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    View Full Profile
-                  </button>
-                  <div id="profile-details" class="collapsible__body">
-                    <div style="display:flex;flex-direction:column;gap:10px;padding:8px 0;font-size:12px;color:rgba(232,234,246,0.6);">
-                      <div><strong style="color:rgba(232,234,246,0.8);">Core Offering:</strong> <span id="profile-offering"></span></div>
-                      <div><strong style="color:rgba(232,234,246,0.8);">Differentiator:</strong> <span id="profile-diff"></span></div>
-                      <div><strong style="color:rgba(232,234,246,0.8);">Target Audience:</strong> <span id="profile-audience"></span></div>
-                      <div><strong style="color:rgba(232,234,246,0.8);">Key Services:</strong> <span id="profile-services"></span></div>
-                      <div><strong style="color:rgba(232,234,246,0.8);">Proof Points:</strong> <span id="profile-proof"></span></div>
-                      <div><strong style="color:rgba(232,234,246,0.8);">Pain Points Solved:</strong> <span id="profile-pains"></span></div>
-                      <div><strong style="color:rgba(232,234,246,0.8);">Industry Keywords:</strong> <span id="profile-keywords"></span></div>
-                    </div>
-                  </div>
-                  <!-- Generation stats -->
-                  <div id="profile-stats" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(139,92,246,0.15);display:flex;gap:16px;font-size:11px;color:rgba(232,234,246,0.4);">
-                    <span><span style="color:rgba(139,92,246,0.6);">Model:</span> <span id="profile-model"></span></span>
-                    <span><span style="color:rgba(139,92,246,0.6);">Tokens:</span> <span id="profile-tokens"></span></span>
-                    <span><span style="color:rgba(139,92,246,0.6);">Cost:</span> $<span id="profile-cost"></span></span>
-                  </div>
+                <div id="profile-stats" class="hidden" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(139,92,246,0.1);display:flex;gap:14px;font-size:10px;color:rgba(232,234,246,0.35);">
+                  <span><span style="color:rgba(139,92,246,0.5);">Model:</span> <span id="profile-model"></span></span>
+                  <span><span style="color:rgba(139,92,246,0.5);">Tokens:</span> <span id="profile-tokens"></span></span>
+                  <span><span style="color:rgba(139,92,246,0.5);">Cost:</span> $<span id="profile-cost"></span></span>
                 </div>
               </div>
             </div>
-            <p class="form-hint">Content will be tailored to this company's audience and messaging</p>
           </div>
 
           <!-- Message -->
@@ -724,7 +1089,7 @@ footer a:hover { color: var(--primary-300); }
               <select id="generation-model" class="form-input" style="cursor:pointer;">
                 <!-- Populated by JS -->
               </select>
-              <p class="form-hint">Used for both generation and judging. Note: Gemini falls back to Claude Opus for judging.</p>
+              <p class="form-hint">Used for both generation and judging.</p>
             </div>
           </div>
 
@@ -751,7 +1116,8 @@ footer a:hover { color: var(--primary-300); }
 
     <!-- RESULTS SECTION -->
     <div id="results-section" class="hidden">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px;">
         <h2 class="heading-display" style="font-size:28px;color:#fff;">Results</h2>
         <button class="btn-ghost" onclick="resetToForm()">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -759,11 +1125,66 @@ footer a:hover { color: var(--primary-300); }
         </button>
       </div>
 
-      <div class="results-grid">
-        <!-- LEFT COLUMN -->
-        <div style="display:flex;flex-direction:column;gap:24px;">
+      <div class="results-section-flow">
 
-          <!-- Winner post -->
+        <!-- SECTION 1: Company Profile -->
+        <div class="result-section">
+          <div class="result-section__label">Company Context</div>
+          <div id="result-company-card" class="card" style="padding:16px 20px;background:linear-gradient(145deg, rgba(139,92,246,0.06) 0%, rgba(13,17,40,0.4) 100%);border:1px solid rgba(139,92,246,0.15);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <svg width="16" height="16" fill="none" stroke="var(--electric-purple)" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              <div id="result-company-badge" style="font-size:10px;font-weight:600;color:rgba(139,92,246,0.7);text-transform:uppercase;letter-spacing:0.05em;">Company Profile</div>
+              <div style="flex:1;"></div>
+              <button class="collapsible__trigger" onclick="toggleCollapsible('result-company-details')" style="padding:4px 0;font-size:11px;margin:0;">
+                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                Details
+              </button>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px;">
+              <div id="result-company-name" style="font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;"></div>
+              <div id="result-company-tagline" style="font-size:12px;color:rgba(232,234,246,0.45);">—</div>
+            </div>
+            <div id="result-company-details" class="collapsible__body">
+              <div style="display:flex;flex-direction:column;gap:6px;padding:10px 0 2px;font-size:11px;color:rgba(232,234,246,0.55);">
+                <div><strong style="color:rgba(232,234,246,0.75);">Core Offering:</strong> <span id="result-cp-offering"></span></div>
+                <div><strong style="color:rgba(232,234,246,0.75);">Differentiator:</strong> <span id="result-cp-diff"></span></div>
+                <div><strong style="color:rgba(232,234,246,0.75);">Target Audience:</strong> <span id="result-cp-audience"></span></div>
+                <div><strong style="color:rgba(232,234,246,0.75);">Key Services:</strong> <span id="result-cp-services"></span></div>
+                <div><strong style="color:rgba(232,234,246,0.75);">Pain Points:</strong> <span id="result-cp-pains"></span></div>
+                <div><strong style="color:rgba(232,234,246,0.75);">Keywords:</strong> <span id="result-cp-keywords"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Source Article -->
+        <div class="result-section">
+          <div class="result-section__label">Source Material</div>
+          <div id="source-article-card" class="card" style="padding:20px 24px;background:linear-gradient(145deg, rgba(245,158,11,0.06) 0%, rgba(13,17,40,0.4) 100%);border:1px solid rgba(245,158,11,0.15);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--accent-light);flex-shrink:0;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+              </svg>
+              <div style="font-size:11px;font-weight:600;color:rgba(245,158,11,0.7);text-transform:uppercase;letter-spacing:0.05em;">Source Article</div>
+              <div style="flex:1;"></div>
+              <div style="display:flex;gap:8px;">
+                <span id="result-source-tag" style="font-size:11px;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:var(--accent-light);"></span>
+                <span id="result-persona-name" style="font-size:11px;padding:4px 10px;border-radius:6px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);color:var(--electric-purple);"></span>
+              </div>
+            </div>
+            <div id="result-source-title" style="font-family:var(--font-display);font-size:17px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:10px;"></div>
+            <div id="result-source-summary-preview" style="font-size:14px;line-height:1.6;color:rgba(232,234,246,0.55);"></div>
+            <div id="result-source-summary-full" class="collapsible__body" style="font-size:14px;line-height:1.6;color:rgba(232,234,246,0.55);"></div>
+            <button id="source-expand-btn" class="collapsible__trigger" onclick="toggleSourceExpand()" style="padding:8px 0 0 0;font-size:12px;color:rgba(245,158,11,0.6);">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              <span id="source-expand-text">Show full article</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Winning Post -->
+        <div class="result-section">
+          <div class="result-section__label">Generated Post</div>
           <div class="winner-card">
             <div class="winner-card__header">
               <div style="display:flex;align-items:center;gap:12px;">
@@ -779,82 +1200,107 @@ footer a:hover { color: var(--primary-300); }
               </button>
             </div>
             <div id="result-post" class="winner-card__content"></div>
-          </div>
 
-          <!-- Source info tags -->
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <span id="result-source-tag" style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--accent-light);"></span>
-            <span id="result-persona-name" style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);color:var(--electric-purple);"></span>
-          </div>
-
-          <!-- Source Article Card -->
-          <div id="source-article-card" class="card" style="padding:16px 20px;background:linear-gradient(145deg, rgba(245,158,11,0.06) 0%, rgba(13,17,40,0.4) 100%);border:1px solid rgba(245,158,11,0.15);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--accent-light);flex-shrink:0;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-              </svg>
-              <div style="font-size:11px;font-weight:600;color:rgba(245,158,11,0.7);text-transform:uppercase;letter-spacing:0.05em;">Source Article</div>
-            </div>
-            <div id="result-source-title" style="font-family:var(--font-display);font-size:15px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:8px;"></div>
-            <div id="result-source-summary" style="font-size:13px;line-height:1.5;color:rgba(232,234,246,0.5);"></div>
-          </div>
-
-          <!-- Score breakdown -->
-          <div>
-            <div style="font-size:13px;font-weight:600;color:rgba(232,234,246,0.5);margin-bottom:10px;">Score Breakdown</div>
-            <div id="scores-grid" class="scores-grid"></div>
-          </div>
-
-          <!-- Judge reasoning -->
-          <div>
-            <button class="collapsible__trigger" onclick="toggleCollapsible('judge-reasoning')">
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-              Judge's Reasoning
-            </button>
-            <div id="judge-reasoning" class="collapsible__body">
-              <div id="result-reasoning" style="font-size:14px;line-height:1.6;color:rgba(232,234,246,0.55);padding-bottom:16px;"></div>
-              <div id="result-improvements" style="font-size:13px;line-height:1.5;color:rgba(232,234,246,0.35);padding-bottom:16px;"></div>
+            <!-- Score breakdown inside winner card -->
+            <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(0,212,255,0.1);">
+              <div style="font-size:12px;font-weight:600;color:rgba(232,234,246,0.4);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em;">Score Breakdown</div>
+              <div id="scores-grid" class="scores-grid"></div>
             </div>
           </div>
+        </div>
 
-          <!-- All variants -->
-          <div>
-            <button class="collapsible__trigger" onclick="toggleCollapsible('all-variants')">
+        <!-- SECTION 4: LinkedIn Carousel -->
+        <div class="result-section">
+          <div class="result-section__label">Visual Content</div>
+          <div class="carousel-section-card">
+            <div class="carousel-section__header">
+              <div>
+                <div class="carousel-section__title">LinkedIn Carousel</div>
+                <div class="carousel-section__subtitle">5-slide branded PDF</div>
+              </div>
+              <div class="carousel-actions">
+                <button class="btn-ghost" onclick="openCarouselModal()">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                  Expand
+                </button>
+                <a id="carousel-download" class="btn-primary" href="#" download style="text-decoration:none;">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  Download PDF
+                </a>
+              </div>
+            </div>
+            <div class="carousel-preview-wrap">
+              <div class="carousel-preview-container" onclick="openCarouselModal()">
+                <iframe id="carousel-iframe" style="width:100%;height:100%;border:none;pointer-events:none;" title="Carousel preview"></iframe>
+              </div>
+              <div class="carousel-preview-overlay">
+                <div class="expand-hint">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                  Click to expand
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 5: All Variants -->
+        <div class="result-section">
+          <div class="result-section__label">Alternative Versions</div>
+          <div class="card" style="padding:20px 24px;">
+            <button class="collapsible__trigger" onclick="toggleCollapsible('all-variants')" style="padding:0 0 16px 0;">
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
               <span id="variants-count">View All Variants</span>
             </button>
             <div id="all-variants" class="collapsible__body">
-              <div id="variants-list" style="display:flex;flex-direction:column;gap:10px;padding-bottom:16px;"></div>
+              <div id="variants-list" class="variants-grid"></div>
             </div>
           </div>
         </div>
 
-        <!-- RIGHT COLUMN: Carousel -->
-        <div>
-          <div class="card" style="padding:24px;position:sticky;top:80px;">
-            <div style="font-family:var(--font-display);font-weight:700;font-size:16px;color:#fff;margin-bottom:4px;">LinkedIn Carousel</div>
-            <div style="font-size:12px;color:rgba(232,234,246,0.35);margin-bottom:16px;">5-slide branded PDF</div>
-            <div id="carousel-preview" style="width:100%;aspect-ratio:1;border-radius:12px;background:var(--surface-muted);border:1px solid var(--surface-border);margin-bottom:16px;overflow:hidden;">
-              <iframe id="carousel-iframe" style="width:100%;height:100%;border:none;" title="Carousel preview"></iframe>
+        <!-- SECTION 6: Analytics -->
+        <div class="result-section">
+          <div class="result-section__label">Analytics</div>
+
+          <!-- Stats bar -->
+          <div id="result-stats" style="padding:16px 20px;border-radius:12px;background:rgba(13,17,40,0.4);border:1px solid rgba(26,31,60,0.3);display:flex;flex-wrap:wrap;gap:24px;font-size:12px;color:rgba(232,234,246,0.3);margin-bottom:16px;"></div>
+
+          <!-- Judge reasoning -->
+          <div class="card" style="padding:16px 20px;margin-bottom:12px;">
+            <button class="collapsible__trigger" onclick="toggleCollapsible('judge-reasoning')" style="padding:0;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              Judge's Reasoning
+            </button>
+            <div id="judge-reasoning" class="collapsible__body">
+              <div id="result-reasoning" style="font-size:14px;line-height:1.6;color:rgba(232,234,246,0.55);padding:16px 0;"></div>
+              <div id="result-improvements" style="font-size:13px;line-height:1.5;color:rgba(232,234,246,0.35);padding-bottom:8px;"></div>
             </div>
-            <a id="carousel-download" class="btn-primary btn-primary--full" href="#" download style="text-decoration:none;">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              Download PDF
-            </a>
+          </div>
+
+          <!-- Cost Breakdown -->
+          <div id="cost-breakdown" class="hidden card" style="padding:16px 20px;margin-bottom:12px;">
+            <button class="collapsible__trigger" onclick="toggleCollapsible('cost-details')" style="padding:0;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              Cost Breakdown
+            </button>
+            <div id="cost-details" class="collapsible__body" style="overflow-x:auto;padding-top:16px;"></div>
+          </div>
+
+          <!-- Timing Breakdown -->
+          <div id="timing-breakdown" class="hidden card" style="padding:16px 20px;">
+            <button class="collapsible__trigger" onclick="toggleCollapsible('timing-details')" style="padding:0;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              Timing Breakdown
+            </button>
+            <div id="timing-details" class="collapsible__body" style="overflow-x:auto;padding-top:16px;"></div>
           </div>
         </div>
+
       </div>
 
-      <!-- Stats -->
-      <div id="result-stats" style="margin-top:32px;padding:16px 20px;border-radius:12px;background:rgba(13,17,40,0.4);border:1px solid rgba(26,31,60,0.3);display:flex;flex-wrap:wrap;gap:24px;font-size:12px;color:rgba(232,234,246,0.3);"></div>
-
-      <!-- Cost Breakdown -->
-      <div id="cost-breakdown" class="hidden" style="margin-top:16px;">
-        <button class="collapsible__trigger" onclick="toggleCollapsible('cost-details')">
-          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-          Cost Breakdown
-        </button>
-        <div id="cost-details" class="collapsible__body" style="overflow-x:auto;"></div>
+      <!-- Results Footer -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:48px;padding-top:32px;border-top:1px solid rgba(26,31,60,0.4);">
+        <img src="/static/logo.png" alt="AFTA" style="height:48px;width:auto;">
+        <div style="font-size:13px;color:rgba(232,234,246,0.4);">Powered by <a href="https://afta.systems" target="_blank" style="color:var(--primary-500);text-decoration:none;">AFTA Systems</a></div>
       </div>
     </div>
   </div>
@@ -863,24 +1309,167 @@ footer a:hover { color: var(--primary-300); }
 <div class="shell"><div class="section-divider"></div></div>
 
 <footer>
-  <div class="shell">
-    Powered by <a href="https://afta.systems" target="_blank">AFTA Systems</a> &middot; AI Automation for E-commerce
+  <div class="shell" style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+    <img src="/static/logo.png" alt="AFTA" style="height:48px;width:auto;">
+    <div>Powered by <a href="https://afta.systems" target="_blank">AFTA Systems</a> &middot; AI Automation for E-commerce</div>
   </div>
 </footer>
 
 <script>
+// ===== AUTH STATE =====
+let currentUser = null;
+let firebaseInitialized = false;
+
 // ===== STATE =====
 let selectedPersona = 'professional';
 let sourceMode = 'auto';
-let companyMode = 'default';
 let personas = [];
 let models = [];
-let selectedModel = 'claude-opus-4-5-20251101';
+let selectedModel = 'gemini/gemini-3-pro-preview';
 let defaultCompanyProfile = null;
-let customCompanyProfile = null;
+let generatedCompanyProfile = null;
+let lastProfileUrl = null;
+
+// Carousel modal state
+let carouselModalOpen = false;
+let currentCarouselSlide = 0;
+let carouselId = null;
+const TOTAL_SLIDES = 5;
+
+// ===== AUTH FUNCTIONS =====
+async function initFirebase() {
+  try {
+    const res = await fetch('/api/auth/config');
+    const config = await res.json();
+    if (config.apiKey && config.projectId) {
+      firebase.initializeApp(config);
+      firebaseInitialized = true;
+    }
+  } catch (e) {
+    console.warn('Firebase config not available');
+  }
+}
+
+async function checkAuthState() {
+  try {
+    const res = await fetch('/api/auth/me');
+    const data = await res.json();
+    if (data.authenticated) {
+      currentUser = data.user;
+      updateAuthUI(true);
+    } else {
+      updateAuthUI(false);
+    }
+  } catch (e) {
+    updateAuthUI(false);
+  }
+}
+
+function updateAuthUI(isAuthenticated) {
+  const authBtn = document.getElementById('auth-btn');
+  const userBadge = document.getElementById('user-badge');
+  const userName = document.getElementById('user-name');
+
+  if (isAuthenticated && currentUser) {
+    authBtn.style.display = 'none';
+    userBadge.style.display = 'flex';
+    userName.textContent = currentUser.name || currentUser.email;
+  } else {
+    authBtn.style.display = 'block';
+    userBadge.style.display = 'none';
+  }
+}
+
+function openAuthModal() {
+  document.getElementById('auth-modal').classList.add('auth-modal--open');
+  document.getElementById('auth-error').classList.remove('auth-error--visible');
+}
+
+function closeAuthModal(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('auth-modal').classList.remove('auth-modal--open');
+}
+
+function showAuthError(message) {
+  const errorEl = document.getElementById('auth-error');
+  errorEl.textContent = message;
+  errorEl.classList.add('auth-error--visible');
+}
+
+async function signInWithGoogle() {
+  if (!firebaseInitialized) {
+    showAuthError('Authentication not configured');
+    return;
+  }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    const result = await firebase.auth().signInWithPopup(provider);
+    await handleFirebaseUser(result.user);
+  } catch (error) {
+    if (error.code !== 'auth/popup-closed-by-user') {
+      showAuthError(error.message);
+    }
+  }
+}
+
+async function signInWithMicrosoft() {
+  if (!firebaseInitialized) {
+    showAuthError('Authentication not configured');
+    return;
+  }
+  const provider = new firebase.auth.OAuthProvider('microsoft.com');
+  provider.setCustomParameters({ prompt: 'select_account' });
+  try {
+    const result = await firebase.auth().signInWithPopup(provider);
+    await handleFirebaseUser(result.user);
+  } catch (error) {
+    if (error.code !== 'auth/popup-closed-by-user') {
+      showAuthError(error.message);
+    }
+  }
+}
+
+async function handleFirebaseUser(user) {
+  try {
+    const idToken = await user.getIdToken();
+    const res = await fetch('/api/auth/firebase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken })
+    });
+    const result = await res.json();
+    if (result.error) {
+      showAuthError(result.error);
+      return;
+    }
+    currentUser = result.user;
+    updateAuthUI(true);
+    closeAuthModal();
+  } catch (error) {
+    showAuthError('Connection error. Please try again.');
+  }
+}
+
+async function handleLogout() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    currentUser = null;
+    updateAuthUI(false);
+    // Sign out from Firebase as well
+    if (firebaseInitialized) {
+      await firebase.auth().signOut();
+    }
+  } catch (e) {
+    console.error('Logout error:', e);
+  }
+}
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize Firebase and check auth state
+  await initFirebase();
+  await checkAuthState();
+
   // Fetch personas
   try {
     const res = await fetch('/api/personas');
@@ -906,18 +1495,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (e) {
     // Fallback models if API not available
     models = [
-      { id: 'claude-opus-4-5-20251101', name: 'Claude Opus 4.5', provider: 'anthropic' },
       { id: 'gemini/gemini-3-pro-preview', name: 'Gemini 3 Pro', provider: 'google' },
+      { id: 'claude-opus-4-5-20251101', name: 'Claude Opus 4.5', provider: 'anthropic' },
     ];
     renderModels();
   }
 
-  // Fetch default company profile
+  // Fetch default company profile (used when target is afta.systems)
   try {
     const companyRes = await fetch('/api/default-company');
     defaultCompanyProfile = await companyRes.json();
-    document.getElementById('default-company-name').textContent = defaultCompanyProfile.name;
-    document.getElementById('default-company-tagline').textContent = defaultCompanyProfile.tagline;
   } catch (e) {
     // Fallback if API not available
     defaultCompanyProfile = {
@@ -932,6 +1519,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       industry_keywords: ['e-commerce', 'automation', 'n8n'],
     };
   }
+
+  // Show default profile card on load
+  showProfileCard(defaultCompanyProfile, 'Default Profile');
 });
 
 // ===== PERSONA RENDERING =====
@@ -972,70 +1562,75 @@ function setSourceMode(mode) {
   document.getElementById('source-paste').classList.toggle('hidden', mode !== 'paste');
 }
 
-// ===== COMPANY PROFILE TOGGLE =====
-function setCompanyMode(mode) {
-  companyMode = mode;
-  document.getElementById('company-default-btn').classList.toggle('source-toggle__btn--active', mode === 'default');
-  document.getElementById('company-custom-btn').classList.toggle('source-toggle__btn--active', mode === 'custom');
-  document.getElementById('company-default').classList.toggle('hidden', mode !== 'default');
-  document.getElementById('company-custom').classList.toggle('hidden', mode !== 'custom');
+// ===== COMPANY PROFILE HELPERS =====
+function isDefaultCompany(url) {
+  if (!url) return true;
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return hostname === 'afta.systems' || hostname === 'www.afta.systems';
+  } catch {
+    return true;
+  }
 }
 
-async function generateCompanyProfile() {
-  const url = document.getElementById('company-url').value.trim();
-  if (!url) {
-    document.getElementById('company-url').focus();
-    document.getElementById('company-url').style.borderColor = 'rgba(236,72,153,0.5)';
-    setTimeout(() => document.getElementById('company-url').style.borderColor = '', 2000);
-    return;
-  }
+function showProfileCard(profile, badge, stats) {
+  const card = document.getElementById('company-profile-card');
+  document.getElementById('profile-badge').textContent = badge || 'Company Profile';
+  document.getElementById('profile-name').textContent = profile.name;
+  document.getElementById('profile-tagline').textContent = profile.tagline;
+  document.getElementById('profile-offering').textContent = profile.core_offering;
+  document.getElementById('profile-diff').textContent = profile.differentiator;
+  document.getElementById('profile-audience').textContent = (profile.target_audience || []).join(', ');
+  document.getElementById('profile-services').textContent = (profile.key_services || []).join(', ');
+  document.getElementById('profile-proof').textContent = (profile.proof_points || []).join(', ');
+  document.getElementById('profile-pains').textContent = (profile.pain_points_solved || []).join(', ');
+  document.getElementById('profile-keywords').textContent = (profile.industry_keywords || []).join(', ');
 
-  // Show loading state
-  document.getElementById('generate-profile-btn').disabled = true;
-  document.getElementById('company-loading').classList.remove('hidden');
-  document.getElementById('company-profile-preview').classList.add('hidden');
-
-  try {
-    const res = await fetch('/api/generate-company-profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url }),
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.detail || 'Failed to generate profile');
-    }
-
-    const data = await res.json();
-    customCompanyProfile = data.profile;
-
-    // Show profile preview - all fields
-    document.getElementById('profile-name').textContent = customCompanyProfile.name;
-    document.getElementById('profile-tagline').textContent = customCompanyProfile.tagline;
-    document.getElementById('profile-offering').textContent = customCompanyProfile.core_offering;
-    document.getElementById('profile-diff').textContent = customCompanyProfile.differentiator;
-    document.getElementById('profile-audience').textContent = customCompanyProfile.target_audience.join(', ');
-    document.getElementById('profile-services').textContent = customCompanyProfile.key_services.join(', ');
-    document.getElementById('profile-proof').textContent = customCompanyProfile.proof_points.join(', ');
-    document.getElementById('profile-pains').textContent = customCompanyProfile.pain_points_solved.join(', ');
-    document.getElementById('profile-keywords').textContent = customCompanyProfile.industry_keywords.join(', ');
-
-    // Show generation stats
-    const modelShort = data.model.split('/').pop().replace('gemini-', '').replace('-preview', '');
+  const statsEl = document.getElementById('profile-stats');
+  if (stats) {
+    const modelShort = (stats.model || '').split('/').pop().replace('gemini-', '').replace('-preview', '');
     document.getElementById('profile-model').textContent = modelShort;
-    document.getElementById('profile-tokens').textContent = `${data.input_tokens.toLocaleString()} in / ${data.output_tokens.toLocaleString()} out`;
-    document.getElementById('profile-cost').textContent = data.cost_usd.toFixed(4);
-
-    document.getElementById('company-loading').classList.add('hidden');
-    document.getElementById('company-profile-preview').classList.remove('hidden');
-
-  } catch (e) {
-    alert('Error generating company profile: ' + e.message);
-    document.getElementById('company-loading').classList.add('hidden');
-  } finally {
-    document.getElementById('generate-profile-btn').disabled = false;
+    document.getElementById('profile-tokens').textContent = `${(stats.input_tokens || 0).toLocaleString()} in / ${(stats.output_tokens || 0).toLocaleString()} out`;
+    document.getElementById('profile-cost').textContent = (stats.cost_usd || 0).toFixed(4);
+    statsEl.classList.remove('hidden');
+  } else {
+    statsEl.classList.add('hidden');
   }
+
+  card.classList.remove('hidden');
+}
+
+async function generateCompanyProfileFromUrl(url) {
+  const res = await fetch('/api/generate-company-profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+  });
+
+  if (!res.ok) {
+    // Handle 401 - show auth modal
+    if (res.status === 401) {
+      currentUser = null;
+      updateAuthUI(false);
+      openAuthModal();
+      throw new Error('Authentication required');
+    }
+    const err = await res.json();
+    throw new Error(err.detail || 'Failed to generate company profile');
+  }
+
+  const data = await res.json();
+
+  // Show profile in UI and track URL
+  lastProfileUrl = url;
+  showProfileCard(data.profile, 'Generated Profile', {
+    model: data.model,
+    input_tokens: data.input_tokens,
+    output_tokens: data.output_tokens,
+    cost_usd: data.cost_usd,
+  });
+
+  return data.profile;
 }
 
 // ===== LOGO PREVIEW =====
@@ -1043,6 +1638,16 @@ let logoTimeout;
 document.getElementById('target-url').addEventListener('blur', async function() {
   const url = this.value.trim();
   if (!url) return;
+
+  // Update profile card when URL changes
+  if (isDefaultCompany(url)) {
+    showProfileCard(defaultCompanyProfile, 'Default Profile');
+    generatedCompanyProfile = null;
+  } else if (!generatedCompanyProfile || lastProfileUrl !== url) {
+    // Hide old profile if URL changed
+    document.getElementById('company-profile-card').classList.add('hidden');
+  }
+
   const preview = document.getElementById('logo-preview');
   preview.classList.add('logo-preview--loading');
   try {
@@ -1057,6 +1662,12 @@ document.getElementById('target-url').addEventListener('blur', async function() 
 
 // ===== GENERATE =====
 async function handleGenerate() {
+  // Check if user is authenticated
+  if (!currentUser) {
+    openAuthModal();
+    return;
+  }
+
   const targetUrl = document.getElementById('target-url').value.trim();
   if (!targetUrl) {
     document.getElementById('target-url').focus();
@@ -1080,15 +1691,25 @@ async function handleGenerate() {
   document.getElementById('form-section').classList.add('hidden');
   document.getElementById('results-section').classList.add('hidden');
   document.getElementById('loading-section').classList.remove('hidden');
-  document.getElementById('loading-persona').textContent = `Using ${personaName} voice with ${modelName} (${numGenerators} samples)`;
   document.getElementById('generate-btn').disabled = true;
 
-  // Determine which company profile to use
-  const companyProfile = companyMode === 'custom' && customCompanyProfile
-    ? customCompanyProfile
-    : null;  // null = use default on server
-
   try {
+    // Determine which company profile to use
+    let companyProfile = null;  // null = use default on server (afta.systems)
+
+    if (!isDefaultCompany(targetUrl)) {
+      // Reuse cached profile if same URL, otherwise generate new one
+      if (generatedCompanyProfile && lastProfileUrl === targetUrl) {
+        companyProfile = generatedCompanyProfile;
+      } else {
+        document.getElementById('loading-persona').textContent = `Analyzing ${new URL(targetUrl).hostname}...`;
+        companyProfile = await generateCompanyProfileFromUrl(targetUrl);
+        generatedCompanyProfile = companyProfile;
+      }
+    }
+
+    document.getElementById('loading-persona').textContent = `Using ${personaName} voice with ${modelName} (${numGenerators} samples)`;
+
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1105,6 +1726,15 @@ async function handleGenerate() {
     });
 
     if (!res.ok) {
+      // Handle 401 - show auth modal
+      if (res.status === 401) {
+        currentUser = null;
+        updateAuthUI(false);
+        openAuthModal();
+        document.getElementById('loading-section').classList.add('hidden');
+        document.getElementById('form-section').classList.remove('hidden');
+        return;
+      }
       const err = await res.json();
       throw new Error(err.detail || 'Generation failed');
     }
@@ -1139,7 +1769,33 @@ function showResults(data) {
 
   // Source article card
   document.getElementById('result-source-title').textContent = data.source_title || 'Custom Source';
-  document.getElementById('result-source-summary').textContent = data.source_summary || '';
+
+  // Handle source summary with preview/full toggle
+  const sourceSummary = data.source_summary || '';
+  const previewLength = 250;
+  const needsExpand = sourceSummary.length > previewLength;
+
+  const previewEl = document.getElementById('result-source-summary-preview');
+  const fullEl = document.getElementById('result-source-summary-full');
+  const expandBtn = document.getElementById('source-expand-btn');
+
+  if (needsExpand) {
+    // Show truncated preview + expand button
+    previewEl.textContent = sourceSummary.substring(0, previewLength) + '...';
+    previewEl.style.display = '';
+    fullEl.textContent = sourceSummary;
+    fullEl.classList.remove('collapsible__body--open');
+    expandBtn.style.display = '';
+    expandBtn.classList.remove('collapsible__trigger--open');
+    document.getElementById('source-expand-text').textContent = 'Show full article';
+    sourceExpanded = false;
+  } else {
+    // Short text - show directly, hide expand button
+    previewEl.textContent = sourceSummary;
+    previewEl.style.display = '';
+    fullEl.textContent = '';
+    expandBtn.style.display = 'none';
+  }
 
   // Score breakdown
   if (data.score_breakdown) {
@@ -1170,20 +1826,28 @@ function showResults(data) {
     improvements.style.display = 'none';
   }
 
-  // Carousel - show HTML preview in iframe, PDF download button
+  // Carousel - store ID and show preview
+  carouselId = data.carousel_id;
   const carouselPreviewUrl = `/api/carousel/preview/${data.carousel_id}`;
   document.getElementById('carousel-iframe').src = carouselPreviewUrl;
   document.getElementById('carousel-download').href = data.carousel_pdf_url;
 
-  // Variants
+  // Variants - full content with copy buttons
   const variants = data.all_variants || [];
   document.getElementById('variants-count').textContent = `View All ${variants.length} Variants`;
   document.getElementById('variants-list').innerHTML = variants.map((v, i) => `
-    <div class="variant-card">
-      <div style="max-height:100px;overflow:hidden;">${escapeHtml(v.content.substring(0, 200))}${v.content.length > 200 ? '...' : ''}</div>
-      <div class="variant-card__meta">
-        <span class="variant-card__tag">${v.hook_type}</span>
-        <span class="variant-card__tag">${v.framework_used}</span>
+    <div class="variant-card--full">
+      <div class="variant-card__header">
+        <span class="variant-card__number">#${i + 1}</span>
+        <button class="variant-card__copy" data-copy-variant="${i}" onclick="copyVariant(${i})">
+          <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="1.5"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="1.5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="variant-card__content" data-variant-content="${i}">${escapeHtml(v.content)}</div>
+      <div class="variant-card__footer">
+        <span class="variant-card__tag">${escapeHtml(v.hook_type)}</span>
+        <span class="variant-card__tag">${escapeHtml(v.structure_used)}</span>
       </div>
     </div>
   `).join('');
@@ -1198,12 +1862,27 @@ function showResults(data) {
   // Format cost with dollar sign
   const formatCost = (cost) => cost != null ? `$${cost.toFixed(4)}` : '—';
 
+  // Show which company profile was used in results
+  const activeProfile = generatedCompanyProfile || defaultCompanyProfile;
+  const companyName = activeProfile?.name || 'AFTA Systems';
+  const companyBadge = generatedCompanyProfile ? 'Generated Profile' : 'Default Profile';
+  document.getElementById('result-company-badge').textContent = companyBadge;
+  document.getElementById('result-company-name').textContent = companyName;
+  document.getElementById('result-company-tagline').textContent = activeProfile?.tagline || '';
+  document.getElementById('result-cp-offering').textContent = activeProfile?.core_offering || '';
+  document.getElementById('result-cp-diff').textContent = activeProfile?.differentiator || '';
+  document.getElementById('result-cp-audience').textContent = (activeProfile?.target_audience || []).join(', ');
+  document.getElementById('result-cp-services').textContent = (activeProfile?.key_services || []).join(', ');
+  document.getElementById('result-cp-pains').textContent = (activeProfile?.pain_points_solved || []).join(', ');
+  document.getElementById('result-cp-keywords').textContent = (activeProfile?.industry_keywords || []).join(', ');
+
   document.getElementById('result-stats').innerHTML = [
+    `<strong style="color:var(--electric-purple);">Company: ${escapeHtml(companyName)}</strong>`,
     `Model: ${modelDisplayName}`,
     `Generators: ${stats.total_generators || '—'}`,
     `Total variants: ${stats.total_variants || '—'}`,
     `Slop filtered: ${stats.slop_violations || 0}`,
-    `Duration: ${stats.duration_seconds ? stats.duration_seconds.toFixed(1) + 's' : '—'}`,
+    `<strong style="color:var(--accent-light);">Duration: ${stats.duration_seconds ? stats.duration_seconds.toFixed(1) + 's' : '—'}</strong>`,
     costs.total_cost_usd != null ? `<strong style="color:var(--primary-300);">Total Cost: ${formatCost(costs.total_cost_usd)}</strong>` : '',
   ].filter(Boolean).map(s => `<span>${s}</span>`).join('');
 
@@ -1258,6 +1937,74 @@ function showResults(data) {
     costBreakdown.classList.add('hidden');
   }
 
+  // Timing breakdown
+  const timingBreakdown = document.getElementById('timing-breakdown');
+  const timings = (data.stats || {}).timings;
+  if (timings && Object.keys(timings).length > 0) {
+    timingBreakdown.classList.remove('hidden');
+
+    const stepLabels = {
+      'scrape_metadata': 'Scrape Website',
+      'resolve_source': 'Resolve Source (total)',
+      'source_news_fetch': 'RSS Fetch',
+      'source_embedding_filter': 'Embedding Filter',
+      'source_ai_filter': 'AI Filter',
+      'auto_summarize': 'Auto-Summarize',
+      'load_configs': 'Load Configs',
+      'generation': 'Generation (parallel)',
+      'anti_slop': 'Anti-Slop Validation',
+      'judge': 'Judge Evaluation',
+      'carousel': 'Carousel Generation',
+    };
+
+    const stepOrder = [
+      'scrape_metadata', 'resolve_source',
+      'source_news_fetch', 'source_embedding_filter', 'source_ai_filter',
+      'auto_summarize', 'load_configs', 'generation',
+      'anti_slop', 'judge', 'carousel'
+    ];
+
+    const presentSteps = stepOrder.filter(key => timings[key] != null);
+    const maxDuration = Math.max(...presentSteps.map(k => timings[k]));
+    const totalDuration = data.stats.duration_seconds || 0;
+
+    const timingRows = presentSteps.map(key => {
+      const duration = timings[key];
+      const pct = maxDuration > 0 ? (duration / maxDuration) * 100 : 0;
+      const isSubstep = key.startsWith('source_');
+      const label = stepLabels[key] || key;
+      const isSlow = duration > 10;
+      return `
+        <tr${isSubstep ? ' style="opacity:0.7;"' : ''}>
+          <td>${isSubstep ? '<span style="color:rgba(232,234,246,0.3);margin-right:4px;">\u2514</span>' : ''}${label}</td>
+          <td style="font-family:var(--font-display);font-weight:600;${isSlow ? 'color:var(--accent-light);' : ''}">${duration.toFixed(1)}s</td>
+          <td style="width:40%;"><div class="timing-bar${isSlow ? ' timing-bar--slow' : ''}" style="width:${pct}%;"></div></td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('timing-details').innerHTML = `
+      <table class="timing-table">
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Duration</th>
+            <th>Relative</th>
+          </tr>
+        </thead>
+        <tbody>${timingRows}</tbody>
+        <tfoot>
+          <tr>
+            <td><strong>Total (wall clock)</strong></td>
+            <td><strong>${totalDuration.toFixed(1)}s</strong></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+  } else {
+    timingBreakdown.classList.add('hidden');
+  }
+
   // Scroll to top of results
   document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -1294,6 +2041,208 @@ function escapeHtml(text) {
   d.textContent = text;
   return d.innerHTML;
 }
+
+// ===== CAROUSEL MODAL =====
+function openCarouselModal() {
+  if (!carouselId) return;
+
+  carouselModalOpen = true;
+  currentCarouselSlide = 0;
+
+  const modal = document.getElementById('carousel-modal');
+  modal.classList.add('carousel-modal--open');
+  document.body.style.overflow = 'hidden';
+
+  // Set download link
+  document.getElementById('modal-download-btn').href = `/api/carousel/download/${carouselId}`;
+
+  // Render dots
+  renderModalDots();
+
+  // Load first slide
+  loadModalSlide(0);
+}
+
+function closeCarouselModal() {
+  carouselModalOpen = false;
+  const modal = document.getElementById('carousel-modal');
+  modal.classList.remove('carousel-modal--open');
+  document.body.style.overflow = '';
+}
+
+function modalNavigate(direction) {
+  const newSlide = currentCarouselSlide + direction;
+  if (newSlide < 0 || newSlide >= TOTAL_SLIDES) return;
+  currentCarouselSlide = newSlide;
+  loadModalSlide(newSlide);
+  updateModalDots();
+  updateNavButtons();
+}
+
+function loadModalSlide(slideIndex) {
+  const iframe = document.getElementById('modal-carousel-iframe');
+  iframe.src = `/api/carousel/preview/${carouselId}?slide=${slideIndex}`;
+}
+
+function renderModalDots() {
+  const dotsContainer = document.getElementById('modal-dots');
+  dotsContainer.innerHTML = Array.from({ length: TOTAL_SLIDES }, (_, i) => `
+    <button class="carousel-modal__dot ${i === 0 ? 'carousel-modal__dot--active' : ''}"
+            onclick="goToSlide(${i})" title="Slide ${i + 1}"></button>
+  `).join('');
+  updateNavButtons();
+}
+
+function updateModalDots() {
+  const dots = document.querySelectorAll('.carousel-modal__dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('carousel-modal__dot--active', i === currentCarouselSlide);
+  });
+}
+
+function updateNavButtons() {
+  document.getElementById('modal-prev-btn').disabled = currentCarouselSlide === 0;
+  document.getElementById('modal-next-btn').disabled = currentCarouselSlide === TOTAL_SLIDES - 1;
+}
+
+function goToSlide(index) {
+  currentCarouselSlide = index;
+  loadModalSlide(index);
+  updateModalDots();
+  updateNavButtons();
+}
+
+function handleModalBackdropClick(event) {
+  if (event.target.classList.contains('carousel-modal')) {
+    closeCarouselModal();
+  }
+}
+
+// Keyboard navigation for modal
+document.addEventListener('keydown', (e) => {
+  if (!carouselModalOpen) return;
+
+  switch (e.key) {
+    case 'Escape':
+      closeCarouselModal();
+      break;
+    case 'ArrowLeft':
+      modalNavigate(-1);
+      break;
+    case 'ArrowRight':
+      modalNavigate(1);
+      break;
+  }
+});
+
+// ===== SOURCE EXPAND =====
+let sourceExpanded = false;
+
+function toggleSourceExpand() {
+  sourceExpanded = !sourceExpanded;
+  const preview = document.getElementById('result-source-summary-preview');
+  const full = document.getElementById('result-source-summary-full');
+  const btn = document.getElementById('source-expand-btn');
+  const text = document.getElementById('source-expand-text');
+
+  if (sourceExpanded) {
+    preview.style.display = 'none';
+    full.classList.add('collapsible__body--open');
+    btn.classList.add('collapsible__trigger--open');
+    text.textContent = 'Show less';
+  } else {
+    preview.style.display = '';
+    full.classList.remove('collapsible__body--open');
+    btn.classList.remove('collapsible__trigger--open');
+    text.textContent = 'Show full article';
+  }
+}
+
+// ===== VARIANT COPY =====
+function copyVariant(index) {
+  const content = document.querySelector(`[data-variant-content="${index}"]`);
+  if (!content) return;
+
+  navigator.clipboard.writeText(content.textContent).then(() => {
+    const btn = document.querySelector(`[data-copy-variant="${index}"]`);
+    btn.classList.add('variant-card__copy--copied');
+    btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Copied';
+    setTimeout(() => {
+      btn.classList.remove('variant-card__copy--copied');
+      btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="1.5"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="1.5"/></svg> Copy';
+    }, 2000);
+  });
+}
 </script>
+
+<!-- Carousel Modal -->
+<div id="carousel-modal" class="carousel-modal" onclick="handleModalBackdropClick(event)">
+  <div class="carousel-modal__header">
+    <button class="carousel-modal__close" onclick="closeCarouselModal()" title="Close (Esc)">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <a id="modal-download-btn" class="btn-primary" href="#" download style="text-decoration:none;">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      Download PDF
+    </a>
+  </div>
+
+  <div class="carousel-modal__content" onclick="event.stopPropagation()">
+    <button id="modal-prev-btn" class="carousel-modal__nav" onclick="modalNavigate(-1)" title="Previous (Left Arrow)">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+
+    <div class="carousel-modal__slide-wrap">
+      <iframe id="modal-carousel-iframe" title="Carousel slide"></iframe>
+    </div>
+
+    <button id="modal-next-btn" class="carousel-modal__nav" onclick="modalNavigate(1)" title="Next (Right Arrow)">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+
+  <div id="modal-dots" class="carousel-modal__dots">
+    <!-- Dots populated by JS -->
+  </div>
+</div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div id="auth-modal" class="auth-modal" onclick="closeAuthModal(event)">
+  <div class="auth-modal__card" onclick="event.stopPropagation()">
+    <h2 class="auth-modal__title">Sign In to Generate</h2>
+    <p class="auth-modal__subtitle">Sign in to create LinkedIn posts</p>
+
+    <button onclick="signInWithGoogle()" class="auth-btn auth-btn--google">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <button onclick="signInWithMicrosoft()" class="auth-btn auth-btn--microsoft">
+      <svg width="20" height="20" viewBox="0 0 23 23">
+        <path fill="#f35325" d="M1 1h10v10H1z"/>
+        <path fill="#81bc06" d="M12 1h10v10H12z"/>
+        <path fill="#05a6f0" d="M1 12h10v10H1z"/>
+        <path fill="#ffba08" d="M12 12h10v10H12z"/>
+      </svg>
+      Continue with Microsoft
+    </button>
+
+    <div id="auth-error" class="auth-error"></div>
+  </div>
+</div>
+
 </body>
 </html>

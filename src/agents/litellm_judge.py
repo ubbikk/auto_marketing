@@ -1,116 +1,87 @@
-"""Judge Agent for evaluating and selecting the best content variant.
+"""LiteLLM-based Judge Agent for non-Anthropic models.
 
-Uses Claude Opus 4.5 with extended thinking to rigorously
-evaluate all generated variants and select the winner.
+Uses LiteLLM to support Gemini and other models for variant judging.
 """
 
 import json
-from dataclasses import dataclass
+import logging
+import re
 from typing import Optional
 
-import anthropic
-
-from .base_agent import BaseAgent, UsageData
+from ..creativity.engine import CreativityContext
+from ..utils.llm_client import get_completion_async
+from ..utils.cost_tracker import extract_usage_from_litellm_response
+from .base_agent import UsageData
 from .generator_agent import GeneratedVariant
+from .judge_agent import JudgmentResult, VariantScore
+
+logger = logging.getLogger(__name__)
 
 
-@dataclass
-class VariantScore:
-    """Detailed scoring for a single variant."""
-
-    variant_id: int
-    generator_id: int
-    hook_strength: float  # 0-10
-    anti_slop: float  # 0-10
-    distinctiveness: float  # 0-10
-    relevance: float  # 0-10
-    persona_fit: float  # 0-10
-    weighted_total: float  # 0-10
-    notes: str
-
-
-@dataclass
-class JudgmentResult:
-    """Result of judging all variants."""
-
-    winner: GeneratedVariant
-    winner_score: VariantScore
-    winner_reasoning: str
-    all_scores: list[VariantScore]
-    improvement_notes: Optional[str]
-    total_variants_judged: int
-    usage: Optional[UsageData] = None
-
-
-class JudgeAgent(BaseAgent):
+class LiteLLMJudgeAgent:
     """
-    Evaluates and selects the best content variant.
+    Judge agent using LiteLLM for Gemini and other non-Anthropic models.
 
-    Uses weighted scoring across 5 criteria:
-    1. Hook Strength (30%) - Would first 2 lines stop scrolling?
-    2. Anti-Slop (25%) - Any banned words/AI tells?
-    3. Distinctiveness (20%) - Does it have a point of view?
-    4. Relevance (15%) - Connects news to AFTA value prop?
-    5. Persona Fit (10%) - Sounds like intended persona?
+    Provides the same interface as JudgeAgent but uses LiteLLM for API calls.
     """
-
-    SCORING_WEIGHTS = {
-        "hook_strength": 0.30,
-        "anti_slop": 0.25,
-        "distinctiveness": 0.20,
-        "relevance": 0.15,
-        "persona_fit": 0.10,
-    }
 
     def __init__(
         self,
-        client: anthropic.Anthropic,
+        model_id: str,
         anti_slop_rules: str,
-        **kwargs,
+        max_tokens: int = 16384,
     ):
-        """
-        Initialize judge agent.
-
-        Args:
-            client: Anthropic API client
-            anti_slop_rules: Anti-slop rules for reference
-        """
-        super().__init__(client, **kwargs)
+        self.model_id = model_id
         self.anti_slop_rules = anti_slop_rules
+        self.max_tokens = max_tokens
 
     async def execute(
         self,
         variants: list[GeneratedVariant],
         news_context: str,
     ) -> JudgmentResult:
-        """
-        Judge all variants and select the winner.
-
-        Args:
-            variants: All generated variants to judge
-            news_context: News article context for relevance scoring
-
-        Returns:
-            JudgmentResult with winner and all scores
-        """
         if not variants:
             raise ValueError("No variants to judge")
 
         prompt = self._build_prompt(variants, news_context)
 
-        response = self._create_message(prompt)
-        usage = self._extract_usage(response)
-        result = self._parse_judgment(response, variants)
-        result.usage = usage
+        logger.info("[LITELLM_JUDGE] Calling %s with %d variants...", self.model_id, len(variants))
 
-        return result
+        try:
+            response_text, response = await get_completion_async(
+                model=self.model_id,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=self.max_tokens,
+                temperature=1.0,
+                return_full_response=True,
+            )
+
+            logger.info(
+                "[LITELLM_JUDGE] Got response (%d chars)",
+                len(response_text) if response_text else 0,
+            )
+
+            result = self._parse_judgment(response_text, variants)
+
+            # Extract usage
+            input_tokens, output_tokens, _ = extract_usage_from_litellm_response(response)
+            result.usage = UsageData(
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                model=self.model_id,
+            )
+
+            return result
+
+        except Exception as e:
+            logger.error("[LITELLM_JUDGE] Failed: %s", str(e))
+            raise
 
     def _build_prompt(
         self,
         variants: list[GeneratedVariant],
         news_context: str,
     ) -> str:
-        """Build the complete judge prompt."""
         from ..prompts import render
 
         variants_text = ""
@@ -137,20 +108,17 @@ CONTENT:
 
     def _parse_judgment(
         self,
-        response: anthropic.types.Message,
+        response_text: str,
         variants: list[GeneratedVariant],
     ) -> JudgmentResult:
-        """Parse response into JudgmentResult."""
-        json_data = self._extract_json(response)
+        json_data = self._extract_json(response_text)
 
         if not json_data or not isinstance(json_data, dict):
-            # Fallback: return first variant as winner
             return self._fallback_result(variants)
 
         try:
             all_scores = []
             for score_data in json_data.get("all_scores", []):
-                # Calculate weighted total if not provided
                 weighted = score_data.get("weighted_total")
                 if not weighted:
                     weighted = (
@@ -176,8 +144,6 @@ CONTENT:
                 )
 
             winner_index = json_data.get("winner_index", 0)
-
-            # Ensure winner_index is valid
             if winner_index >= len(variants):
                 winner_index = 0
 
@@ -196,7 +162,6 @@ CONTENT:
             return self._fallback_result(variants)
 
     def _fallback_result(self, variants: list[GeneratedVariant]) -> JudgmentResult:
-        """Create fallback result when parsing fails."""
         winner = variants[0]
         return JudgmentResult(
             winner=winner,
@@ -217,12 +182,29 @@ CONTENT:
             total_variants_judged=len(variants),
         )
 
-    def execute_sync(
-        self,
-        variants: list[GeneratedVariant],
-        news_context: str,
-    ) -> JudgmentResult:
-        """Synchronous wrapper for execute()."""
-        import asyncio
+    def _extract_json(self, text: str) -> Optional[dict | list]:
+        if not text:
+            return None
 
-        return asyncio.run(self.execute(variants, news_context))
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+
+        json_patterns = [
+            r"```json\s*([\s\S]*?)\s*```",
+            r"```\s*([\s\S]*?)\s*```",
+            r"\{[\s\S]*\}",
+            r"\[[\s\S]*\]",
+        ]
+
+        for pattern in json_patterns:
+            match = re.search(pattern, text)
+            if match:
+                try:
+                    json_str = match.group(1) if "```" in pattern else match.group(0)
+                    return json.loads(json_str)
+                except (json.JSONDecodeError, IndexError):
+                    continue
+
+        return None

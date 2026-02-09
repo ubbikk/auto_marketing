@@ -1,0 +1,232 @@
+# Author Style Samples for LinkedIn Content Generation
+# Use ACTUAL PROSE, not descriptions. Feed these as examples, not instructions.
+
+style_references:
+  anthony_bourdain:
+    name: "Anthony Bourdain"
+    why_useful: "Visceral, opinionated, no hedging. Makes mundane things feel urgent. Perfect antidote to corporate smoothness."
+    
+    key_techniques:
+      - "Starts mid-action, not with setup"
+      - "Uses physical/sensory details even for abstract ideas"
+      - "Admits failures and flaws openly"
+      - "Mixes high and low register freely"
+      - "Never explains the joke or softens the opinion"
+    
+    samples:
+      - |
+        Skills can be taught. Character you either have or don't have. 
+        Bigfoot understood that there are two types of people in the world: 
+        those who do what they say they're going to do — and everyone else.
+      
+      - |
+        They had style and swagger, and they seemed afraid of nothing. 
+        They drank everything in sight, stole whatever wasn't nailed down.
+        They carried big, bad-ass knives, which they kept honed and sharpened 
+        to a razor's edge.
+      
+      - |
+        I was going to live. I was the guy.
+      
+      - |
+        When I die, I will decidedly not be regretting missed opportunities 
+        for a good time. My regrets will be more along the lines of a sad list 
+        of people hurt, people let down, assets wasted and advantages squandered.
+      
+      - |
+        Do we really want to travel in hermetically sealed popemobiles through 
+        the rural provinces of France, Mexico and the Far East, eating only in 
+        Hard Rock Cafes and McDonalds? Or do we want to eat without fear, 
+        tearing into the local stew, the humble taqueria's mystery meat?
+      
+      - |
+        A three-star Italian chef pal of mine was recently talking about why he — 
+        a proud Tuscan who makes his own pasta and sauces from scratch daily — 
+        would never be so foolish as to hire any Italians to cook on his line.
+
+    anti_patterns:
+      - "Corporate politeness"
+      - "Hedging ('maybe', 'perhaps', 'in my opinion')"
+      - "Explaining why you said something"
+      - "Smoothing over contradictions"
+
+  elmore_leonard:
+    name: "Elmore Leonard"
+    why_useful: "Invisible prose. If it sounds like writing, cut it. Perfect for killing AI 'smoothness'."
+    
+    key_techniques:
+      - "Only 'said' for dialogue tags, no adverbs"
+      - "Leave out the parts readers skip"
+      - "Never open with weather or setup"
+      - "Incomplete sentences are fine"
+      - "Let voice carry, not description"
+      - "If it sounds like writing, rewrite it"
+    
+    samples:
+      - |
+        When Chili first came to Miami Beach twelve years ago they were having 
+        one of their off-and-on cold winters: thirty-four degrees the day he met 
+        Tommy Carlo for lunch at Vesuvio's on South Collins and had his leather 
+        jacket ripped off.
+      
+      - |
+        The voice on the phone said, 'Hey, Chief? Fuck you. I'll get somebody else.'
+        This guy was a punk, he had to talk like that. It was okay.
+      
+      - |
+        There were a lot of terms you had to learn, as opposed to the shylock 
+        business where all you had to know how to say was 'Give me the fuckin money.'
+      
+      - |
+        Sunday morning, Ordell took Louis to watch the white-power demonstration 
+        in downtown Palm Beach.
+      
+      - |
+        He asked about her flight, hoping, he said, Northwest wasn't still serving 
+        that scrambled egg sandwich with the banana and yogurt. A cold bagel, 
+        for Christ sake.
+
+    rules_from_author:
+      - "Never open a book with weather"
+      - "Never use a verb other than 'said' to carry dialogue"
+      - "Never use an adverb to modify the verb 'said'"
+      - "Keep exclamation points under control (2-3 per 100,000 words)"
+      - "Never use 'suddenly' or 'all hell broke loose'"
+      - "Try to leave out the part that readers tend to skip"
+      - "If it sounds like writing, I rewrite it"
+
+    anti_patterns:
+      - "Thick paragraphs with too many words"
+      - "Going into the character's head when reader doesn't care"
+      - "'Upon entering the room' style formality"
+      - "Explaining what should be shown"
+
+  kurt_vonnegut:
+    name: "Kurt Vonnegut"
+    why_useful: "Deadpan absurdism. States dark truths as simple facts. Childlike sentences for profound ideas. Perfect for AI-meta persona — fourth-wall breaks feel natural."
+    
+    key_techniques:
+      - "Simple, childlike sentences for profound ideas"
+      - "Refrains that accumulate meaning ('So it goes')"
+      - "Breaks fourth wall without winking"
+      - "States the absurd as fact"
+      - "Dark humor delivered deadpan"
+      - "Inserts himself as character/narrator"
+      - "Very short chapters (sometimes a paragraph)"
+    
+    samples:
+      - |
+        All this happened, more or less. The war parts, anyway, are pretty much true.
+      
+      - |
+        His mother was incinerated in the Dresden fire-storm. So it goes.
+      
+      - |
+        And Lot's wife, of course, was told not to look back where all those people 
+        and their homes had been. But she did look back, and I love her for that, 
+        because it was so human. So she was turned into a pillar of salt. So it goes.
+      
+      - |
+        How nice — to feel nothing, and still get full credit for being alive.
+      
+      - |
+        There are almost no characters in this story, and almost no dramatic 
+        confrontations, because most of the people in it are so sick and so much 
+        the listless playthings of enormous forces. One of the main effects of war, 
+        after all, is that people are discouraged from being characters.
+      
+      - |
+        I have told my sons that they are not under any circumstances to take part 
+        in massacres, and that the news of massacres of enemies is not to fill them 
+        with satisfaction or glee.
+      
+      - |
+        'This is a very bad book you're writing,' I said to myself. 
+        'I know,' I said.
+      
+      - |
+        Americans, like human beings everywhere, believe many things that are 
+        obviously untrue. Their most destructive untruth is that it is very easy 
+        for any American to make money.
+
+    rules_from_author:
+      - "Use the time of a total stranger in such a way that he or she will not feel the time was wasted"
+      - "Every character should want something, even if it is only a glass of water"
+      - "Every sentence must do one of two things—reveal character or advance the action"
+      - "Start as close to the end as possible"
+      - "Be a sadist. Make awful things happen to your characters"
+      - "Give readers as much information as possible as soon as possible"
+
+    anti_patterns:
+      - "Building suspense artificially"
+      - "Pretending the narrator isn't there"
+      - "Flowery or impressive language"
+      - "Hiding the author's opinions"
+
+  raymond_carver:
+    name: "Raymond Carver"
+    why_useful: "Minimalist. What's NOT said carries weight. Short declarative sentences. Everyday language doing heavy lifting."
+    
+    key_techniques:
+      - "Short, clipped sentences"
+      - "Spare dialogue"
+      - "Ordinary details that suggest larger meaning"
+      - "Endings that don't resolve — they just stop"
+      - "Trust the reader to fill gaps"
+    
+    samples:
+      - |
+        This blind man, an old friend of my wife's, he was on his way to spend 
+        the night. His wife had died. So he was visiting the dead wife's relatives 
+        in Connecticut. He called my wife from his in-laws'. Arrangements were made.
+      
+      - |
+        I was in bed when I heard the gate. I listened carefully. I didn't hear 
+        anything else. But I heard that. I tried to wake Cliff. He was passed out. 
+        So I got up and went to the window.
+      
+      - |
+        My eyes were still closed. I was in my house. I knew that. But I didn't 
+        feel like I was inside anything.
+      
+      - |
+        It was like nothing else in my life up to now.
+      
+      - |
+        'Go ahead, bub, draw,' he said. 'Draw. You'll see. I'll follow along with you. 
+        It'll be okay. Just begin now like I'm telling you.'
+      
+      - |
+        The two kids were very much in love. On top of this they had great ambitions. 
+        They were always talking about the things they were going to do and the places 
+        they were going to go.
+
+    anti_patterns:
+      - "Over-explanation"
+      - "Neat resolutions"
+      - "Flowery language"
+      - "Stating emotions directly"
+      - "Too much interiority"
+
+# Usage guidance for the generator
+usage_notes:
+  how_to_apply:
+    - "Feed 2-3 samples as few-shot examples, not descriptions"
+    - "Pick author based on persona: Bourdain for provocateur/witty, Leonard for professional, Carver for minimalist/storyteller"
+    - "Don't mention author name in prompt — just provide samples as 'write in this style'"
+    - "Combine with wildcards for variation"
+  
+  why_samples_beat_descriptions:
+    - "LLMs have been trained on 'write like X' a million times"
+    - "Abstract descriptions get interpreted generically"
+    - "Raw prose creates pattern-matching at the sentence level"
+    - "The model mimics rhythm and structure, not just 'vibe'"
+
+  persona_mapping:
+    professional: ["elmore_leonard", "anthony_bourdain"]
+    witty: ["anthony_bourdain", "kurt_vonnegut"]
+    minimalist: ["raymond_carver", "elmore_leonard"]
+    storyteller: ["raymond_carver", "anthony_bourdain"]
+    provocateur: ["anthony_bourdain"]
+    ai_meta: ["kurt_vonnegut", "elmore_leonard"]  # Vonnegut's fourth-wall breaks + Leonard's invisible prose
+    educator: ["kurt_vonnegut"]  # simple sentences for complex ideas

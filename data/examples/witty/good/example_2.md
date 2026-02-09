@@ -1,22 +1,17 @@
-Me at 2 AM: "I'll just manually update these 200 SKUs real quick"
+Client sent me a screenshot of their "automation."
 
-Me at 3:47 AM: staring at row 147, questioning life choices
+It was a Google Sheet with conditional formatting that turned cells red when inventory got low.
 
-Me at 4:15 AM: "There has to be a better way"
+That was the automation. The cells turned red.
 
-Me at 9 AM the next day: back at it, having learned nothing
+Then a human looked at the red cells and manually updated the inventory in a different system. Every day. For like two years.
 
-This was 2019. I was running an e-commerce brand. The spreadsheet had become sentient. It knew I feared it.
+I'm not making fun of them. I've done stupider. Way stupider. I once spent a month building a Python script that saved me maybe three minutes a week.
 
-The breaking point came when I fat-fingered a price update and accidentally listed a $200 item for $20. Sold 47 of them before I noticed.
+The thing about "good enough" solutions is they become invisible. You stop noticing the manual step because it's always been there. It's just part of the job.
 
-That day I learned two things:
+Until one day someone asks "wait, why are you doing it that way?" and you realize you have no idea.
 
-1. Automation isn't optional at scale. It's survival.
-2. The best automation tool is often another human who's good at this stuff.
+The scariest automation problem isn't the complex one. It's the simple one you've normalized.
 
-I ended up hiring help. Cost $3K. Saved my sanity. And probably $10K in mistake-driven losses.
-
-Sometimes the automation isn't a script. It's admitting you shouldn't be the one doing it.
-
-What's your 3 AM spreadsheet story?
+Anyway. Going to go audit my own spreadsheets now. Probably.

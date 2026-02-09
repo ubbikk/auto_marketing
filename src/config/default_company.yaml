@@ -2,37 +2,42 @@
 # This is loaded as the default when no custom company is specified
 
 name: "AFTA Systems"
-tagline: "AI Automation for E-commerce"
-core_offering: "Business process discovery + production-ready n8n automation"
-differentiator: "We analyze your business first, then automate. No DIY fumbling."
+tagline: "AI-Powered Business Process Automation"
+core_offering: "AI opportunity discovery + production-ready automation workflows"
+differentiator: "10+ years ML engineering. We don't just automate—we find where AI can unlock value you didn't know existed."
 
 target_audience:
-  - "DIY Automation Survivors - tried Zapier/Make.com, failed, need expert help"
-  - "Struggling E-commerce Operators - drowning in manual tasks, 3+ hours/day wasted"
-  - "Growing E-commerce Businesses - ready to scale, need infrastructure"
+  - "E-commerce SMBs - drowning in manual workflows, 3+ hours/day wasted on repetitive tasks"
+  - "Growing Businesses - ready to scale but need AI-powered infrastructure"
+  - "IT Outsourcing Agencies - want to expand into AI Agents projects but lack senior AI expertise"
 
 key_services:
-  - "Order processing automation"
-  - "Inventory management"
-  - "Customer support automation"
-  - "Marketing campaign automation"
+  - "AI-powered workflow automation (n8n, custom Python, AI agents)"
+  - "AI opportunity discovery - finding untapped value in your processes"
+  - "AI Agents development (CrewAI, LangChain, agentic workflows)"
+  - "AI content generation systems"
+  - "Project kickoff and technical architecture for AI initiatives"
 
 proof_points:
-  - "2-4 weeks to production"
-  - "No technical knowledge required from client"
-  - "n8n expertise (not generic Zapier)"
+  - "10+ years ML engineering, production systems serving 10M+ users"
+  - "Live demo: booktrailers.ai - AI-generated book marketing assets"
+  - "2-4 weeks from concept to production"
+  - "Tool-agnostic: n8n, Python, AI agents—whatever fits best"
+  - "Deep AI expertise (Kaggle Top 2-3%, Stanford ML courses)"
 
 pain_points_solved:
-  - "Manual data entry eating time"
-  - "Inventory sync failures"
-  - "Customer response delays"
-  - "Marketing campaign management overhead"
+  - "Manual workflows eating time and preventing scale"
+  - "Missing AI opportunities in existing processes"
+  - "Need senior AI expertise without full-time commitment"
+  - "AI projects stalling without proper architecture"
+  - "Gap between AI hype and production reality"
 
 industry_keywords:
-  - "e-commerce"
-  - "automation"
-  - "n8n"
-  - "inventory"
-  - "order processing"
-  - "customer support"
-  - "marketing automation"
+  - "AI automation"
+  - "business process automation"
+  - "AI agents"
+  - "e-commerce automation"
+  - "LLM integration"
+  - "workflow automation"
+  - "AI content generation"
+  - "MLOps"

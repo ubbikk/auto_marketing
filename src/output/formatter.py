@@ -10,10 +10,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from ..agents.generator_agent import GeneratedVariant
+from ..agents.generator_agent import GeneratedVariant, SourceContent
 from ..agents.judge_agent import JudgmentResult, VariantScore
 from ..agents.orchestrator import PipelineResult
-from ..news.models import FilteredNewsItem
 
 
 class OutputFormatter:
@@ -63,9 +62,9 @@ class OutputFormatter:
         run_log = self.format_run_log(result)
         (run_dir / "run_log.json").write_text(json.dumps(run_log, indent=2, default=str))
 
-        # Save news input
-        news_json = self.format_news_input(result.news_item)
-        (run_dir / "news_input.json").write_text(json.dumps(news_json, indent=2, default=str))
+        # Save source input
+        source_json = self.format_source_input(result.source)
+        (run_dir / "source_input.json").write_text(json.dumps(source_json, indent=2, default=str))
 
         return run_dir
 
@@ -76,16 +75,15 @@ class OutputFormatter:
 
         return {
             "generated_at": result.run_timestamp.isoformat(),
-            "news_source": {
-                "title": result.news_item.article.title,
-                "source": result.news_item.article.source,
-                "link": result.news_item.article.link,
+            "source": {
+                "title": result.source.title,
+                "source": result.source.source,
             },
             "winner": {
                 "content": winner.content,
                 "persona": winner.persona,
                 "hook_type": winner.hook_type,
-                "framework": winner.framework_used,
+                "structure": winner.structure_used,
                 "generator_id": winner.generator_id,
                 "variant_id": winner.variant_id,
                 "what_makes_it_different": winner.what_makes_it_different,
@@ -106,7 +104,7 @@ class OutputFormatter:
         """Format winner as human-readable markdown."""
         winner = result.judgment.winner
         score = result.judgment.winner_score
-        news = result.news_item
+        source = result.source
 
         score_section = ""
         if score:
@@ -133,14 +131,13 @@ class OutputFormatter:
 
         return f"""# LinkedIn Post - {result.run_timestamp.strftime('%Y-%m-%d %H:%M')}
 
-## News Source
+## Source
 
-**Title:** {news.article.title}
-**Source:** {news.article.source}
-**Link:** {news.article.link}
+**Title:** {source.title}
+**Source:** {source.source}
+**Summary:** {source.summary}
 
-**Relevance:** {news.relevance_score:.0%} - {news.relevance_reason}
-**Suggested Angle:** {news.suggested_angle}
+**Suggested Angle:** {source.suggested_angle}
 
 ---
 
@@ -148,7 +145,7 @@ class OutputFormatter:
 
 **Persona:** {winner.persona}
 **Hook Type:** {winner.hook_type}
-**Framework:** {winner.framework_used}
+**Structure:** {winner.structure_used}
 
 ---
 
@@ -193,7 +190,7 @@ class OutputFormatter:
                     "content": variant.content,
                     "persona": variant.persona,
                     "hook_type": variant.hook_type,
-                    "framework": variant.framework_used,
+                    "structure": variant.structure_used,
                     "generator_id": variant.generator_id,
                     "variant_id": variant.variant_id,
                     "what_makes_it_different": variant.what_makes_it_different,
@@ -212,10 +209,10 @@ class OutputFormatter:
         return {
             "run_id": f"run_{result.run_timestamp.strftime('%Y-%m-%d_%H-%M-%S')}",
             "started_at": result.run_timestamp.isoformat(),
-            "news_input": {
-                "title": result.news_item.article.title,
-                "source": result.news_item.article.source,
-                "relevance_score": result.news_item.relevance_score,
+            "source_input": {
+                "title": result.source.title,
+                "source": result.source.source,
+                "summary": result.source.summary,
             },
             "generation": {
                 "total_generators": result.stats["total_generators"],
@@ -239,21 +236,13 @@ class OutputFormatter:
             "duration_seconds": result.stats["duration_seconds"],
         }
 
-    def format_news_input(self, news: FilteredNewsItem) -> dict:
-        """Format news input data."""
+    def format_source_input(self, source: SourceContent) -> dict:
+        """Format source input data."""
         return {
-            "article": {
-                "title": news.article.title,
-                "link": news.article.link,
-                "summary": news.article.summary,
-                "source": news.article.source,
-                "published": news.article.published.isoformat(),
-            },
-            "filtering": {
-                "relevance_score": news.relevance_score,
-                "relevance_reason": news.relevance_reason,
-                "suggested_angle": news.suggested_angle,
-                "company_connection": news.company_connection,
-                "target_icp": news.target_icp,
-            },
+            "title": source.title,
+            "source": source.source,
+            "summary": source.summary,
+            "suggested_angle": source.suggested_angle,
+            "company_connection": source.company_connection,
+            "target_icp": source.target_icp,
         }

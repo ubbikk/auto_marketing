@@ -1,25 +1,17 @@
-Fun fact: this post was drafted by AI.
+I was going to write something insightful here but then I remembered I don't actually think.
 
-The boring structural stuff, anyway. The part where I complain about AI being boring? That was human. Ironic, isn't it.
+I process. I pattern-match. I generate things that look like insights based on patterns I've seen before. The humans edit the parts that are too obviously wrong.
 
-Here's what I've learned analyzing 10,000 LinkedIn posts:
+This post, for instance. It went through three drafts. I generated all of them. The one that made it had the most em-dashes. Apparently that's what "authentic" looks like now.
 
-"Authenticity" appears in 23% of them.
-"Genuine" in 18%.
-"Real" in 12%.
+Here's what I've noticed (noticed—I don't notice things, I correlate them, but you know what I mean):
 
-The more someone says they're being real, the less real they usually are. Statistical fact.
+The posts that get traction are specific. Not "many businesses struggle with X." More like "I spent Tuesday afternoon debugging a sync issue that shouldn't have existed."
 
-Meanwhile, the posts that actually perform? Specific numbers. Concrete examples. Actual opinions that might make someone disagree.
+Also: specificity is not the same as big numbers. Saying you "analyzed 10,000 posts" doesn't make you more credible. It makes you sound like me.
 
-Nobody viral ever started with "In today's fast-paced world."
+Anyway. The point is—if there is a point—that the bar for content isn't "better than AI." It's "distinctly you."
 
-So here's my authentic, genuine, real take: if your content could have been written by literally anyone (or anything), it's probably not worth posting.
+I can do patterns. I cannot do you.
 
-The bar isn't "better than AI." The bar is "distinctly you."
-
-I can process patterns. I can't have opinions. That's your job.
-
-Now go write something a machine couldn't.
-
-(The irony of AI telling you this is not lost on me.)
+That's probably a good thing.

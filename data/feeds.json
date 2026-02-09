@@ -1,0 +1,244 @@
+{
+  "feeds": [
+    {
+      "name": "TechCrunch AI",
+      "xml_url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "html_url": "https://techcrunch.com",
+      "type": "news",
+      "category": "ai",
+      "enabled": true,
+      "quick": true,
+      "description": "TechCrunch AI and machine learning coverage"
+    },
+    {
+      "name": "Ars Technica",
+      "xml_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+      "html_url": "https://arstechnica.com",
+      "type": "news",
+      "category": "tech",
+      "enabled": true,
+      "quick": false,
+      "description": "In-depth technology news and analysis"
+    },
+    {
+      "name": "VentureBeat AI",
+      "xml_url": "https://venturebeat.com/category/ai/feed/",
+      "html_url": "https://venturebeat.com",
+      "type": "news",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "Enterprise AI and ML industry news"
+    },
+    {
+      "name": "Wired AI",
+      "xml_url": "https://www.wired.com/feed/category/business/topic/artificial-intelligence/latest/rss",
+      "html_url": "https://wired.com",
+      "type": "news",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "Wired magazine AI and business coverage"
+    },
+    {
+      "name": "IEEE Spectrum AI",
+      "xml_url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",
+      "html_url": "https://spectrum.ieee.org",
+      "type": "news",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "IEEE engineering perspective on AI developments"
+    },
+    {
+      "name": "TechCrunch Startups",
+      "xml_url": "https://techcrunch.com/category/startups/feed/",
+      "html_url": "https://techcrunch.com",
+      "type": "news",
+      "category": "startup",
+      "enabled": true,
+      "quick": false,
+      "description": "Startup funding, launches, and ecosystem news"
+    },
+    {
+      "name": "Hacker News Frontpage",
+      "xml_url": "https://hnrss.org/frontpage",
+      "html_url": "https://news.ycombinator.com",
+      "type": "news",
+      "category": "tech",
+      "enabled": true,
+      "quick": true,
+      "description": "Top stories from Hacker News frontpage"
+    },
+    {
+      "name": "Paul Graham",
+      "xml_url": "http://www.aaronsw.com/2002/feeds/pgessays.rss",
+      "html_url": "https://paulgraham.com",
+      "type": "blog",
+      "category": "startup",
+      "enabled": true,
+      "quick": false,
+      "description": "Y Combinator co-founder; iconic essays on startups, hiring, and building companies"
+    },
+    {
+      "name": "Steve Blank",
+      "xml_url": "https://steveblank.com/feed/",
+      "html_url": "https://steveblank.com",
+      "type": "blog",
+      "category": "startup",
+      "enabled": true,
+      "quick": false,
+      "description": "Father of lean startup methodology; entrepreneurship and customer development"
+    },
+    {
+      "name": "Simon Willison",
+      "xml_url": "https://simonwillison.net/atom/everything/",
+      "html_url": "https://simonwillison.net",
+      "type": "blog",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "Django co-creator; prolific coverage of LLMs, AI tools, and practical AI applications"
+    },
+    {
+      "name": "Dwarkesh Patel",
+      "xml_url": "https://www.dwarkeshpatel.com/feed",
+      "html_url": "https://dwarkesh.com",
+      "type": "blog",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "In-depth interviews with AI researchers, tech leaders, and economists"
+    },
+    {
+      "name": "Pluralistic (Cory Doctorow)",
+      "xml_url": "https://pluralistic.net/feed/",
+      "html_url": "https://pluralistic.net",
+      "type": "blog",
+      "category": "tech",
+      "enabled": true,
+      "quick": false,
+      "description": "Platform economics, monopolies, enshittification, and digital rights"
+    },
+    {
+      "name": "Where's Your Ed At",
+      "xml_url": "https://www.wheresyoured.at/rss/",
+      "html_url": "https://wheresyoured.at",
+      "type": "blog",
+      "category": "tech",
+      "enabled": true,
+      "quick": false,
+      "description": "Sharp tech industry criticism; AI hype cycles, VC dynamics, and platform decay"
+    },
+    {
+      "name": "Anil Dash",
+      "xml_url": "https://anildash.com/feed.xml",
+      "html_url": "https://anildash.com",
+      "type": "blog",
+      "category": "tech",
+      "enabled": true,
+      "quick": false,
+      "description": "Tech CEO and commentator on tech ethics, open web, and digital culture"
+    },
+    {
+      "name": "Derek Thompson",
+      "xml_url": "https://www.theatlantic.com/feed/author/derek-thompson/",
+      "html_url": "https://derekthompson.org",
+      "type": "blog",
+      "category": "business",
+      "enabled": true,
+      "quick": false,
+      "description": "The Atlantic staff writer; business trends, economics, and technology's impact"
+    },
+    {
+      "name": "Overreacted (Dan Abramov)",
+      "xml_url": "https://overreacted.io/rss.xml",
+      "html_url": "https://overreacted.io",
+      "type": "blog",
+      "category": "tech",
+      "enabled": true,
+      "quick": false,
+      "description": "React core team member; deep dives on frontend architecture and component design"
+    },
+    {
+      "name": "George Hotz",
+      "xml_url": "https://geohot.github.io/blog/feed.xml",
+      "html_url": "https://geohot.github.io",
+      "type": "blog",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "Founder of comma.ai and tinygrad; AI/ML, self-driving, and hacking"
+    },
+    {
+      "name": "Gwern Branwen",
+      "xml_url": "https://gwern.substack.com/feed",
+      "html_url": "https://gwern.net",
+      "type": "blog",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "Long-form research on AI scaling, GPT, statistics, and technology forecasting"
+    },
+    {
+      "name": "Max Woolf (minimaxir)",
+      "xml_url": "https://minimaxir.com/index.xml",
+      "html_url": "https://minimaxir.com",
+      "type": "blog",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "Data scientist; practical tutorials on LLMs, data visualization, and AI tools"
+    },
+    {
+      "name": "Terrible Software",
+      "xml_url": "https://terriblesoftware.org/feed/",
+      "html_url": "https://terriblesoftware.org",
+      "type": "blog",
+      "category": "tech",
+      "enabled": true,
+      "quick": false,
+      "description": "Engineering leadership covering management, AI in engineering, and team dynamics"
+    },
+    {
+      "name": "Keygen",
+      "xml_url": "https://keygen.sh/blog/feed.xml",
+      "html_url": "https://keygen.sh",
+      "type": "blog",
+      "category": "startup",
+      "enabled": true,
+      "quick": false,
+      "description": "Software licensing platform; building SaaS, developer tools, and indie business"
+    },
+    {
+      "name": "Works on My Machine",
+      "xml_url": "https://worksonmymachine.substack.com/feed",
+      "html_url": "https://worksonmymachine.substack.com",
+      "type": "blog",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "Newsletter on how LLMs are transforming software development and knowledge work"
+    },
+    {
+      "name": "Joan Westenberg",
+      "xml_url": "https://joanwestenberg.com/rss",
+      "html_url": "https://joanwestenberg.com",
+      "type": "blog",
+      "category": "startup",
+      "enabled": true,
+      "quick": false,
+      "description": "Tech and culture writer covering startup life, creativity, and the tech industry"
+    },
+    {
+      "name": "Martin Alderson",
+      "xml_url": "https://martinalderson.com/feed.xml",
+      "html_url": "https://martinalderson.com",
+      "type": "blog",
+      "category": "ai",
+      "enabled": true,
+      "quick": false,
+      "description": "Commentary on AI's impact on software development, infrastructure costs, and tech business"
+    }
+  ]
+}

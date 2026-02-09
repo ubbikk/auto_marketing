@@ -1,20 +1,15 @@
-70% of e-commerce operators spend 45+ minutes daily on tasks a basic script could handle.
+I've been tracking where my clients' time actually goes. Not where they think it goes. Where it actually goes.
 
-I know because we surveyed 200 of them.
+The answer is almost always some version of copy-paste. Order comes in, someone copies data to a spreadsheet. Spreadsheet gets updated, someone copies it back to the system. Customer asks a question, someone copies a tracking number from one tab to another.
 
-The usual suspects:
-- Copy-pasting order data between systems: 23 min/day avg
-- Manual inventory updates: 18 min/day avg
-- Responding to "where's my order" with tracking links: 12 min/day avg
+It adds up to—I don't know, call it an hour a day? Maybe more for bigger stores.
 
-That's 53 minutes. Every day. 4.4 hours per week.
+The frustrating part: this isn't hard to automate. Like, at all. Most of it is weekend-project level if you know what you're doing.
 
-At even a modest hourly value of $50, you're burning $11,440/year on copy-paste.
+But here's what nobody tells you: the hard part isn't the automation. It's deciding what to automate and in what order. Everything feels urgent when you're drowning.
 
-The frustrating part? Most of this is weekend-project level automation. Not rocket science.
+My rule of thumb: start with whatever makes you angriest. The task that makes you think "I can't believe I'm still doing this manually." That's usually right.
 
-But here's what nobody tells you: the hard part isn't the automation. It's deciding what to automate and in what order.
+Because anger is information. It's telling you where the leverage is.
 
-Start with whatever makes you angriest. That's usually right.
-
-What's eating your time today?
+Anyway. I should probably stop writing about this and go finish a client's order-routing workflow. But I keep thinking about it.

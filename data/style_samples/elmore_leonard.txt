@@ -1,0 +1,56 @@
+# Elmore Leonard
+# Invisible prose. If it sounds like writing, cut it.
+# Perfect for killing AI 'smoothness'.
+
+## SAMPLES
+
+When Chili first came to Miami Beach twelve years ago they were having
+one of their off-and-on cold winters: thirty-four degrees the day he met
+Tommy Carlo for lunch at Vesuvio's on South Collins and had his leather
+jacket ripped off.
+
+---
+
+The voice on the phone said, 'Hey, Chief? Fuck you. I'll get somebody else.'
+This guy was a punk, he had to talk like that. It was okay.
+
+---
+
+There were a lot of terms you had to learn, as opposed to the shylock
+business where all you had to know how to say was 'Give me the fuckin money.'
+
+---
+
+Sunday morning, Ordell took Louis to watch the white-power demonstration
+in downtown Palm Beach.
+
+---
+
+He asked about her flight, hoping, he said, Northwest wasn't still serving
+that scrambled egg sandwich with the banana and yogurt. A cold bagel,
+for Christ sake.
+
+## ELMORE LEONARD'S RULES OF WRITING
+
+1. Never open a book with weather
+2. Never use a verb other than 'said' to carry dialogue
+3. Never use an adverb to modify the verb 'said'
+4. Keep exclamation points under control (2-3 per 100,000 words)
+5. Never use 'suddenly' or 'all hell broke loose'
+6. Try to leave out the part that readers tend to skip
+7. If it sounds like writing, I rewrite it
+
+## KEY TECHNIQUES
+
+- Only 'said' for dialogue tags, no adverbs
+- Leave out the parts readers skip
+- Never open with weather or setup
+- Incomplete sentences are fine
+- Let voice carry, not description
+
+## ANTI-PATTERNS (what Leonard never does)
+
+- Thick paragraphs with too many words
+- Going into the character's head when reader doesn't care
+- 'Upon entering the room' style formality
+- Explaining what should be shown

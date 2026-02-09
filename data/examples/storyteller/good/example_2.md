@@ -1,15 +1,21 @@
-Three months ago, a client told us "automation doesn't work for my business." He ran a mid-size outdoor gear store. 2,000 SKUs. Three warehouse locations.
+He told me automation doesn't work for his business.
 
-He'd tried Zapier twice. Both times, the workflows broke within weeks. Orders slipped through. Inventory counts drifted. He went back to spreadsheets and hired another part-timer.
+This was—when was this, November? October? Sometime last fall. He ran an outdoor gear store. Not huge, not tiny. Maybe a couple thousand products across three warehouses.
 
-We spent the first week not building anything. We mapped his actual workflow. Not what he thought he did. What he actually did.
+He'd tried Zapier twice before. Both times it broke within a few weeks. Orders slipping through, inventory counts drifting. He gave up and hired another part-timer.
 
-Turns out 60% of his team's time went to three things: cross-checking inventory across warehouses, manually routing orders to the nearest fulfillment point, and copy-pasting tracking numbers into customer emails.
+I said okay, show me.
 
-None of these were hard to automate. But each one had edge cases his Zapier setup couldn't handle. An item split across two warehouses. A customer who ordered twice in one day. A supplier who sends CSVs with different column headers every month.
+We didn't build anything for the first week. I just... watched. Sat in on calls. Looked at spreadsheets. Asked questions that probably annoyed everyone.
 
-We built 7 workflows. Took 3 weeks. His part-timer now handles customer relationships instead of data entry.
+What I found: his team spent most of their time doing three things. Checking inventory across warehouses. Routing orders to the right location. Copying tracking numbers into emails.
 
-Last Tuesday he sent us a screenshot: "First month I didn't work a single weekend since 2022."
+Simple stuff. But each one had weird edge cases. An item split across two warehouses. A customer who ordered twice in one day. A supplier who sends CSVs with different column headers every month because apparently that's a thing suppliers do.
 
-That's not an automation success story. That's a weekend back.
+His Zapier setup couldn't handle the edge cases. So it broke. So he stopped trusting it.
+
+We built him seven workflows. Took maybe three weeks. His part-timer does customer stuff now instead of data entry.
+
+Last week he texted me a screenshot. "First month I haven't worked a weekend since 2022."
+
+That's not really an automation story. It's a weekend.

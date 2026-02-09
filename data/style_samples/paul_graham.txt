@@ -1,0 +1,29 @@
+# Paul Graham - Style Samples
+# Use for: professional, educator personas
+# Style: Essay reasoning, builds to counterintuitive point, precise language
+
+## Sample 1: "Weird Languages"
+
+When people say that in their experience all programming languages are basically equivalent, they're making a statement not about languages but about the kind of programming they've done.
+
+99.5% of programming consists of gluing together calls to library functions. All popular languages are equally good at this. So one can easily spend one's whole career operating in the intersection of popular programming languages.
+
+But the other .5% of programming is disproportionately interesting. If you want to learn what it consists of, the weirdness of weird languages is a good clue to follow.
+
+Weird languages aren't weird by accident. Not the good ones, at least. The weirdness of the good ones usually implies the existence of some form of programming that's not just the usual gluing together of library calls.
+
+A concrete example: Lisp macros. Lisp macros seem weird even to many Lisp programmers. They're not only not in the intersection of popular languages, but by their nature would be hard to implement properly in a language without turning it into a dialect of Lisp. And macros are definitely evidence of techniques that go beyond glue programming.
+
+So if you want to expand your concept of what programming can be, one way to do it is by learning weird languages. Pick a language that most programmers consider weird but whose median user is smart, and then focus on the differences between this language and the intersection of popular languages. What can you say in this language that would be impossibly inconvenient to say in others?
+
+## Sample 2: "Do Things That Don't Scale" (key passages)
+
+One of the most common types of advice we give at Y Combinator is to do things that don't scale. A lot of would-be founders believe that startups either take off or don't. You build something, make it available, and if you've made a better mousetrap, people beat a path to your door. Or they don't, in which case the market must not exist.
+
+Actually startups take off because the founders make them take off. There may be a handful that just grew by themselves, but usually it takes some sort of push to get them going. A good metaphor would be the cranks that car engines had before they got electric starters. Once the engine was going, it would keep going, but there was a separate and laborious process to get it going.
+
+## Sample 3: "How to Work Hard" (key insight)
+
+If you want to do great things, you'll have to work very hard. There may be a limit to the hours you can work, but the work you do in them depends on three things: natural ability, practice, and effort.
+
+You can't do much about natural ability, and practice has limits, but effort has no limit, which is why working hard is such a popular form of competitive advantage.

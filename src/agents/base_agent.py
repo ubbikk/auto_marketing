@@ -7,9 +7,19 @@ with the effort parameter for maximum quality.
 import json
 import re
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Any, Optional
 
 import anthropic
+
+
+@dataclass
+class UsageData:
+    """Token usage data from an API call."""
+
+    input_tokens: int
+    output_tokens: int
+    model: str
 
 
 class BaseAgent(ABC):
@@ -43,21 +53,14 @@ class BaseAgent(ABC):
 
     def _create_message(
         self,
-        system_prompt: str,
-        user_prompt: str,
+        prompt: str,
         temperature: float = 1.0,
     ) -> anthropic.types.Message:
         """
-        Create a message using Claude Opus 4.5 with effort parameter.
-
-        The effort parameter controls the depth of extended thinking:
-        - "high": Maximum reasoning depth (default, equivalent to no setting)
-        - "medium": Balanced reasoning
-        - "low": Faster responses, less reasoning
+        Create a message using Claude with the given prompt.
 
         Args:
-            system_prompt: System instructions
-            user_prompt: User message content
+            prompt: Full prompt content (sent as user message)
             temperature: Sampling temperature
 
         Returns:
@@ -67,8 +70,7 @@ class BaseAgent(ABC):
             model=self.model_id,
             max_tokens=self.max_tokens,
             temperature=temperature,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
+            messages=[{"role": "user", "content": prompt}],
         )
 
     def _extract_text(self, response: anthropic.types.Message) -> str:
@@ -122,6 +124,21 @@ class BaseAgent(ABC):
             if block.type == "thinking":
                 return block.thinking
         return None
+
+    def _extract_usage(self, response: anthropic.types.Message) -> UsageData:
+        """Extract token usage from response.
+
+        Args:
+            response: Anthropic Message response
+
+        Returns:
+            UsageData with token counts and model info
+        """
+        return UsageData(
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+            model=self.model_id,
+        )
 
     @abstractmethod
     async def execute(self, *args: Any, **kwargs: Any) -> Any:

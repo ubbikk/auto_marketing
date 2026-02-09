@@ -1,0 +1,51 @@
+# Raymond Carver
+# Minimalist. What's NOT said carries weight. Short declarative sentences.
+# Everyday language doing heavy lifting.
+
+## SAMPLES
+
+This blind man, an old friend of my wife's, he was on his way to spend
+the night. His wife had died. So he was visiting the dead wife's relatives
+in Connecticut. He called my wife from his in-laws'. Arrangements were made.
+
+---
+
+I was in bed when I heard the gate. I listened carefully. I didn't hear
+anything else. But I heard that. I tried to wake Cliff. He was passed out.
+So I got up and went to the window.
+
+---
+
+My eyes were still closed. I was in my house. I knew that. But I didn't
+feel like I was inside anything.
+
+---
+
+It was like nothing else in my life up to now.
+
+---
+
+'Go ahead, bub, draw,' he said. 'Draw. You'll see. I'll follow along with you.
+It'll be okay. Just begin now like I'm telling you.'
+
+---
+
+The two kids were very much in love. On top of this they had great ambitions.
+They were always talking about the things they were going to do and the places
+they were going to go.
+
+## KEY TECHNIQUES
+
+- Short, clipped sentences
+- Spare dialogue
+- Ordinary details that suggest larger meaning
+- Endings that don't resolve — they just stop
+- Trust the reader to fill gaps
+
+## ANTI-PATTERNS (what Carver never does)
+
+- Over-explanation
+- Neat resolutions
+- Flowery language
+- Stating emotions directly
+- Too much interiority

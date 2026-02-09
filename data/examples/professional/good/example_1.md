@@ -1,20 +1,17 @@
-I analyzed 47 failed e-commerce automation projects last quarter.
+A client called on Tuesday—I think it was Tuesday, I was making coffee—and said their automation was broken.
 
-43 of them had the same root cause: they started building before they understood the problem.
+It wasn't broken. It was doing exactly what they'd asked for.
 
-"We need to automate inventory sync" sounds specific. It isn't.
+That's the thing nobody tells you. The automation works fine. The spec was wrong.
 
-The actual questions that matter:
-- Which inventory changes trigger sync? All? Only stock-outs?
-- What happens when data conflicts? Source of truth?
-- Who gets alerted when things break? How fast?
+We spent an hour on the phone and I mostly just asked questions. What does "sync" mean to you? When you say "inventory," which inventory? The one in Shopify or the spreadsheet your warehouse guy updates whenever he remembers?
 
-Most automation failures aren't technical. They're definitional.
+By the end we'd discovered three different versions of truth living in their business. No wonder the automation was "wrong." It was faithfully replicating chaos.
 
-You can build the most elegant Zapier workflow in the world. If it's solving the wrong problem, you've just automated confusion.
+This happens maybe two-thirds of the time. Someone comes to us with an automation problem and it's actually a clarity problem. They haven't defined their process—they've just been doing it.
 
-At AFTA, we spend the first week doing nothing but asking questions. Clients think we're slow. We're preventing the rebuild they'd need in month 3.
+We spend the first week doing nothing but mapping. Clients get impatient. They want to see code.
 
-Business process discovery first. Code second.
+But if you automate confusion, you just get faster confusion.
 
-It's not exciting. But it's why our stuff actually works.
+Process first. That's all I've got.

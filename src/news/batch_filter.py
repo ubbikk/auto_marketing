@@ -126,38 +126,16 @@ class BatchNewsFilter:
         company_filter_context = self.company_context.to_filter_prompt()
 
         # Build prompt for batch evaluation
-        prompt = f"""Evaluate these news articles for {company_name}'s LinkedIn content.
-
-{company_filter_context}
-
-{articles_xml}
-
-TASK: For each article, determine if it can be connected to {company_name}'s messaging and audience.
-
-Consider for each:
-- Can we tie this to the company's core themes and offerings?
-- Does it relate to the target audience's pain points?
-- Can we offer a unique perspective or contrarian take?
-- Would the target ICPs find this relevant to their problems?
-
-Respond ONLY with valid JSON (no markdown, no explanation):
-{{
-    "relevant_articles": [
-        {{
-            "id": <article_id_number>,
-            "relevance_score": <0.0-1.0>,
-            "relevance_reason": "Brief explanation",
-            "suggested_angle": "How to frame for {company_name}'s audience",
-            "company_connection": "Specific tie-in to {company_name}'s services",
-            "target_icp": "One of the target audience segments"
-        }}
-    ]
-}}
-
-Only include articles with relevance_score >= {self.relevance_threshold}.
-Sort by relevance_score descending.
-Return at most {max_results * 2} articles (we'll pick the top {max_results}).
-"""
+        from ..prompts import render
+        prompt = render(
+            "batch_filter",
+            company_name=company_name,
+            company_filter_context=company_filter_context,
+            articles_xml=articles_xml,
+            relevance_threshold=str(self.relevance_threshold),
+            max_results=str(max_results),
+            max_results_doubled=str(max_results * 2),
+        )
 
         try:
             logger.info(

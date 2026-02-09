@@ -166,7 +166,7 @@ async def scrape_website_content(url: str) -> Optional[str]:
         from firecrawl import FirecrawlApp
 
         app = FirecrawlApp(api_key=api_key)
-        result = app.scrape(url, formats=["markdown"])
+        result = app.scrape_url(url, params={"formats": ["markdown"]})
 
         if result and isinstance(result, dict):
             return result.get("markdown", result.get("content", ""))
@@ -236,50 +236,8 @@ async def generate_company_profile(
     logger.info("[PROFILE] Got %d chars of content, generating profile...", len(content))
 
     # Step 2: Generate structured profile using AI
-    prompt = f"""Analyze this website content and extract a company profile for LinkedIn content generation.
-
-WEBSITE CONTENT:
-{content}
-
-Extract the following information. If something isn't explicitly stated, make reasonable inferences based on the content. Be specific and actionable.
-
-Return ONLY valid JSON (no markdown, no explanation):
-{{
-    "name": "Company name",
-    "tagline": "Short tagline or value proposition (1 sentence)",
-    "core_offering": "What the company primarily offers (1-2 sentences)",
-    "differentiator": "What makes them different from competitors (be specific)",
-    "target_audience": [
-        "Primary customer type 1 with brief description",
-        "Primary customer type 2 with brief description",
-        "Primary customer type 3 with brief description"
-    ],
-    "key_services": [
-        "Service/product 1",
-        "Service/product 2",
-        "Service/product 3",
-        "Service/product 4"
-    ],
-    "proof_points": [
-        "Credibility point 1 (stats, awards, customers, timeframes)",
-        "Credibility point 2",
-        "Credibility point 3"
-    ],
-    "pain_points_solved": [
-        "Customer pain point 1 that they solve",
-        "Customer pain point 2 that they solve",
-        "Customer pain point 3 that they solve",
-        "Customer pain point 4 that they solve"
-    ],
-    "industry_keywords": [
-        "keyword1",
-        "keyword2",
-        "keyword3",
-        "keyword4",
-        "keyword5"
-    ]
-}}
-"""
+    from ..prompts import render
+    prompt = render("company_profile", content=content)
 
     response_text, response = await get_completion_async(
         model=model,

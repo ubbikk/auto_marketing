@@ -1,17 +1,15 @@
-Your Zapier setup isn't automation. It's a Rube Goldberg machine with a monthly fee.
+Look. Your Zapier setup isn't automation. It's a Rube Goldberg machine with a monthly fee.
 
-I audited 30 e-commerce stores last quarter that called themselves "automated." Here's what I found:
+I've been inside a lot of e-commerce stores that call themselves "automated." Most of them have someone—usually the same person every morning—checking whether the zaps ran. That's not automation. That's a babysitting job dressed up in SaaS clothing.
 
-26 of them had at least one person manually copying data between tabs. Every day.
+The tool isn't the problem. Zapier is fine for basic stuff. The problem is nobody actually mapped the process before building anything.
 
-19 had Zapier workflows that broke so often they'd assigned someone to "check the zaps" each morning. That's not automation. That's a babysitting job with extra steps.
+Like, actually mapped it. Not "we sync orders to the spreadsheet." More like: which orders? All of them? Just the ones over a certain value? What happens when two orders come in at the same time? Who gets notified when something breaks?
 
-12 were paying over $200/month for tools that handled maybe 30% of what they needed.
+Nobody thinks about this stuff until it breaks. And then it's my problem to fix.
 
-The problem isn't the tools. Zapier is fine for simple stuff. The problem is nobody sat down and mapped the actual process before building anything.
+I had to leave a call last week because I couldn't stop saying "but why" and the client was getting annoyed. But seriously—why does this workflow exist? Who asked for it? Is anyone even using the output?
 
-You wouldn't renovate a house without blueprints. But somehow everyone thinks they can automate a 47-step order fulfillment process by watching a YouTube tutorial.
+Half the time the answer is "I don't know, it's always been there."
 
-At AFTA, we spend the first week doing nothing but asking questions and mapping workflows. Clients think we're slow. We're preventing the $15K rebuild they'd need in 6 months.
-
-Automation without process discovery is just faster chaos.
+Automation without process clarity is just faster chaos. I'm tired of cleaning up chaos.

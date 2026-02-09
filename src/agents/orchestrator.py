@@ -18,10 +18,11 @@ from typing import Optional
 import anthropic
 import yaml
 
+from ..company.profile import load_default_context
 from ..creativity.anti_slop import AntiSlopValidator
 from ..creativity.engine import CreativityEngine
 from ..news.models import FilteredNewsItem
-from .generator_agent import GeneratedVariant, GeneratorAgent
+from .generator_agent import GeneratedVariant, GeneratorAgent, GeneratorResult, SourceContent
 from .judge_agent import JudgeAgent, JudgmentResult
 
 
@@ -42,7 +43,7 @@ class PipelineResult:
     judgment: JudgmentResult
     all_variants: list[GeneratedVariant]
     filtered_variants: list[GeneratedVariant]  # After anti-slop check
-    news_item: FilteredNewsItem
+    source: SourceContent
     run_timestamp: datetime
     stats: dict
 
@@ -66,7 +67,7 @@ class Orchestrator:
         config_dir: Path,
         data_dir: Path,
         num_generators: int = 7,
-        variants_range: tuple[int, int] = (2, 4),
+        variants_range: tuple[int, int] = (1, 1),
         model_id: str = "claude-opus-4-5-20251101",
     ):
         """
@@ -89,7 +90,8 @@ class Orchestrator:
 
         # Load configurations
         self.personas = self._load_personas()
-        self.company_profile = self._load_company_profile()
+        self.company_context = load_default_context()
+        self.company_profile = self.company_context.to_generator_prompt()
 
         # Initialize anti-slop validator
         self.anti_slop = AntiSlopValidator()
@@ -109,23 +111,6 @@ class Orchestrator:
             data = yaml.safe_load(f)
         return data.get("personas", {})
 
-    def _load_company_profile(self) -> str:
-        """Load company profile for context."""
-        personas_path = self.config_dir / "personas.yaml"
-        with open(personas_path) as f:
-            data = yaml.safe_load(f)
-
-        ctx = data.get("company_context", {})
-        return f"""
-Company: {ctx.get('name', 'AFTA Systems')}
-Tagline: {ctx.get('tagline', '')}
-Core Offering: {ctx.get('core_offering', '')}
-Differentiator: {ctx.get('differentiator', '')}
-Target Audience: {', '.join(ctx.get('target_audience', []))}
-Key Services: {', '.join(ctx.get('key_services', []))}
-Proof Points: {', '.join(ctx.get('proof_points', []))}
-"""
-
     async def run(self, news_item: FilteredNewsItem) -> PipelineResult:
         """
         Run the full generation pipeline.
@@ -136,6 +121,27 @@ Proof Points: {', '.join(ctx.get('proof_points', []))}
         Returns:
             PipelineResult with all outputs
         """
+        # Convert FilteredNewsItem to unified SourceContent
+        source = SourceContent(
+            title=news_item.article.title,
+            source=news_item.article.source,
+            summary=news_item.article.summary,
+            suggested_angle=news_item.suggested_angle,
+            company_connection=news_item.company_connection,
+            target_icp=news_item.target_icp,
+        )
+        return await self.run_from_source(source)
+
+    async def run_from_source(self, source: SourceContent) -> PipelineResult:
+        """
+        Run the full generation pipeline from unified source content.
+
+        Args:
+            source: Source content to generate posts for.
+
+        Returns:
+            PipelineResult with all outputs.
+        """
         run_start = datetime.now()
 
         # Step 1: Create generator configurations
@@ -143,7 +149,7 @@ Proof Points: {', '.join(ctx.get('proof_points', []))}
 
         # Step 2: Run generators in parallel
         generation_tasks = [
-            self._run_generator(config, news_item) for config in generator_configs
+            self._run_generator(config, source) for config in generator_configs
         ]
 
         all_results = await asyncio.gather(*generation_tasks, return_exceptions=True)
@@ -152,7 +158,9 @@ Proof Points: {', '.join(ctx.get('proof_points', []))}
         all_variants: list[GeneratedVariant] = []
         generation_errors = 0
         for result in all_results:
-            if isinstance(result, list):
+            if isinstance(result, GeneratorResult):
+                all_variants.extend(result.variants)
+            elif isinstance(result, list):
                 all_variants.extend(result)
             else:
                 generation_errors += 1
@@ -178,8 +186,8 @@ Proof Points: {', '.join(ctx.get('proof_points', []))}
             model_id=self.model_id,
         )
 
-        news_context = f"Title: {news_item.article.title}\nSummary: {news_item.article.summary}"
-        judgment = await judge.execute(filtered_variants, news_context)
+        source_context = f"Title: {source.title}\nSummary: {source.summary}"
+        judgment = await judge.execute(filtered_variants, source_context)
 
         # Compile stats
         stats = {
@@ -196,7 +204,7 @@ Proof Points: {', '.join(ctx.get('proof_points', []))}
             judgment=judgment,
             all_variants=all_variants,
             filtered_variants=filtered_variants,
-            news_item=news_item,
+            source=source,
             run_timestamp=run_start,
             stats=stats,
         )
@@ -227,8 +235,8 @@ Proof Points: {', '.join(ctx.get('proof_points', []))}
     async def _run_generator(
         self,
         config: GeneratorConfig,
-        news_item: FilteredNewsItem,
-    ) -> list[GeneratedVariant]:
+        source: SourceContent,
+    ) -> GeneratorResult:
         """Run a single generator agent."""
         # Get creativity context
         creativity_ctx = self.creativity_engine.generate_context(config.persona_name)
@@ -238,13 +246,14 @@ Proof Points: {', '.join(ctx.get('proof_points', []))}
             client=self.client,
             generator_id=config.generator_id,
             persona_config=config.persona_config,
+            company_name=self.company_context.name,
             company_profile=self.company_profile,
             model_id=self.model_id,
         )
 
         # Run generation
         return await generator.execute(
-            news_item=news_item,
+            source=source,
             creativity_ctx=creativity_ctx,
             num_variants=config.num_variants,
         )

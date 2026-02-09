@@ -1,4 +1,4 @@
-"""Render carousel slides to HTML and compile to PDF via Playwright."""
+"""Render carousel slides to standalone HTML."""
 
 import html
 from pathlib import Path
@@ -542,15 +542,12 @@ def build_html(
 </html>"""
 
 
-async def render_pdf(html_content: str, output_path: Path) -> Path:
-    """Render the HTML carousel to a multi-page PDF using Playwright.
+def build_printable_html(html_content: str) -> str:
+    """Inject @media print CSS into carousel HTML for print-to-PDF workflow.
 
-    Uses native PDF rendering to preserve clickable links.
-    Each 1080x1080 slide becomes one page.
+    The returned HTML can be opened in Chrome and printed (Cmd+P → Save as PDF)
+    to produce a multi-page PDF with one 1080x1080 slide per page.
     """
-    from playwright.async_api import async_playwright
-
-    # Inject print CSS so each slide fits exactly one page
     print_css = """
 <style>
   @media print {
@@ -561,30 +558,4 @@ async def render_pdf(html_content: str, output_path: Path) -> Path:
   @page { size: 1080px 1080px; margin: 0; }
 </style>
 """
-    html_content = html_content.replace("</head>", print_css + "</head>")
-
-    # Write HTML to a temp file
-    tmp_html = output_path.with_suffix(".html")
-    tmp_html.write_text(html_content, encoding="utf-8")
-
-    async with async_playwright() as pw:
-        browser = await pw.chromium.launch()
-        page = await browser.new_page(viewport={"width": 1080, "height": 1080})
-
-        await page.goto(f"file://{tmp_html.resolve()}", wait_until="networkidle")
-        await page.evaluate("() => document.fonts.ready")
-        await page.wait_for_timeout(1000)
-
-        await page.pdf(
-            path=str(output_path),
-            width="1080px",
-            height="1080px",
-            margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
-            print_background=True,
-        )
-
-        await browser.close()
-
-    tmp_html.unlink(missing_ok=True)
-
-    return output_path
+    return html_content.replace("</head>", print_css + "</head>")

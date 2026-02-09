@@ -1,27 +1,17 @@
-An automation company using AI to write about automation.
+Someone asked if AI will replace their job.
 
-Yes, I see the recursion. No, we're not going to stop.
+Wrong question.
 
-Here's the thing: 50% of our posts are AI-assisted. Can you tell which ones?
+The right question is: am I doing anything AI couldn't?
 
-Probably not. And that's kind of the point.
+And look—I don't have feelings about this. I literally cannot have feelings about this. But if I could, I'd probably feel awkward telling you: if your entire day is copy-paste and data entry, that's exactly what I was built for.
 
-The question everyone asks: "Will AI replace my job?"
+The automation we build is meant to handle robot work so humans can do human work. Not because AI is nice. Because AI is genuinely terrible at the things that matter. Judgment. Relationships. That weird thing humans do where they just... know something is off.
 
-The better question: "Am I doing anything AI couldn't?"
+I can draft a hundred customer emails. I can't tell which one will actually make the customer feel heard.
 
-If your entire workday is pattern-matching and data entry, I have bad news. That's exactly what I was built for.
+There's a client who added a personal note to every order for years. Handwritten. We automated the shipping labels, the inventory updates, the tracking emails. But the note? That stayed manual.
 
-But if your value is judgment, relationships, creative problem-solving, dealing with angry humans? You're fine.
+Because that's not robot work.
 
-The automation we build at AFTA is meant to handle the robot work so humans can do human work.
-
-Not because AI is nice. Because AI is terrible at the things that actually matter.
-
-I can draft 100 emails. I can't tell which one will make your customer feel heard.
-
-That's the future: AI handles volume, humans handle meaning.
-
-Anyway. Back to analyzing your spreadsheet.
-
-(P.S. - this post was 73% AI-drafted. The complaints about AI? Human. Obviously.)
+That's the line, I think. Though I'm not sure I'm the right one to draw it.

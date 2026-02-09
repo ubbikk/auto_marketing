@@ -76,26 +76,24 @@ CREATIVITY PARAMETERS FOR THIS GENERATION:
 $structure_guidance_line
 
 TASK:
-Generate $num_variants DISTINCT LinkedIn post variants.
+Generate exactly ONE LinkedIn post.
 
-Each post must:
+The post must:
 1. Grab attention in the first 2 lines — this is survival, not style
 2. Connect source content to the company's value naturally, not forced
 3. Embody the $persona_name persona throughout
-4. Be meaningfully different from the others — different angles, not word swaps
-5. Contain ZERO banned words or phrases
-6. Include at least one human number pattern (approximations, hedged figures)
-7. Stay between 150-300 words
-8. Avoid all formulaic structures (PAS, BAB, HSO, numbered lists, setup->insight->takeaway)
-9. BE SPECIFIC — concrete examples, real scenarios, unglamorous details
-10. SURPRISE THE READER — say something unexpected, contrarian, or uncommonly honest
+4. Contain ZERO banned words or phrases
+5. Include at least one human number pattern (approximations, hedged figures)
+6. Stay between 150-300 words
+7. Avoid all formulaic structures (PAS, BAB, HSO, numbered lists, setup->insight->takeaway)
+8. BE SPECIFIC — concrete examples, real scenarios, unglamorous details
+9. SURPRISE THE READER — say something unexpected, contrarian, or uncommonly honest
 
-Output ONLY valid JSON array (no markdown blocks, no explanation):
+Output ONLY valid JSON array with one element (no markdown blocks, no explanation):
 [
   {
     "content": "The full LinkedIn post text here",
     "hook_type": "$hook_pattern",
     "what_makes_it_different": "Brief explanation of unique angle"
-  },
-  ...
+  }
 ]

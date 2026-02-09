@@ -12,30 +12,10 @@ from typing import Optional
 
 import feedparser
 
+from .feed_loader import get_blog_feeds, get_news_feeds
 from .models import NewsArticle
-from .opml_parser import load_blog_feeds
 
 logger = logging.getLogger(__name__)
-
-# AI and Tech News RSS Feeds (from NEWS_SOURCES.md)
-AI_FEEDS = [
-    "https://techcrunch.com/category/artificial-intelligence/feed/",
-    "https://feeds.arstechnica.com/arstechnica/technology-lab",
-    "https://venturebeat.com/category/ai/feed/",
-    "https://www.wired.com/feed/category/business/topic/artificial-intelligence/latest/rss",
-    "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",
-]
-
-BUSINESS_FEEDS = [
-    "https://techcrunch.com/category/startups/feed/",
-    "https://hnrss.org/frontpage",
-]
-
-# Lighter feed list for faster testing
-QUICK_FEEDS = [
-    "https://techcrunch.com/category/artificial-intelligence/feed/",
-    "https://hnrss.org/frontpage",
-]
 
 
 class NewsFetcher:
@@ -60,19 +40,19 @@ class NewsFetcher:
         Initialize news fetcher.
 
         Args:
-            feeds: List of RSS feed URLs (default: AI + Business feeds)
+            feeds: List of RSS feed URLs (default: loaded from feeds.json)
             hours_back: How far back to look for news articles
             blog_days_back: How far back to look for blog posts (days)
             quick_mode: Use minimal feed list for faster testing
-            include_blogs: Include blog feeds from OPML file
-            project_root: Project root for locating OPML file
+            include_blogs: Include blog feeds from feeds.json
+            project_root: Project root for locating feeds.json
         """
         if feeds:
             self.feeds = feeds
         elif quick_mode:
-            self.feeds = QUICK_FEEDS
+            self.feeds = get_news_feeds(quick=True)
         else:
-            self.feeds = AI_FEEDS + BUSINESS_FEEDS
+            self.feeds = get_news_feeds()
 
         self.hours_back = hours_back
         self.blog_hours_back = blog_days_back * 24
@@ -80,8 +60,8 @@ class NewsFetcher:
         # Load blog feeds if requested
         self.blog_feeds: list[str] = []
         if include_blogs and not quick_mode:
-            self.blog_feeds = load_blog_feeds(project_root)
-            logger.info("[FETCHER] Loaded %d blog feeds from OPML", len(self.blog_feeds))
+            self.blog_feeds = get_blog_feeds()
+            logger.info("[FETCHER] Loaded %d blog feeds", len(self.blog_feeds))
 
     async def fetch_all(self) -> list[NewsArticle]:
         """

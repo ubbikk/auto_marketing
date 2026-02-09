@@ -1,1 +1,1 @@
-"""LinkedIn carousel generation — text to branded PDF slides."""
+"""LinkedIn carousel generation — text to branded HTML slides."""

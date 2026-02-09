@@ -1,21 +1,17 @@
-The five stages of DIY automation:
+I opened Slack on a Saturday.
 
-1. Excitement: "Zapier looks easy!"
-2. YouTube: "Tutorial says 10 minutes"
-3. Confusion: "Why isn't it triggering?"
-4. Denial: "I just need one more zap"
-5. Acceptance: "Maybe I should call someone"
+I know. I know.
 
-Been there. Built that. Got the broken workflows to prove it.
+But there was a notification and I thought "it's probably nothing" and then it wasn't nothing. It was a client's entire order sync breaking at like 11 PM on a Friday.
 
-The problem isn't intelligence. The problem is you're trying to automate processes you've never actually mapped out.
+Turns out their supplier changed a column header in their CSV. Just one column. "Item_SKU" became "ItemSKU". No underscore.
 
-It's like optimizing your morning routine when you haven't admitted you hit snooze 4 times.
+That's it. That's what broke everything.
 
-The unsexy truth: before you automate anything, you need to write down what you actually do. Not what you think you do. What you actually do.
+I spent two hours fixing something that could've been prevented if anyone had told me "hey, sometimes our supplier randomly renames columns." But nobody thinks to mention that. Because to them it's obvious.
 
-Then you realize half your "process" is "check email, panic, do the urgent thing."
+Anyway, the moral of the story is: never open Slack on a Saturday.
 
-That's not automatable. That's a management problem wearing a technology costume.
+Actually the real moral is: your automation is only as good as the assumptions it makes. And it makes a lot of assumptions.
 
-Start with the process. The automation is the easy part.
+But also don't open Slack on a Saturday.

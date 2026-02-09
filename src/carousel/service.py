@@ -1,89 +1,90 @@
-"""Carousel service — text → insights → branded slides → PDF."""
+"""Carousel service — text → insights → branded slides."""
 
-import asyncio
-from datetime import datetime
+import hashlib
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 import anthropic
 
 from .extractor import extract_carousel_content
-from .models import CarouselContent
-from .renderer import build_html, render_pdf
+from .renderer import build_html, build_printable_html
 
 _PROJECT_ROOT = Path(__file__).parent.parent.parent
 _OUTPUT_DIR = _PROJECT_ROOT / "data" / "carousels"
 
 
-async def generate_carousel(
+@dataclass
+class CarouselGenerationResult:
+    """Result from carousel generation including HTML and usage data."""
+
+    html: str
+    carousel_id: str
+    input_tokens: int = 0
+    output_tokens: int = 0
+    model: str = "claude-sonnet-4-20250514"
+
+
+async def generate_carousel_html(
     text: str,
-    output_dir: Optional[Path] = None,
-    filename: Optional[str] = None,
     client: Optional[anthropic.Anthropic] = None,
     message: str = "",
     logo_data_url: Optional[str] = None,
     footer_domain: str = "afta.systems",
-) -> Path:
-    """Full pipeline: text → Claude extraction → HTML → PDF.
+) -> CarouselGenerationResult:
+    """Generate carousel HTML without PDF rendering.
 
     Args:
         text: Source text to extract insights from.
-        output_dir: Where to save the PDF. Defaults to data/carousels/.
-        filename: PDF filename (without extension). Defaults to timestamp.
         client: Optional Anthropic client.
         message: Optional key message to guide content direction.
         logo_data_url: Optional base64 data URL for target website logo.
         footer_domain: Domain to display in carousel footer.
 
     Returns:
-        Path to the generated PDF file.
+        CarouselGenerationResult with HTML, carousel_id, and usage data.
     """
-    out = output_dir or _OUTPUT_DIR
-    out.mkdir(parents=True, exist_ok=True)
-
-    name = filename or f"carousel_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    pdf_path = out / f"{name}.pdf"
-
     # Step 1: Extract structured content from text via Claude
-    content: CarouselContent = await extract_carousel_content(
+    extraction_result = await extract_carousel_content(
         text, client=client, message=message
     )
 
     # Step 2: Build HTML from the template
     html_doc = build_html(
-        content,
+        extraction_result.content,
         logo_data_url=logo_data_url,
         footer_domain=footer_domain,
     )
 
-    # Step 3: Render to PDF via Playwright
-    await render_pdf(html_doc, pdf_path)
+    # Generate a unique ID for this carousel
+    carousel_id = hashlib.md5(html_doc.encode()).hexdigest()[:12]
 
-    return pdf_path
+    # Save HTML for later download
+    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    html_path = _OUTPUT_DIR / f"{carousel_id}.html"
+    html_path.write_text(html_doc, encoding="utf-8")
+
+    return CarouselGenerationResult(
+        html=html_doc,
+        carousel_id=carousel_id,
+        input_tokens=extraction_result.input_tokens,
+        output_tokens=extraction_result.output_tokens,
+        model=extraction_result.model,
+    )
 
 
-def run(
-    text: str,
-    output_dir: Optional[Path] = None,
-    filename: Optional[str] = None,
-) -> Path:
-    """Synchronous wrapper for generate_carousel."""
-    return asyncio.run(generate_carousel(text, output_dir, filename))
+def get_printable_html(carousel_id: str) -> Optional[str]:
+    """Get print-ready HTML for a previously generated carousel.
 
+    Args:
+        carousel_id: The carousel ID returned from generate_carousel_html.
 
-if __name__ == "__main__":
-    import sys
+    Returns:
+        Print-ready HTML string, or None if not found.
+    """
+    html_path = _OUTPUT_DIR / f"{carousel_id}.html"
+    if not html_path.exists():
+        return None
 
-    if len(sys.argv) < 2:
-        print("Usage: python -m src.carousel.service <path_to_text_file> [output_filename]")
-        sys.exit(1)
-
-    text_path = Path(sys.argv[1])
-    if not text_path.exists():
-        print(f"File not found: {text_path}")
-        sys.exit(1)
-
-    source_text = text_path.read_text(encoding="utf-8")
-    out_name = sys.argv[2] if len(sys.argv) > 2 else None
-    pdf = run(source_text, filename=out_name)
-    print(f"Carousel PDF saved to: {pdf}")
+    html_content = html_path.read_text(encoding="utf-8")
+    return build_printable_html(html_content)

@@ -15,7 +15,7 @@ RSS Feeds (7 sources) → News Filter (Sonnet) → 7 Generators (Opus, parallel)
 
 1. **Fetch** — Aggregates articles from TechCrunch, Hacker News, ArsTechnica, VentureBeat, Wired, IEEE Spectrum
 2. **Filter** — Claude Sonnet scores each article for relevance to AFTA's audience, suggests angles
-3. **Generate** — 7 generator agents run in parallel, each producing 2–4 variants with randomized hook/framework/persona combos (14–28 total)
+3. **Generate** — 7 generator agents run in parallel, each producing 2–4 variants with randomized hook/structure/persona combos (14–28 total)
 4. **Validate** — Anti-slop engine checks for 74 banned words, 16 banned phrases, 8 structural patterns (emoji spam, em-dash overuse, listicle format, etc.)
 5. **Judge** — Scores surviving variants on hook strength (30%), anti-slop (25%), distinctiveness (20%), relevance (15%), persona fit (10%)
 
@@ -24,16 +24,23 @@ RSS Feeds (7 sources) → News Filter (Sonnet) → 7 Generators (Opus, parallel)
 - **Professional** — Confident peer with specific data, admits uncertainty
 - **Witty** — Observational humor, deadpan, friend-who-knows-stuff energy
 - **AI-Meta** — Self-aware AI, fourth-wall breaks, honest about its own limitations
+- **Storyteller** — Narrative-driven, client stories, specific details that build trust
+- **Provocateur** — Contrarian takes, challenges common assumptions, blunt about industry problems
 
 ### Creativity engine
 
 Each generator gets a unique combination of:
 - **Hook pattern** (weighted): contrarian, specificity, open loop, identity callout, story drop, bold statement
-- **Framework**: PAS, BAB, or HSO
+- **Organic structure**: stream of consciousness, start in the middle, one point only, anti-framework, or no structure (deliberately avoids formulaic PAS/BAB/HSO)
 - **Few-shot examples** from the assigned persona
-- **Style reference** (50% chance): Ethan Mollick, Gary Provost, Wendy's Twitter, etc.
-- **Wildcard constraint** (40% chance): e.g. "assume reader has 10 seconds attention"
+- **Style reference**: actual prose samples from authors (Derek Sivers, Paul Graham, Anthony Bourdain, Elmore Leonard, Raymond Carver, Kurt Vonnegut)
+- **Tone wildcard** (40% chance): perspective shifts like "assume reader has 10 seconds attention"
+- **Structural break** (30% chance): human imperfections like abandoned thoughts, abrupt transitions, mundane details
 - **Content angle** (weighted): DIY automation trap, time drain reality, quick wins, etc.
+
+## Philosophy
+
+The design principles behind this system — style injection through actual prose samples, deliberate polish-breaking, anti-pattern enforcement, and why most LinkedIn "best practices" are the problem — are documented in [Project Philosophy: Anti-Slop Content Generation](Project%20Philosophy-%20Anti-Slop%20Content%20Generation.md).
 
 ## Planned features
 
@@ -117,6 +124,7 @@ src/
 data/
 ├── examples/                # Few-shot examples per persona
 ├── hooks/                   # Hook pattern templates
+├── style_samples/           # Author prose samples (Sivers, Graham, Bourdain, etc.)
 └── anti_slop/               # Banned words database
 
 tests/                       # Pytest suite
@@ -128,6 +136,6 @@ Roughly ~$0.15 per generator (Opus) + ~$0.30 for judging + minor Sonnet costs fo
 
 ## Background
 
-This started as a question: can taste in content be systematized? Most AI-generated LinkedIn posts are immediately recognizable — the emoji openers, the "let's dive in," the listicle structure. The anti-slop detection here is based on research showing certain words (delve, tapestry, leverage, etc.) increased 700–1500% in frequency post-ChatGPT.
+This started as a question: can taste in content be systematized? Most AI-generated LinkedIn posts are immediately recognizable — the emoji openers, the "let's dive in," the listicle structure, the PAS/BAB/HSO frameworks that LLMs have seen millions of times. The anti-slop detection here is based on research showing certain words (delve, tapestry, leverage, etc.) increased 700–1500% in frequency post-ChatGPT.
 
-The multi-agent approach generates diversity (different personas, hooks, frameworks), while the judge agent acts as a taste filter. It's not perfect — the best output still benefits from human editing — but it's a step toward content that doesn't make people reflexively scroll past.
+The multi-agent approach generates diversity (different personas, hooks, organic structures), while the judge agent acts as a taste filter. Style samples from actual authors (not descriptions like "write like X") help break AI smoothness at the sentence level. Structural breaks inject human imperfections — abandoned thoughts, abrupt transitions, mundane details that don't serve the argument. It's not perfect — the best output still benefits from human editing — but it's a step toward content that doesn't make people reflexively scroll past.

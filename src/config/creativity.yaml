@@ -1,5 +1,5 @@
 # Creativity Engine Configuration
-# Controls randomization, hook selection, framework weights, and mutation settings
+# Controls randomization, hook selection, structure weights, and mutation settings
 
 creativity_engine:
   # Mutation settings for prompt variability
@@ -21,12 +21,25 @@ creativity_engine:
 
     specificity_hook:
       weight: 0.20
-      description: "Specific numbers and details feel credible"
+      description: "Specific details feel credible - use human number patterns"
       templates:
-        - "I spent ${amount} on {thing}. Here's what actually worked."
-        - "I reviewed {number} {items}. {N} patterns separated winners."
-        - "{Specific_number}% of {audience} are doing {thing} wrong."
-      anti_pattern: "I've learned SO much about marketing!"
+        - "I spent like ${approximate_amount} on {thing}. Here's what actually worked."
+        - "I looked at maybe {casual_number} {items}. A few patterns stood out."
+        - "Something like {rough_percentage}% of {audience} are doing {thing} wrong."
+      examples:
+        - "I spent like $40k on LinkedIn ads last year. Here's what worked."
+        - "I looked at maybe a hundred cold emails. Three things kept showing up."
+        - "Something like two-thirds of e-commerce operators waste hours on this."
+      anti_patterns:
+        - "Round numbers that sound specific (47, 200, 2,847)"
+        - "Numbers ending in 0 or 7 (AI tells)"
+        - "Fake-precise statistics (73.2%, exactly 47 projects)"
+      number_guidance: |
+        Use human number patterns:
+        - Approximations: "like 50", "maybe 60", "a few hundred", "around a dozen"
+        - Hedged: "almost 200", "just under a hundred", "a handful"
+        - Ugly exact (when you really have data): "1,247", "143", "$38,400"
+        - Casual fractions: "two-thirds", "about half", "most of them"
 
     open_loop:
       weight: 0.15
@@ -52,7 +65,11 @@ creativity_engine:
       templates:
         - "There I was at {time}, {doing_painful_thing}."
         - "I'd just {failed_at_something} when..."
-        - "The spreadsheet had 2,847 rows. I had 3 hours."
+        - "The spreadsheet had like {ugly_number} rows. I had a few hours."
+      examples:
+        - "There I was at 11 PM on a Tuesday, updating prices by hand."
+        - "I'd just broken the third automation this month when..."
+        - "The spreadsheet had like 1,200-something rows. I had maybe three hours."
       anti_pattern: "So I wanted to share something I learned recently..."
 
     bold_statement:
@@ -64,34 +81,57 @@ creativity_engine:
         - "The best {thing} in e-commerce isn't {obvious_answer}."
       anti_pattern: "Hedging with 'I think maybe possibly...'"
 
-  # Copywriting frameworks (scaffolding, not templates)
-  frameworks:
-    - name: "PAS"
-      description: "Problem -> Agitate -> Solution"
-      weight: 0.40
-      structure:
-        - "State the problem clearly"
-        - "Agitate: show the pain, make it vivid"
-        - "Present the solution (AFTA's approach)"
-      best_for: "Pain-point focused content, when selling a solution"
+  # Organic structures (replacing formulaic copywriting frameworks)
+  structures:
+    - name: "stream_of_consciousness"
+      weight: 0.25
+      description: "Start with one thought, follow where it leads, land on one insight"
+      guidance: |
+        No sections. No structure. Just think out loud until you hit something true.
+        Start with whatever's on your mind. Follow the thread.
+        The reader is watching you think, not receiving a presentation.
 
-    - name: "BAB"
-      description: "Before -> After -> Bridge"
-      weight: 0.30
-      structure:
-        - "Paint the 'before' picture (current pain)"
-        - "Show the 'after' (desired outcome)"
-        - "Bridge: how to get there"
-      best_for: "Transformation stories, showing outcomes"
+    - name: "start_in_the_middle"
+      weight: 0.25
+      description: "Begin mid-action or mid-thought, never explain the setup"
+      guidance: |
+        The reader is dropped into the middle. No context. No "let me tell you about..."
+        They figure it out from the details. Trust them.
+        The story already started before this post.
 
-    - name: "HSO"
-      description: "Hook -> Story -> Offer"
-      weight: 0.30
-      structure:
-        - "Hook: grab attention"
-        - "Story: share experience or insight"
-        - "Offer: what they can do/learn"
-      best_for: "Personal brand content, LinkedIn posts"
+    - name: "one_point_only"
+      weight: 0.20
+      description: "Single insight, explored from multiple angles, no tangents"
+      guidance: |
+        One idea. Say it three different ways. That's the whole post.
+        Don't add related ideas. Don't branch out. Just the one thing.
+        Depth over breadth.
+
+    - name: "anti_framework"
+      weight: 0.15
+      description: "Explicitly break PAS/BAB/HSO expectations"
+      guidance: |
+        Break the expected pattern:
+        - Start with the solution, never state the problem
+        - All agitation, no resolution
+        - Hook with no story
+        - Story with no point
+        The reader should feel slightly off-balance.
+
+    - name: "no_structure"
+      weight: 0.15
+      description: "Just write. No structural guidance at all."
+      guidance: null  # Generator receives no structural guidance
+
+  # Structure anti-patterns (what NOT to do)
+  structure_anti_patterns:
+    - "PAS (Problem-Agitate-Solution) - too recognizable as LinkedIn formula"
+    - "BAB (Before-After-Bridge) - classic marketing template"
+    - "HSO (Hook-Story-Offer) - content marketing skeleton"
+    - "Numbered lists as structure (1. 2. 3.)"
+    - "Clear setup -> insight -> takeaway arc"
+    - "Bullet points summarizing lessons"
+    - "Ending with a call-to-action question"
 
   # Few-shot example selection
   few_shot:
@@ -99,37 +139,69 @@ creativity_engine:
     include_anti_examples: true
     randomize_selection: true
 
-  # Style reference injection (optional flavor)
+  # Style reference injection (actual samples, not descriptions)
   style_references:
     enabled: true
     max_references: 1
+    sample_directory: "data/style_samples"
     authors:
-      - name: "Ethan Mollick"
-        style: "Practical AI insights, no hype, specific examples"
-        use_for: ["professional", "ai_meta"]
+      - name: "Derek Sivers"
+        sample_file: "derek_sivers.txt"
+        style_essence: "Ultra-minimalist. Counterintuitive. Short sentences that land."
+        use_for: ["minimalist", "professional"]
 
-      - name: "Gary Provost"
-        style: "Sentence rhythm variation - mix short punchy with complex"
-        use_for: ["professional", "witty"]
+      - name: "Paul Graham"
+        sample_file: "paul_graham.txt"
+        style_essence: "Essay reasoning. Builds to a counterintuitive point. Precise language."
+        use_for: ["professional", "educator"]
 
-      - name: "Wendy's Twitter"
-        style: "Sassy, confident, willing to roast"
-        use_for: ["witty"]
+      - name: "Anthony Bourdain"
+        sample_file: "anthony_bourdain.txt"
+        style_essence: "Blunt insider. Sensory details. No bullshit. Working-class respect."
+        use_for: ["witty", "provocateur", "storyteller"]
 
-      - name: "Dollar Shave Club"
-        style: "Deadpan humor, low production value, confident delivery"
-        use_for: ["witty", "ai_meta"]
+      - name: "Elmore Leonard"
+        sample_file: "elmore_leonard.txt"
+        style_essence: "Invisible prose. If it sounds like writing, cut it. Perfect for killing AI smoothness."
+        use_for: ["professional", "minimalist", "ai_meta"]
 
-  # Wildcard constraints for additional variability
-  wildcards:
-    - "Assume the reader has exactly 10 seconds of attention"
-    - "Write as if slightly annoyed by the obvious"
-    - "Pretend you're writing to someone skeptical of automation"
-    - "Write as if the reader has tried and failed at DIY automation"
-    - "Channel the energy of someone who just saved 10 hours"
-    - "Write like you're revealing an industry secret"
-    - "Assume the reader is smart but busy"
-    - "Write as if this is the only post they'll read today"
+      - name: "Raymond Carver"
+        sample_file: "raymond_carver.txt"
+        style_essence: "Minimalist. Subtext. Working-class. What's not said matters."
+        use_for: ["storyteller", "minimalist"]
+
+      - name: "Kurt Vonnegut"
+        sample_file: "vonnegut.txt"
+        style_essence: "Deadpan absurdism. States dark truths as simple facts. Fourth-wall breaks feel natural."
+        use_for: ["witty", "ai_meta", "educator"]
+
+  # Tone wildcards (original set - perspective shifts)
+  tone_wildcards:
+    probability: 0.40  # 40% chance to include one
+    options:
+      - "Assume the reader has exactly 10 seconds of attention"
+      - "Write as if slightly annoyed by the obvious"
+      - "Pretend you're writing to someone skeptical of automation"
+      - "Write as if the reader has tried and failed at DIY automation"
+      - "Channel the energy of someone who just saved 10 hours"
+      - "Write like you're revealing an industry secret"
+      - "Assume the reader is smart but busy"
+      - "Write as if this is the only post they'll read today"
+
+  # Structural break wildcards (NEW - create human imperfections)
+  structural_breaks:
+    probability: 0.30  # 30% chance to include one
+    options:
+      - "Include one sentence that goes nowhere and don't resolve it"
+      - "Start a thought and change your mind mid-paragraph"
+      - "Reference something mundanely specific: a day of the week, a coffee order, a Slack ping"
+      - "No transition sentences. Jump between ideas abruptly"
+      - "Leave one point half-made. Trust the reader to complete it"
+      - "Interrupt yourself with a parenthetical that's slightly off-topic"
+      - "End on a minor note, not the main point"
+      - "Include a detail that doesn't serve the argument"
+      - "Repeat yourself once, slightly differently, like you're still thinking"
+      - "Admit you're not sure about something mid-post"
 
   # Content angles from marketing strategy (for news connection)
   content_angles:

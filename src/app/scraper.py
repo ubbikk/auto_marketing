@@ -2,6 +2,7 @@
 
 import base64
 import io
+import logging
 import re
 from dataclasses import dataclass
 from typing import Optional
@@ -10,6 +11,19 @@ from urllib.parse import urljoin, urlparse
 import httpx
 from bs4 import BeautifulSoup
 from PIL import Image
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ArticleContent:
+    """Scraped article content from a URL."""
+
+    url: str
+    title: str
+    content: str  # Main article text
+    success: bool
+    error: Optional[str] = None
 
 
 @dataclass
@@ -186,3 +200,88 @@ async def _download_as_data_url(
         pass
 
     return None
+
+
+async def scrape_article_content(url: str, timeout: int = 30) -> ArticleContent:
+    """Scrape article content from a URL using Firecrawl.
+
+    Args:
+        url: The article URL to scrape.
+        timeout: Timeout in seconds (passed to Firecrawl).
+
+    Returns:
+        ArticleContent with the scraped text content.
+    """
+    logger.info("[SCRAPER] Scraping article content from %s via Firecrawl", url)
+
+    try:
+        import os
+        from firecrawl import FirecrawlApp
+
+        api_key = os.getenv("FIRECRAWL_API_KEY")
+        if not api_key:
+            raise ValueError("FIRECRAWL_API_KEY environment variable is required")
+
+        app = FirecrawlApp(api_key=api_key)
+        result = app.scrape_url(url, params={
+            "formats": ["markdown"],
+            "timeout": timeout * 1000,
+            "onlyMainContent": True,
+        })
+
+        if not result:
+            return ArticleContent(
+                url=url, title="", content="", success=False,
+                error="Firecrawl returned empty result",
+            )
+
+        # Extract content and metadata
+        content = result.get("markdown", "") or ""
+        metadata = result.get("metadata", {}) or {}
+        title = metadata.get("title", "") or metadata.get("ogTitle", "") or ""
+
+        content = _clean_article_content(content)
+
+        if len(content) < 100:
+            return ArticleContent(
+                url=url, title=title, content="", success=False,
+                error="Content too short after extraction",
+            )
+
+        logger.info("[SCRAPER] Successfully scraped %d chars from %s", len(content), url)
+        return ArticleContent(
+            url=url,
+            title=title,
+            content=content[:8000],  # Limit to avoid token explosion
+            success=True,
+        )
+
+    except Exception as e:
+        logger.error("[SCRAPER] Failed to scrape article: %s", e)
+        return ArticleContent(
+            url=url, title="", content="", success=False, error=str(e),
+        )
+
+
+def _clean_article_content(text: str) -> str:
+    """Clean scraped article content."""
+    # Remove excessive whitespace
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    text = re.sub(r"[ \t]+", " ", text)
+
+    # Remove common noise patterns
+    noise_patterns = [
+        r"Cookie.*?policy",
+        r"Subscribe.*?newsletter",
+        r"Sign up.*?free",
+        r"Advertisement",
+        r"Share this article",
+        r"Follow us on",
+        r"Related articles",
+        r"Read more:",
+        r"Comments \(\d+\)",
+    ]
+    for pattern in noise_patterns:
+        text = re.sub(pattern, "", text, flags=re.IGNORECASE)
+
+    return text.strip()

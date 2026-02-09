@@ -1,18 +1,15 @@
-Stop calling it a tech stack. You have 14 apps that don't talk to each other and a prayer.
+Stop calling it a tech stack. You have a dozen apps that don't talk to each other and a prayer.
 
-I looked at the average mid-size e-commerce setup last month. The numbers are ugly:
+I'm serious. I looked at a mid-size store last month. They were paying for—I had to count—like fourteen different SaaS tools. Three of them did email. Two did inventory. One was a CRM they bought in 2022 that nobody uses but everyone's afraid to cancel.
 
-Average number of SaaS tools: 14
-Average monthly SaaS spend: $2,800
-Percentage that integrate natively: 23%
-Hours spent weekly on manual data transfer between tools: 11
+And here's the part nobody wants to hear: someone on their team spent maybe ten hours a week just moving data between these tools. That's a part-time job. Their entire job was being a human API.
 
-Eleven hours. That's a part-time employee whose entire job is being a human API.
+The fix isn't buying tool fifteen. It's figuring out which six you actually need and killing the rest.
 
-And the thing nobody wants to hear: most of these tools overlap. You're paying for three different things that all do email. Two that both track inventory. One CRM you bought in 2022 that nobody actually uses but everyone's afraid to cancel.
-
-The fix isn't buying tool #15. It's connecting the 6 you actually need and cutting the rest.
-
-We've saved clients an average of $1,100/month just by consolidating tools before we even start automating. The automation savings come on top of that.
+I saved a client over a thousand bucks a month last quarter just by helping them cancel stuff. We hadn't even started automating anything yet. That's just tool bloat.
 
 Your tech stack isn't a stack. It's a pile. And piles fall over.
+
+I know this isn't the fun answer. The fun answer is "here's a cool new app that solves everything." But that's how you got into this mess.
+
+Sometimes the right automation is subtraction.

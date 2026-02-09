@@ -1,13 +1,19 @@
-At 11 PM on a Tuesday, Sarah was manually updating 340 product prices. Her Shopify store had grown faster than her processes.
+The Slack ping came while I was making coffee. It's always while you're making coffee.
 
-She'd been at it since 7. Four hours of copy-paste between a supplier spreadsheet and her admin panel. Row by row. Tab by tab.
+Sarah—not her real name—was panicking. She'd somehow broken the price sync we'd built for her last month. Except she hadn't.
 
-At row 212, she fat-fingered a decimal point. A $45 candle became $4.50. She didn't catch it until 37 people had ordered.
+What happened was this: her supplier sent the weekly price update early. Usually comes Tuesday. This week it came Monday. The workflow triggered on schedule, pulled the file, ran the comparison, flagged anomalies.
 
-That night cost her $1,500 in losses and a weekend of damage control.
+Except there weren't any anomalies. The prices hadn't changed. The file was from last week.
 
-The fix wasn't complicated. A single n8n workflow now pulls her supplier's price list, compares it to her current prices, flags anomalies over 10%, and updates the rest automatically. Takes 4 minutes. Runs at 6 AM before she wakes up.
+So the system did nothing. Because nothing needed to happen. And Sarah interpreted "system did nothing" as "system is broken."
 
-Sarah told me last week she forgot it existed. That's how automation should feel. Not like a project. Like a thing that just... works.
+I spent twenty minutes explaining that the silence was the feature. The workflow checked, found no changes, and moved on. That's what we wanted.
 
-If your Tuesday nights look like Sarah's used to, something is broken. Not you. Your process.
+She didn't believe me at first. "But it always sends me an email."
+
+It does. When something changes. Nothing changed.
+
+I think about this a lot. The hardest part of automation isn't making it work. It's making people trust it when it's working correctly.
+
+Silence doesn't feel like success. But sometimes it is.

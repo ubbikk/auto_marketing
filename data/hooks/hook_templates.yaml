@@ -1,11 +1,12 @@
 # Hook templates for LinkedIn content generation
 # Based on TASTE_IN_MARKETING.md research
+# Updated to avoid AI-coded patterns
 
 hooks:
   contrarian_opening:
     description: "Challenge a common belief, then explain"
     examples:
-      - "Everyone says you need 10,000 hours. They're wrong."
+      - "Everyone says you need to automate everything. That's actually backwards."
       - "I stopped posting daily. My engagement doubled."
       - "The best e-commerce tool isn't Shopify. Here's why."
       - "Automation isn't saving you time. It's hiding problems."
@@ -18,18 +19,31 @@ hooks:
       - "Hot take: [lukewarm take]"
 
   specificity_hook:
-    description: "Lead with specific numbers that prove credibility"
+    description: "Lead with specific details - but use HUMAN number patterns"
     examples:
-      - "I spent $47,000 on LinkedIn ads last year. Here's what worked."
-      - "I reviewed 200 cold emails. 3 patterns separated winners."
-      - "70% of e-commerce operators waste 3+ hours daily on this."
+      - "I spent like $40k on LinkedIn ads last year. Here's what worked."
+      - "I looked at maybe a hundred cold emails. Three things kept showing up."
+      - "Something like two-thirds of e-commerce operators waste hours on this."
+      - "We tracked costs for almost a year. The real number was ugly."
     templates:
-      - "I spent ${amount} on {thing}. Here's what actually worked."
-      - "I analyzed {number} {items}. {N} patterns emerged."
-      - "{X}% of {audience} make this mistake."
+      - "I spent like ${approximate_amount} on {thing}. Here's what actually worked."
+      - "I looked at maybe {casual_number} {items}. A few patterns stood out."
+      - "Something like {rough_fraction} of {audience} are doing {thing} wrong."
+    number_guidance: |
+      Use human number patterns, NOT AI-coded specific-but-round numbers:
+      - Good: "like 50", "maybe 60", "a few hundred", "around a dozen"
+      - Good: "almost 200", "just under a hundred", "a handful"
+      - Good (ugly exact when you have real data): "1,247", "143", "$38,400"
+      - Good: "two-thirds", "about half", "most of them"
+      - BAD: "47", "200", "2,847" - these are AI tells
+      - BAD: numbers ending in 0 or 7
+      - BAD: fake-precise statistics (73.2%, exactly 47 projects)
     anti_patterns:
       - "I've learned SO much about marketing!"
       - "Many businesses struggle with this."
+      - "I analyzed 47 projects..."
+      - "2,847 rows..."
+      - "70% of operators..."
 
   open_loop:
     description: "Hint at payoff without revealing it"
@@ -61,18 +75,21 @@ hooks:
       - "People often ask me..."
 
   story_drop:
-    description: "Start in the middle of action, skip context"
+    description: "Start in the middle of action, skip context - use human details"
     examples:
-      - "There I was at 2 AM, manually updating 200 SKUs."
-      - "The spreadsheet had 2,847 rows. I had 3 hours."
-      - "I'd just watched my third Zapier workflow fail when..."
+      - "There I was at like 2 AM, updating SKUs by hand."
+      - "The spreadsheet had—I don't know, over a thousand rows? I had maybe three hours."
+      - "I'd just watched my third workflow fail when..."
+      - "She called at 6, right as I was leaving. Never a good sign."
     templates:
       - "There I was at {time}, {doing something painful}."
-      - "The {thing} had {specific number}. I had {constraint}."
+      - "The {thing} had {vague_number}. I had {constraint}."
       - "I'd just {failed at something} when..."
     anti_patterns:
       - "So I wanted to share something I learned recently..."
       - "Let me tell you about a time when..."
+      - "At 11 PM on a Tuesday... (becoming cliche)"
+      - "The spreadsheet had 2,847 rows... (AI-coded number)"
 
   bold_statement:
     description: "Make a claim that demands attention"

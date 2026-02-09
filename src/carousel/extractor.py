@@ -1,85 +1,34 @@
 """Extract carousel content from text using Claude Sonnet."""
 
 import json
+import logging
+from dataclasses import dataclass
 from typing import Optional
 
 import anthropic
 
 from .models import CarouselContent
 
-SYSTEM_PROMPT = """\
-You are a content strategist creating LinkedIn carousel slides.
-Your job is to read an article or text and extract the most compelling insights
-to fill a 5-slide LinkedIn carousel.
+logger = logging.getLogger(__name__)
 
-The carousel has this structure:
-1. COVER — An attention-grabbing title (max ~10 words) + one-line subtitle.
-2. BULLETS — A heading + exactly 3 bullet points with concrete facts/stats.
-3. NUMBERED — A heading + exactly 3 numbered items, each with a bold title and a description.
-4. STATS — A heading + exactly 3 stat cards (short value like "3×" + label) + a quote.
-5. CTA — A closing headline + subtitle + button text.
 
-Rules:
-- Keep language punchy and professional. No fluff.
-- Use specific numbers and data from the source text whenever possible.
-- If the source doesn't contain exact stats, synthesize plausible key takeaways.
-- The quote on slide 4 should capture the most memorable or impactful line from the text.
-- Badge text for each slide should be a single word reflecting the slide's theme.
-- All content should relate to the source text's core topic.
-"""
+@dataclass
+class CarouselExtractionResult:
+    """Result from carousel extraction including content and usage."""
 
-USER_PROMPT_TEMPLATE = """\
-Extract carousel content from this text. Return ONLY valid JSON matching the schema below.
+    content: CarouselContent
+    input_tokens: int = 0
+    output_tokens: int = 0
+    model: str = "claude-sonnet-4-20250514"
 
-Schema:
-{{
-  "cover": {{
-    "title": "string (max ~10 words)",
-    "subtitle": "string (one sentence)",
-    "badge": "string (one word)"
-  }},
-  "bullets": {{
-    "heading": "string (3-6 words)",
-    "badge": "string (one word)",
-    "bullets": ["string", "string", "string"]
-  }},
-  "numbered": {{
-    "heading": "string (3-6 words)",
-    "badge": "string (one word)",
-    "items": [
-      {{"title": "string", "description": "string"}},
-      {{"title": "string", "description": "string"}},
-      {{"title": "string", "description": "string"}}
-    ]
-  }},
-  "stats": {{
-    "heading": "string (3-6 words)",
-    "badge": "string (one word)",
-    "stats": [
-      {{"value": "string (MAX 4 chars, e.g. '3×', '87%', '14h')", "label": "string"}},
-      {{"value": "string (MAX 4 chars)", "label": "string"}},
-      {{"value": "string (MAX 4 chars)", "label": "string"}}
-    ],
-    "quote_text": "string (1-2 sentences)",
-    "quote_attribution": "string (e.g. '— Author, Source')"
-  }},
-  "cta": {{
-    "heading": "string",
-    "subtitle": "string",
-    "button_text": "string"
-  }}
-}}
-
-{message_section}SOURCE TEXT:
-{text}
-"""
+from ..prompts import render as render_prompt
 
 
 async def extract_carousel_content(
     text: str,
     client: Optional[anthropic.Anthropic] = None,
     message: str = "",
-) -> CarouselContent:
+) -> CarouselExtractionResult:
     """Call Claude Sonnet to extract structured carousel content from text.
 
     Args:
@@ -88,7 +37,7 @@ async def extract_carousel_content(
         message: Optional key message to guide content direction.
 
     Returns:
-        CarouselContent with structured slide data.
+        CarouselExtractionResult with content and usage data.
     """
     if client is None:
         client = anthropic.Anthropic()
@@ -97,20 +46,22 @@ async def extract_carousel_content(
     if message:
         message_section = f"KEY MESSAGE TO CONVEY:\n{message}\n\n"
 
-    user_prompt = USER_PROMPT_TEMPLATE.format(
-        text=text[:5000],
-        message_section=message_section,
-    )
+    prompt = render_prompt("carousel", text=text[:5000], message_section=message_section)
 
+    model = "claude-sonnet-4-20250514"
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model=model,
         max_tokens=2000,
         temperature=0.7,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_prompt}],
+        messages=[{"role": "user", "content": prompt}],
     )
 
+    # Extract usage data
+    input_tokens = response.usage.input_tokens
+    output_tokens = response.usage.output_tokens
+
     raw = response.content[0].text
+    logger.debug("Carousel extraction raw response: %s", raw[:500])
 
     # Extract JSON from response, handling markdown fences and surrounding text
     stripped = raw.strip()
@@ -137,5 +88,20 @@ async def extract_carousel_content(
     if brace_start != -1 and brace_end != -1:
         stripped = stripped[brace_start : brace_end + 1]
 
-    data = json.loads(stripped)
-    return CarouselContent.model_validate(data)
+    if not stripped:
+        logger.error("Carousel extraction returned empty content. Raw response: %s", raw)
+        raise ValueError(f"Failed to extract JSON from carousel response. Raw: {raw[:200]}")
+
+    try:
+        data = json.loads(stripped)
+    except json.JSONDecodeError as e:
+        logger.error("JSON parse error in carousel extraction: %s. Content: %s", e, stripped[:500])
+        raise ValueError(f"Invalid JSON in carousel response: {e}. Content: {stripped[:200]}")
+
+    content = CarouselContent.model_validate(data)
+    return CarouselExtractionResult(
+        content=content,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        model=model,
+    )

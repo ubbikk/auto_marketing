@@ -396,28 +396,21 @@ async def generate(request: GenerateRequest, user: User = Depends(require_auth))
 
 
 @app.get("/api/carousel/download/{carousel_id}")
-async def download_carousel_pdf(carousel_id: str, user: User = Depends(require_auth)):
-    """Generate and serve carousel PDF on-demand."""
-    from ..carousel.service import render_carousel_pdf
+async def download_carousel_html(carousel_id: str, user: User = Depends(require_auth)):
+    """Serve print-ready carousel HTML for download."""
+    from fastapi.responses import Response
+    from ..carousel.service import get_printable_html
 
-    # Check if PDF already exists
-    pdf_path = _CAROUSEL_DIR / f"{carousel_id}.pdf"
-    if not pdf_path.exists():
-        # Check if HTML exists
-        html_path = _CAROUSEL_DIR / f"{carousel_id}.html"
-        if not html_path.exists():
-            raise HTTPException(status_code=404, detail="Carousel not found")
+    html = get_printable_html(carousel_id)
+    if html is None:
+        raise HTTPException(status_code=404, detail="Carousel not found")
 
-        # Render PDF on-demand
-        logger.info("Rendering PDF on-demand for carousel %s", carousel_id)
-        pdf_path = await render_carousel_pdf(carousel_id)
-        if not pdf_path:
-            raise HTTPException(status_code=500, detail="Failed to render PDF")
-
-    return FileResponse(
-        str(pdf_path),
-        media_type="application/pdf",
-        filename=f"carousel_{carousel_id}.pdf",
+    return Response(
+        content=html,
+        media_type="text/html",
+        headers={
+            "Content-Disposition": f'attachment; filename="carousel_{carousel_id}.html"',
+        },
     )
 
 

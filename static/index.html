@@ -1708,7 +1708,23 @@ async function handleGenerate() {
       }
     }
 
-    document.getElementById('loading-persona').textContent = `Using ${personaName} voice with ${modelName} (${numGenerators} samples)`;
+    // Set loading text — detect if source looks like a URL
+    const genMsg = `Using ${personaName} voice with ${modelName} (${numGenerators} samples)`;
+    if (sourceText !== 'auto' && /^https?:\/\/\S+$/.test(sourceText.trim())) {
+      const isYT = /youtube\.com\/(watch|shorts|live)|youtu\.be\//.test(sourceText);
+      document.getElementById('loading-persona').textContent = isYT
+        ? 'Analyzing YouTube video...'
+        : 'Scraping URL content...';
+      // Transition to generation message after a few seconds
+      setTimeout(() => {
+        const el = document.getElementById('loading-persona');
+        if (el && !document.getElementById('loading-section').classList.contains('hidden')) {
+          el.textContent = genMsg;
+        }
+      }, 5000);
+    } else {
+      document.getElementById('loading-persona').textContent = genMsg;
+    }
 
     const res = await fetch('/api/generate', {
       method: 'POST',
@@ -1763,7 +1779,8 @@ function showResults(data) {
   document.getElementById('result-score').textContent = score;
 
   // Source + persona tags
-  document.getElementById('result-source-tag').textContent = data.source_title ? 'Auto-fetched' : 'Custom';
+  const sourceLabels = { auto: 'Auto-fetched', paste: 'Custom', url_generic: 'Scraped URL', url_youtube: 'YouTube' };
+  document.getElementById('result-source-tag').textContent = sourceLabels[data.source_mode] || (data.source_title ? 'Auto-fetched' : 'Custom');
   const pName = personas.find(p => p.id === data.persona_used)?.name || data.persona_used;
   document.getElementById('result-persona-name').textContent = pName;
 

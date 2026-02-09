@@ -1,0 +1,12 @@
+Summarize this YouTube video for use as source material for a LinkedIn post.
+
+Extract:
+- Main topic and thesis
+- Key arguments, data points, or findings
+- Notable quotes or strong opinions
+- Contrarian or surprising viewpoints
+- Practical implications or takeaways
+
+Write 400-600 words. Be specific — use names, numbers, and concrete details from the video. Avoid vague summaries like "the speaker discusses trends." Instead, capture the actual substance: what exactly was said, what data was cited, what conclusions were drawn.
+
+Start with a one-line title summarizing the video's core argument.

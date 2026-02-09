@@ -30,6 +30,7 @@ from ..utils.cost_tracker import PipelineCosts, calculate_cost
 from ..company.profile import CompanyContext, load_default_context
 from ..config.settings import settings
 from .scraper import ArticleContent, WebsiteMetadata, scrape_article_content, scrape_website_metadata
+from .url_resolver import UrlResolveResult, detect_url, resolve_url
 
 _PROJECT_ROOT = Path(__file__).parent.parent.parent
 _CONFIG_DIR = _PROJECT_ROOT / "src" / "config"
@@ -74,6 +75,7 @@ class WebPipelineResult:
     source_content: SourceContent
     stats: dict
     costs: dict
+    source_mode: str = "paste"  # "auto" | "paste" | "url_generic" | "url_youtube"
 
 
 async def analyze_source_text(
@@ -357,7 +359,7 @@ def _save_run_artifacts(
                 "target_url": target_url,
                 "message": message,
                 "effective_message": effective_message,
-                "source_mode": "auto" if source_text.strip().lower() == "auto" else "paste",
+                "source_mode": _source_mode,
                 "persona": persona,
                 "num_generators": num_generators,
                 "generation_model": generation_model,
@@ -584,6 +586,8 @@ async def run_pipeline(
     _artifact_auto_summarize = None
     _artifact_creativity_contexts = []
     _artifact_slop_validations = []
+    _resolved_source_text = None  # URL-resolved content for carousel (Step 9)
+    _source_mode = "auto"  # Will be updated in Step 2
 
     # Load default company context if not provided
     if company_context is None:
@@ -644,12 +648,49 @@ async def run_pipeline(
                 cost,
             )
     else:
-        analysis_result = await analyze_source_text(client, source_text, message)
+        # Check if pasted text is a single URL
+        detected_url = detect_url(source_text)
+        _source_mode = "paste"
+
+        if detected_url:
+            logger.info("[STEP 2] Detected URL in pasted text: %s", detected_url)
+            url_result = await resolve_url(detected_url)
+
+            if url_result.success and url_result.content:
+                _source_mode = f"url_{url_result.url_type}"
+                _resolved_source_text = url_result.content
+                logger.info("[STEP 2] URL resolved: type=%s, %d chars", url_result.url_type, len(url_result.content))
+
+                # Track URL resolution costs (YouTube uses LLM)
+                if url_result.model:
+                    costs.add_usage(
+                        "url_resolution",
+                        url_result.model,
+                        url_result.input_tokens,
+                        url_result.output_tokens,
+                        url_result.cost_usd,
+                    )
+
+                # Use resolved content for analysis
+                analysis_text = url_result.content
+            else:
+                logger.warning("[STEP 2] URL resolution failed: %s — falling back to raw text", url_result.error)
+                analysis_text = source_text
+        else:
+            analysis_text = source_text
+
+        analysis_result = await analyze_source_text(client, analysis_text, message)
         source = analysis_result.content
+
+        # Set source URL if we detected one
+        if detected_url and _resolved_source_text:
+            source.url = detected_url
+
         # Capture raw source artifact
         _artifact_source_raw = {
-            "mode": "paste",
+            "mode": _source_mode,
             "pasted_text": source_text,
+            "detected_url": detected_url,
             "analysis_model": analysis_result.model,
             "analysis_input_tokens": analysis_result.input_tokens,
             "analysis_output_tokens": analysis_result.output_tokens,
@@ -873,7 +914,10 @@ async def run_pipeline(
     t0 = time.time()
     logger.info("[STEP 9] Generating carousel HTML...")
     # Use the full source text for carousel extraction (richer content)
-    if source_text.strip().lower() != "auto":
+    # For URL-resolved sources, use the resolved content instead of the raw URL
+    if source_text.strip().lower() != "auto" and _resolved_source_text:
+        carousel_source = _resolved_source_text
+    elif source_text.strip().lower() != "auto":
         carousel_source = source_text
     else:
         # For auto mode, scrape the actual article content using Playwright
@@ -989,6 +1033,7 @@ Target Audience: {source.target_icp}"""
         source_content=source,
         stats=stats,
         costs=costs_dict,
+        source_mode=_source_mode,
     )
 
 

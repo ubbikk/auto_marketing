@@ -392,6 +392,7 @@ async def generate(request: GenerateRequest, user: User = Depends(require_auth))
         all_variants=variants_data,
         stats=result.stats,
         costs=costs_data,
+        source_mode=result.source_mode,
     )
 
 

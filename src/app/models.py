@@ -112,6 +112,7 @@ class GenerateResponse(BaseModel):
     all_variants: list[VariantData] = []
     stats: dict = {}
     costs: Optional[CostBreakdown] = None
+    source_mode: str = "paste"  # "auto" | "paste" | "url_generic" | "url_youtube"
 
 
 class PersonaInfo(BaseModel):

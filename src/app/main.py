@@ -415,7 +415,7 @@ async def download_carousel_html(carousel_id: str, user: User = Depends(require_
 
 
 @app.get("/api/carousel/preview/{carousel_id}")
-async def preview_carousel_html(carousel_id: str, user: User = Depends(require_auth)):
+async def preview_carousel_html(carousel_id: str, slide: int = 0, user: User = Depends(require_auth)):
     """Serve carousel HTML for preview with scaling and navigation."""
     from fastapi.responses import HTMLResponse
 
@@ -425,7 +425,7 @@ async def preview_carousel_html(carousel_id: str, user: User = Depends(require_a
 
     original_html = html_path.read_text(encoding="utf-8")
 
-    # Inject preview wrapper CSS and JS for scaled carousel with navigation
+    # Inject preview wrapper CSS and JS for scaled carousel
     preview_wrapper = """
 <style>
   html, body {
@@ -445,7 +445,7 @@ async def preview_carousel_html(carousel_id: str, user: User = Depends(require_a
   .preview-container {
     position: relative;
     width: 100%;
-    height: calc(100% - 32px);
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -466,63 +466,11 @@ async def preview_carousel_html(carousel_id: str, user: User = Depends(require_a
   .slide.active {
     display: flex !important;
   }
-  .preview-nav {
-    display: flex;
-    gap: 6px;
-    padding: 6px 0;
-    z-index: 20;
-  }
-  .preview-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(232, 234, 246, 0.3);
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .preview-dot:hover {
-    background: rgba(0, 212, 255, 0.5);
-  }
-  .preview-dot.active {
-    background: #00d4ff;
-    box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
-  }
-  .preview-arrows {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 4px;
-    pointer-events: none;
-    z-index: 10;
-  }
-  .preview-arrow {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(0, 212, 255, 0.4);
-    color: #00d4ff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: auto;
-    font-size: 12px;
-    transition: all 0.2s;
-  }
-  .preview-arrow:hover {
-    background: rgba(0, 212, 255, 0.3);
-  }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const slides = document.querySelectorAll('.slide');
-  const total = slides.length;
-  let current = 0;
+  const startSlide = __SLIDE_INDEX__;
 
   // Calculate scale based on container size
   function updateScale() {
@@ -537,47 +485,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Show slide
-  function showSlide(idx) {
-    slides.forEach((s, i) => {
-      s.classList.toggle('active', i === idx);
-    });
-    document.querySelectorAll('.preview-dot').forEach((d, i) => {
-      d.classList.toggle('active', i === idx);
-    });
-    current = idx;
-  }
+  // Show the requested slide
+  slides.forEach((s, i) => {
+    s.classList.toggle('active', i === startSlide);
+  });
 
-  // Create navigation
-  const nav = document.createElement('div');
-  nav.className = 'preview-nav';
-  for (let i = 0; i < total; i++) {
-    const dot = document.createElement('button');
-    dot.className = 'preview-dot' + (i === 0 ? ' active' : '');
-    dot.onclick = () => showSlide(i);
-    nav.appendChild(dot);
-  }
-  document.body.appendChild(nav);
-
-  // Create arrows
-  const arrows = document.createElement('div');
-  arrows.className = 'preview-arrows';
-  arrows.innerHTML = `
-    <button class="preview-arrow" onclick="prevSlide()">‹</button>
-    <button class="preview-arrow" onclick="nextSlide()">›</button>
-  `;
-  document.querySelector('.preview-container').appendChild(arrows);
-
-  window.prevSlide = () => showSlide((current - 1 + total) % total);
-  window.nextSlide = () => showSlide((current + 1) % total);
-
-  // Initial setup
-  showSlide(0);
   updateScale();
   window.addEventListener('resize', updateScale);
 });
 </script>
 """
+
+    preview_wrapper = preview_wrapper.replace("__SLIDE_INDEX__", str(slide))
 
     # Wrap body content in preview container
     modified_html = original_html.replace(

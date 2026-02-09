@@ -69,6 +69,10 @@ Key directories:
 
 See [Project Philosophy: Anti-Slop Content Generation](Project%20Philosophy-%20Anti-Slop%20Content%20Generation.md) for the design principles behind persona selection, style injection via author samples, deliberate polish-breaking, and the anti-slop ruleset.
 
+## Screenshots
+
+Never save screenshots or PNG files to the project root. Use the `.playwright-mcp/` directory instead (already gitignored). When taking Playwright screenshots, always specify a filename with that directory prefix, e.g. `filename: ".playwright-mcp/my-screenshot.png"`.
+
 ## Key conventions
 
 - Python 3.11+, async throughout (asyncio)

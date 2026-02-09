@@ -1,4 +1,5 @@
 .env
+.envrc
 
 # Python
 __pycache__/
@@ -14,6 +15,7 @@ build/
 data/carousels/*.pdf
 data/output/runs/
 data/output/carousels/*.pdf
+output/runs/
 
 # IDE
 .idea/
@@ -28,3 +30,8 @@ Thumbs.db
 .claude/
 .playwright-mcp/
 tmp.txt
+trash/
+
+# Screenshots (never commit these)
+*.png
+!static/logo.png

@@ -104,6 +104,14 @@ async def extract_carousel_content(
             "Try again or use different source text."
         )
 
+    # Truncate lists to expected length (LLM sometimes returns extra items)
+    if "bullets" in data and "bullets" in data["bullets"]:
+        data["bullets"]["bullets"] = data["bullets"]["bullets"][:3]
+    if "numbered" in data and "items" in data["numbered"]:
+        data["numbered"]["items"] = data["numbered"]["items"][:3]
+    if "stats" in data and "stats" in data["stats"]:
+        data["stats"]["stats"] = data["stats"]["stats"][:3]
+
     content = CarouselContent.model_validate(data)
     return CarouselExtractionResult(
         content=content,

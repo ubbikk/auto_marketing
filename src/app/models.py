@@ -163,3 +163,11 @@ class UserInfo(BaseModel):
     name: str
     email: str
     photo_url: Optional[str] = None
+
+
+class AccessRequestResponse(BaseModel):
+    """Response for access request endpoint."""
+
+    success: bool
+    status: str = "pending"
+    message: str = ""

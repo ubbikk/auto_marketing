@@ -53,6 +53,12 @@ class Settings(BaseSettings):
     blog_days_back: int = 14  # 2 weeks for blog posts
     include_blog_feeds: bool = True  # Enable OPML blog feeds
 
+    # SMTP / Notification
+    smtp_email: str = os.getenv("SMTP_EMAIL", "")
+    smtp_password: str = os.getenv("SMTP_PASSWORD", "")
+    notify_email: str = os.getenv("NOTIFY_EMAIL", "dd.petrovskiy@gmail.com")
+    default_generation_limit: int = 3
+
     # Embedding Pre-filter
     embedding_enabled: bool = True
     embedding_model: str = "vertex_ai/text-embedding-005"  # Vertex AI embedding model

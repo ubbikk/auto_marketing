@@ -357,28 +357,18 @@ section { position: relative; z-index: 1; }
   flex-shrink: 0;
 }
 
-/* ===== VIDEO PLACEHOLDER ===== */
-.video-placeholder {
-  position: relative; width: 100%; padding-top: 56.25%;
-  border-radius: 16px; overflow: hidden;
+/* ===== PROMO VIDEO ===== */
+.promo-video-wrap {
+  position: relative; width: 100%; border-radius: 16px; overflow: hidden;
   border: 1px solid rgba(26,31,60,0.5);
-  background: linear-gradient(145deg, rgba(13,17,40,0.6) 0%, rgba(6,9,24,0.9) 100%);
+  background: #060918;
   box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 60px rgba(0,212,255,0.06);
 }
-.video-placeholder__inner {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+.promo-video-wrap video {
+  display: block; width: 100%; height: auto; border-radius: 16px;
 }
-.video-placeholder__play {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.3s ease;
-}
-.video-placeholder__play:hover {
-  background: rgba(0,212,255,0.2);
-  box-shadow: 0 0 40px rgba(0,212,255,0.2);
-  transform: scale(1.05);
+.promo-video-wrap video::-webkit-media-controls-panel {
+  background: linear-gradient(transparent, rgba(6,9,24,0.8));
 }
 
 /* ===== LOADING ===== */
@@ -444,6 +434,116 @@ section { position: relative; z-index: 1; }
 .anim-delay-3 { animation-delay: 300ms; }
 .anim-delay-4 { animation-delay: 400ms; }
 .anim-delay-5 { animation-delay: 500ms; }
+
+/* ===== VIEW SYSTEM ===== */
+.view { display: none; }
+.view--active { display: block; }
+
+/* ===== CREDITS BAR ===== */
+.credits-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px; border-radius: 12px;
+  background: linear-gradient(145deg, rgba(139,92,246,0.08) 0%, rgba(13,17,40,0.4) 100%);
+  border: 1px solid rgba(139,92,246,0.2);
+  margin-bottom: 24px;
+}
+.credits-bar__icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(139,92,246,0.12); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.credits-bar__text {
+  font-size: 13px; color: rgba(232,234,246,0.6);
+}
+.credits-bar__count {
+  font-family: var(--font-display); font-weight: 700; font-size: 15px;
+  color: var(--electric-purple);
+}
+.credits-bar__unlimited {
+  font-family: var(--font-display); font-weight: 700; font-size: 15px;
+  color: var(--primary-400);
+}
+
+/* ===== LANDING GALLERY ===== */
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  max-width: 1000px; margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .gallery-grid { grid-template-columns: 1fr; max-width: 400px; }
+}
+.gallery-card {
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(26,31,60,0.5);
+  background: linear-gradient(145deg, rgba(13,17,40,0.7) 0%, rgba(6,9,24,0.9) 100%);
+  transition: all 0.4s ease;
+}
+.gallery-card:hover {
+  border-color: rgba(0,212,255,0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 40px rgba(0,212,255,0.06);
+}
+.gallery-card__type {
+  padding: 10px 16px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--primary-400);
+  border-bottom: 1px solid rgba(26,31,60,0.4);
+}
+.gallery-card__body {
+  padding: 20px;
+  font-size: 13px; line-height: 1.65;
+  color: rgba(232,234,246,0.65);
+  max-height: 280px; overflow: hidden;
+  position: relative;
+}
+.gallery-card__body::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+  background: linear-gradient(transparent, rgba(6,9,24,0.95));
+  pointer-events: none;
+}
+.gallery-card__footer {
+  padding: 12px 16px;
+  display: flex; gap: 8px; flex-wrap: wrap;
+  border-top: 1px solid rgba(26,31,60,0.3);
+}
+.gallery-tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 6px;
+  background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.15);
+  color: var(--primary-300); font-weight: 600;
+}
+
+/* ===== ACCESS REQUEST VIEWS ===== */
+.access-view {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center;
+  padding: 80px 24px; min-height: 50vh;
+}
+.access-view__icon {
+  width: 80px; height: 80px; border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px;
+}
+.access-view__icon--request {
+  background: linear-gradient(135deg, rgba(0,212,255,0.12) 0%, rgba(139,92,246,0.08) 100%);
+  border: 1px solid rgba(0,212,255,0.2);
+}
+.access-view__icon--pending {
+  background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(245,158,11,0.06) 100%);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+.access-view__icon--rejected {
+  background: linear-gradient(135deg, rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.06) 100%);
+  border: 1px solid rgba(239,68,68,0.2);
+}
+.access-view__title {
+  font-family: var(--font-display); font-size: 28px; font-weight: 700;
+  color: #fff; margin-bottom: 12px;
+}
+.access-view__desc {
+  font-size: 15px; line-height: 1.6; color: rgba(232,234,246,0.5);
+  max-width: 400px; margin-bottom: 32px;
+}
 
 /* ===== HIDE/SHOW ===== */
 .hidden { display: none !important; }
@@ -939,7 +1039,8 @@ footer a:hover { color: var(--primary-300); }
   </div>
 </header>
 
-<!-- ===== HERO ===== -->
+<!-- ===== VIEW: LANDING (public) ===== -->
+<div id="view-landing" class="view view--active">
 <section style="padding:80px 0 60px;position:relative;overflow:hidden;">
   <div class="glow-orb glow-orb--cyan" style="width:600px;height:600px;top:-200px;right:-200px;opacity:0.25;"></div>
   <div class="glow-orb glow-orb--purple" style="width:400px;height:400px;bottom:-100px;left:-150px;opacity:0.15;"></div>
@@ -960,23 +1061,155 @@ footer a:hover { color: var(--primary-300); }
       Your voice. Your brand. Zero slop.
     </p>
 
-    <!-- Video placeholder -->
-    <div class="video-placeholder anim-fade-up anim-delay-3" style="max-width:720px;margin-left:auto;margin-right:auto;">
-      <div class="video-placeholder__inner">
-        <div class="video-placeholder__play">
-          <svg width="28" height="28" fill="var(--primary-400)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-        <span style="font-size:13px;font-weight:500;color:rgba(232,234,246,0.3);">Promo Video Coming Soon</span>
-      </div>
+    <button onclick="handleLandingCTA()" class="btn-primary btn-primary--lg anim-fade-up anim-delay-2" style="margin-bottom:48px;">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Get Started Free
+    </button>
+
+    <!-- Promo video -->
+    <div class="promo-video-wrap anim-fade-up anim-delay-3" style="max-width:720px;margin-left:auto;margin-right:auto;">
+      <video autoplay muted loop playsinline preload="auto">
+        <source src="/static/promo.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
 </section>
 
 <div class="shell"><div class="section-divider"></div></div>
 
-<!-- ===== FORM SECTION ===== -->
+<!-- Examples Gallery -->
+<section style="padding:60px 0;">
+  <div class="shell" style="text-align:center;">
+    <h2 class="heading-display anim-fade-up" style="font-size:28px;color:#fff;margin-bottom:8px;">See What It Creates</h2>
+    <p class="anim-fade-up anim-delay-1" style="font-size:15px;color:rgba(232,234,246,0.45);margin-bottom:40px;">Real examples generated by our multi-agent pipeline</p>
+
+    <div class="gallery-grid anim-fade-up anim-delay-2">
+      <!-- Example 1: LinkedIn Post - Professional -->
+      <div class="gallery-card">
+        <div class="gallery-card__type">LinkedIn Post</div>
+        <div class="gallery-card__body">
+          I analyzed 47 failed automation projects last quarter. One pattern showed up in 43 of them.<br><br>
+          The founders didn't fail at picking tools. They failed at mapping their actual process first.<br><br>
+          They jumped straight to Zapier/Make/n8n and tried to automate what they thought they were doing. Not what they were actually doing.<br><br>
+          The 4 that succeeded? They spent 2 weeks documenting every manual step before writing a single automation.
+        </div>
+        <div class="gallery-card__footer">
+          <span class="gallery-tag">Professional</span>
+          <span class="gallery-tag">Data Hook</span>
+        </div>
+      </div>
+
+      <!-- Example 2: LinkedIn Post - Witty -->
+      <div class="gallery-card">
+        <div class="gallery-card__type">LinkedIn Post</div>
+        <div class="gallery-card__body">
+          Me at 2 AM: "I'll just manually update these 200 SKUs real quick."<br><br>
+          Me at 4 AM: still updating SKUs, questioning every life decision that led here.<br><br>
+          Me at 9 AM: discovers the CSV import button that's been there since 2019.<br><br>
+          This is roughly what happens when e-commerce operators try to scale without automation. You don't need more coffee. You need fewer manual steps.
+        </div>
+        <div class="gallery-card__footer">
+          <span class="gallery-tag">Witty</span>
+          <span class="gallery-tag">Story Hook</span>
+        </div>
+      </div>
+
+      <!-- Example 3: Carousel -->
+      <div class="gallery-card">
+        <div class="gallery-card__type">Branded Carousel</div>
+        <div class="gallery-card__body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:240px;">
+          <div style="width:100%;aspect-ratio:1;max-width:220px;border-radius:12px;background:linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(139,92,246,0.06) 100%);border:1px solid rgba(0,212,255,0.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+            <svg width="40" height="40" fill="none" stroke="var(--primary-400)" viewBox="0 0 24 24" style="opacity:0.6;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span style="font-size:12px;color:rgba(232,234,246,0.4);">5-slide branded carousel</span>
+            <span style="font-size:11px;color:rgba(0,212,255,0.5);">Auto-generated from post</span>
+          </div>
+        </div>
+        <div class="gallery-card__footer">
+          <span class="gallery-tag">Carousel</span>
+          <span class="gallery-tag">AFTA Brand</span>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="handleLandingCTA()" class="btn-primary anim-fade-up anim-delay-3" style="margin-top:40px;">
+      Try It Now
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+    </button>
+  </div>
+</section>
+
+<div class="shell"><div class="section-divider"></div></div>
+
+<footer>
+  <div class="shell" style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+    <img src="/static/logo.png" alt="AFTA" style="height:48px;width:auto;">
+    <div>Powered by <a href="https://afta.systems" target="_blank">AFTA Systems</a> &middot; AI Automation for E-commerce</div>
+  </div>
+</footer>
+</div>
+
+<!-- ===== VIEW: REQUEST ACCESS ===== -->
+<div id="view-request-access" class="view">
+  <div class="access-view">
+    <div class="access-view__icon access-view__icon--request">
+      <svg width="36" height="36" fill="none" stroke="var(--primary-400)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+    </div>
+    <div class="access-view__title">Request Access</div>
+    <div class="access-view__desc">
+      You're signed in! Request access to start generating LinkedIn content with 3 free generations.
+    </div>
+    <button onclick="handleRequestAccess()" class="btn-primary btn-primary--lg" id="request-access-btn">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      Request Access
+    </button>
+  </div>
+</div>
+
+<!-- ===== VIEW: PENDING ===== -->
+<div id="view-pending" class="view">
+  <div class="access-view">
+    <div class="access-view__icon access-view__icon--pending">
+      <svg width="36" height="36" fill="none" stroke="var(--accent)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+    <div class="access-view__title">Access Request Pending</div>
+    <div class="access-view__desc">
+      Your request has been submitted and is being reviewed. You'll get access once approved.
+    </div>
+    <div style="font-size:13px;color:rgba(232,234,246,0.3);">Check back soon or refresh this page.</div>
+  </div>
+</div>
+
+<!-- ===== VIEW: REJECTED ===== -->
+<div id="view-rejected" class="view">
+  <div class="access-view">
+    <div class="access-view__icon access-view__icon--rejected">
+      <svg width="36" height="36" fill="none" stroke="#ef4444" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+    </div>
+    <div class="access-view__title">Access Not Approved</div>
+    <div class="access-view__desc">
+      Your access request was not approved. If you believe this is an error, please contact us.
+    </div>
+    <a href="mailto:dd.petrovskiy@gmail.com" class="btn-ghost">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      Contact Admin
+    </a>
+  </div>
+</div>
+
+<!-- ===== VIEW: DASHBOARD (approved users) ===== -->
+<div id="view-dashboard" class="view">
 <section id="generate" style="padding:60px 0 40px;">
   <div class="shell">
+    <!-- Credits Bar -->
+    <div id="credits-bar" class="credits-bar hidden">
+      <div class="credits-bar__icon">
+        <svg width="18" height="18" fill="none" stroke="var(--electric-purple)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <div class="credits-bar__text">
+        <span id="credits-count"></span>
+      </div>
+    </div>
+
     <div id="form-section">
       <h2 class="heading-display" style="font-size:28px;color:#fff;margin-bottom:32px;">
         Generate Marketing Materials
@@ -1314,11 +1547,16 @@ footer a:hover { color: var(--primary-300); }
     <div>Powered by <a href="https://afta.systems" target="_blank">AFTA Systems</a> &middot; AI Automation for E-commerce</div>
   </div>
 </footer>
+</div><!-- /view-dashboard -->
 
 <script>
 // ===== AUTH STATE =====
 let currentUser = null;
 let firebaseInitialized = false;
+let userApproved = false;
+let userIsAdmin = false;
+let generationsRemaining = null;
+let accessRequestStatus = null;
 
 // ===== STATE =====
 let selectedPersona = 'professional';
@@ -1350,18 +1588,103 @@ async function initFirebase() {
   }
 }
 
-async function checkAuthState() {
+// ===== VIEW SYSTEM =====
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('view--active'));
+  const view = document.getElementById('view-' + name);
+  if (view) view.classList.add('view--active');
+}
+
+async function checkAuthAndRoute() {
   try {
     const res = await fetch('/api/auth/me');
     const data = await res.json();
     if (data.authenticated) {
       currentUser = data.user;
+      userApproved = data.approved || false;
+      userIsAdmin = data.is_admin || false;
+      generationsRemaining = data.generations_remaining;
+      accessRequestStatus = data.access_request_status;
       updateAuthUI(true);
+      routeToView();
     } else {
+      currentUser = null;
+      userApproved = false;
       updateAuthUI(false);
+      showView('landing');
     }
   } catch (e) {
     updateAuthUI(false);
+    showView('landing');
+  }
+}
+
+function routeToView() {
+  if (!currentUser) {
+    showView('landing');
+    return;
+  }
+  if (userApproved || userIsAdmin) {
+    showView('dashboard');
+    updateCreditsBar();
+    return;
+  }
+  if (accessRequestStatus === 'rejected') {
+    showView('rejected');
+    return;
+  }
+  if (accessRequestStatus === 'pending') {
+    showView('pending');
+    return;
+  }
+  showView('request-access');
+}
+
+function updateCreditsBar() {
+  const bar = document.getElementById('credits-bar');
+  const count = document.getElementById('credits-count');
+  if (!bar || !count) return;
+
+  if (userIsAdmin || generationsRemaining === null) {
+    count.innerHTML = '<span class="credits-bar__unlimited">Unlimited</span> generations';
+    bar.classList.remove('hidden');
+  } else if (generationsRemaining !== undefined) {
+    count.innerHTML = '<span class="credits-bar__count">' + generationsRemaining + '</span> generation' + (generationsRemaining !== 1 ? 's' : '') + ' remaining';
+    bar.classList.remove('hidden');
+  } else {
+    bar.classList.add('hidden');
+  }
+}
+
+function handleLandingCTA() {
+  if (currentUser) {
+    routeToView();
+  } else {
+    openAuthModal();
+  }
+}
+
+async function handleRequestAccess() {
+  const btn = document.getElementById('request-access-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="animation:spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-width="2" stroke-dasharray="31.4 31.4"/></svg> Submitting...';
+
+  try {
+    const res = await fetch('/api/request-access', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      accessRequestStatus = data.status;
+      if (data.status === 'approved') {
+        userApproved = true;
+        routeToView();
+      } else {
+        showView('pending');
+      }
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = 'Request Access';
+    alert('Error: ' + e.message);
   }
 }
 
@@ -1443,8 +1766,8 @@ async function handleFirebaseUser(user) {
       return;
     }
     currentUser = result.user;
-    updateAuthUI(true);
     closeAuthModal();
+    await checkAuthAndRoute();
   } catch (error) {
     showAuthError('Connection error. Please try again.');
   }
@@ -1454,7 +1777,12 @@ async function handleLogout() {
   try {
     await fetch('/api/auth/logout', { method: 'POST' });
     currentUser = null;
+    userApproved = false;
+    userIsAdmin = false;
+    generationsRemaining = null;
+    accessRequestStatus = null;
     updateAuthUI(false);
+    showView('landing');
     // Sign out from Firebase as well
     if (firebaseInitialized) {
       await firebase.auth().signOut();
@@ -1466,9 +1794,9 @@ async function handleLogout() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
-  // Initialize Firebase and check auth state
+  // Initialize Firebase and check auth + route
   await initFirebase();
-  await checkAuthState();
+  await checkAuthAndRoute();
 
   // Fetch personas
   try {
@@ -1668,6 +1996,18 @@ async function handleGenerate() {
     return;
   }
 
+  // Check approval
+  if (!userApproved && !userIsAdmin) {
+    routeToView();
+    return;
+  }
+
+  // Check credits
+  if (generationsRemaining !== null && generationsRemaining <= 0) {
+    alert('No generations remaining. Contact admin for more credits.');
+    return;
+  }
+
   const targetUrl = document.getElementById('target-url').value.trim();
   if (!targetUrl) {
     document.getElementById('target-url').focus();
@@ -1751,11 +2091,27 @@ async function handleGenerate() {
         document.getElementById('form-section').classList.remove('hidden');
         return;
       }
+      // Handle 403 - not approved or out of credits
+      if (res.status === 403) {
+        document.getElementById('loading-section').classList.add('hidden');
+        document.getElementById('form-section').classList.remove('hidden');
+        const err = await res.json();
+        alert(err.detail || 'Access denied');
+        await checkAuthAndRoute();
+        return;
+      }
       const err = await res.json();
       throw new Error(err.detail || 'Generation failed');
     }
 
     const data = await res.json();
+
+    // Decrement local credits counter
+    if (generationsRemaining !== null) {
+      generationsRemaining = Math.max(0, generationsRemaining - 1);
+      updateCreditsBar();
+    }
+
     showResults(data);
   } catch (e) {
     alert('Error: ' + e.message);

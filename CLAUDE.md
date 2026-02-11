@@ -212,8 +212,8 @@ gcloud run deploy auto-marketing \
     --memory 2Gi \
     --cpu 2 \
     --timeout 600 \
-    --set-secrets="ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,GOOGLE_API_KEY=GOOGLE_API_KEY:latest,FIRECRAWL_API_KEY=FIRECRAWL_API_KEY:latest,SECRET_KEY=AUTO_MARKETING_SECRET_KEY:latest" \
-    --set-env-vars="GOOGLE_CLOUD_PROJECT=gen-lang-client-0463729029,FIREBASE_PROJECT_ID=gen-lang-client-04637290-cffaa,FIREBASE_API_KEY=AIzaSyBZZNu8Q2ngLxw37e8yraZcCw3_weSHqHw,FIREBASE_AUTH_DOMAIN=gen-lang-client-04637290-cffaa.firebaseapp.com" \
+    --set-secrets="ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,GOOGLE_API_KEY=GOOGLE_API_KEY:latest,FIRECRAWL_API_KEY=FIRECRAWL_API_KEY:latest,SECRET_KEY=AUTO_MARKETING_SECRET_KEY:latest,SMTP_EMAIL=SMTP_EMAIL:latest,SMTP_PASSWORD=SMTP_PASSWORD:latest" \
+    --set-env-vars="GOOGLE_CLOUD_PROJECT=gen-lang-client-0463729029,FIREBASE_PROJECT_ID=gen-lang-client-04637290-cffaa,FIREBASE_API_KEY=AIzaSyBZZNu8Q2ngLxw37e8yraZcCw3_weSHqHw,FIREBASE_AUTH_DOMAIN=gen-lang-client-04637290-cffaa.firebaseapp.com,NOTIFY_EMAIL=dd.petrovskiy@gmail.com" \
     --port 8000 \
     --execution-environment gen2 \
     --no-cpu-throttling

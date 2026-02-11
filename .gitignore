@@ -12,7 +12,8 @@ dist/
 build/
 
 # Generated outputs
-data/carousels/*.pdf
+data/carousels/
+static/promo.mp4
 data/output/runs/
 data/output/carousels/*.pdf
 output/runs/

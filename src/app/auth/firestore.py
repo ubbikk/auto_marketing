@@ -117,18 +117,17 @@ class FirestoreService:
 
     def get_user_access_request(self, user_id: str) -> Optional[Dict[str, Any]]:
         """Get the most recent access request for a user."""
-        docs = (
-            self.access_requests
-            .where('user_id', '==', user_id)
-            .order_by('created_at', direction=firestore.Query.DESCENDING)
-            .limit(1)
-            .stream()
-        )
+        docs = self.access_requests.where('user_id', '==', user_id).stream()
+        requests = []
         for doc in docs:
             data = doc.to_dict()
             data['id'] = doc.id
-            return data
-        return None
+            requests.append(data)
+        if not requests:
+            return None
+        # Sort in Python to avoid requiring a Firestore composite index
+        requests.sort(key=lambda x: x.get('created_at') or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+        return requests[0]
 
     def approve_access_request(self, request_id: str, generation_limit: int = 3) -> bool:
         """Approve an access request and update the user."""

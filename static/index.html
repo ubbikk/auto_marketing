@@ -929,6 +929,41 @@ footer a:hover { color: var(--primary-300); }
   display: flex; gap: 10px; flex-wrap: wrap;
 }
 
+/* Download dropdown */
+.download-dropdown {
+  position: relative; display: inline-flex;
+}
+.download-dropdown__menu {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  min-width: 180px; padding: 6px;
+  border-radius: 12px; border: 1px solid rgba(26,31,60,0.6);
+  background: rgba(13,17,40,0.95); backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  opacity: 0; visibility: hidden; transform: translateY(-4px);
+  transition: all 0.15s ease; z-index: 20;
+}
+.download-dropdown.open .download-dropdown__menu {
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
+.download-dropdown__item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 10px 14px; border: none;
+  border-radius: 8px; background: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 13px; font-weight: 500;
+  color: var(--surface-foreground); text-decoration: none;
+  transition: background 0.15s ease;
+}
+.download-dropdown__item:hover {
+  background: rgba(0,212,255,0.1); color: var(--primary-300);
+}
+.download-dropdown__item svg { flex-shrink: 0; }
+.download-dropdown__item span.download-dropdown__badge {
+  margin-left: auto; font-size: 10px; font-weight: 700;
+  padding: 2px 6px; border-radius: 4px;
+  background: rgba(0,212,255,0.15); color: var(--primary-400);
+  letter-spacing: 0.05em;
+}
+
 /* Auth Modal */
 .auth-modal {
   position: fixed; inset: 0; z-index: 100;
@@ -1007,6 +1042,9 @@ footer a:hover { color: var(--primary-300); }
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<!-- Carousel PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -1456,10 +1494,25 @@ footer a:hover { color: var(--primary-300); }
                   <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
                   Expand
                 </button>
-                <a id="carousel-download" class="btn-primary" href="#" download style="text-decoration:none;">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                  Download HTML
-                </a>
+                <div class="download-dropdown" id="carousel-download-dropdown">
+                  <button class="btn-primary" onclick="toggleDownloadDropdown('carousel-download-dropdown')">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Download
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left:-2px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                  </button>
+                  <div class="download-dropdown__menu">
+                    <button class="download-dropdown__item" id="carousel-pdf-btn" onclick="generateCarouselPDF()">
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                      Download PDF
+                      <span class="download-dropdown__badge">PDF</span>
+                    </button>
+                    <a class="download-dropdown__item" id="carousel-html-link" href="#" download>
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                      Download HTML
+                      <span class="download-dropdown__badge">HTML</span>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="carousel-preview-wrap">
@@ -2203,7 +2256,7 @@ function showResults(data) {
   carouselId = data.carousel_id;
   const carouselPreviewUrl = `/api/carousel/preview/${data.carousel_id}`;
   document.getElementById('carousel-iframe').src = carouselPreviewUrl;
-  document.getElementById('carousel-download').href = data.carousel_pdf_url;
+  document.getElementById('carousel-html-link').href = data.carousel_pdf_url;
 
   // Variants - full content with copy buttons
   const variants = data.all_variants || [];
@@ -2415,6 +2468,143 @@ function escapeHtml(text) {
   return d.innerHTML;
 }
 
+// ===== CAROUSEL DOWNLOAD =====
+function toggleDownloadDropdown(dropdownId) {
+  const dropdown = document.getElementById(dropdownId);
+  const isOpen = dropdown.classList.contains('open');
+
+  // Close all dropdowns first
+  document.querySelectorAll('.download-dropdown.open').forEach(d => d.classList.remove('open'));
+
+  if (!isOpen) {
+    dropdown.classList.add('open');
+    // Close on outside click
+    setTimeout(() => {
+      const handler = (e) => {
+        if (!dropdown.contains(e.target)) {
+          dropdown.classList.remove('open');
+          document.removeEventListener('click', handler);
+        }
+      };
+      document.addEventListener('click', handler);
+    }, 0);
+  }
+}
+
+let pdfGenerating = false;
+
+async function generateCarouselPDF() {
+  if (!carouselId || pdfGenerating) return;
+
+  // Close any open dropdowns
+  document.querySelectorAll('.download-dropdown.open').forEach(d => d.classList.remove('open'));
+
+  pdfGenerating = true;
+
+  // Update all PDF buttons to show loading state
+  const pdfBtns = document.querySelectorAll('#carousel-pdf-btn, [onclick="generateCarouselPDF()"]');
+  const origTexts = [];
+  pdfBtns.forEach((btn, i) => {
+    origTexts[i] = btn.innerHTML;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Generating PDF...';
+    btn.disabled = true;
+  });
+
+  try {
+    // Fetch the carousel HTML
+    const resp = await fetch(`/api/carousel/download/${carouselId}?inline=true`, { credentials: 'same-origin' });
+    if (!resp.ok) throw new Error('Failed to fetch carousel HTML');
+    const htmlContent = await resp.text();
+
+    // Create a hidden container off-screen
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:1080px;height:auto;z-index:-1;overflow:hidden;';
+    document.body.appendChild(container);
+
+    // Inject HTML into a shadow-like container to avoid style conflicts
+    const wrapper = document.createElement('div');
+    container.appendChild(wrapper);
+
+    // Parse the carousel HTML and extract styles + slides
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+
+    // Copy styles from the carousel HTML
+    const styleEl = document.createElement('style');
+    doc.querySelectorAll('style').forEach(s => { styleEl.textContent += s.textContent; });
+    wrapper.appendChild(styleEl);
+
+    // Copy the font link
+    const fontLink = document.createElement('link');
+    fontLink.rel = 'stylesheet';
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
+    wrapper.appendChild(fontLink);
+
+    // Copy all slides
+    const slides = doc.querySelectorAll('.slide');
+    slides.forEach(slide => {
+      const imported = document.importNode(slide, true);
+      wrapper.appendChild(imported);
+    });
+
+    // Wait for fonts to load
+    await document.fonts.ready;
+    // Small delay for rendering
+    await new Promise(r => setTimeout(r, 500));
+
+    const renderedSlides = wrapper.querySelectorAll('.slide');
+    const { jsPDF } = window.jspdf;
+
+    // Capture each slide as a canvas
+    const canvases = [];
+    for (const slide of renderedSlides) {
+      // Ensure slide is visible and has correct dimensions
+      slide.style.display = 'flex';
+      slide.style.width = '1080px';
+      slide.style.height = '1080px';
+
+      const canvas = await html2canvas(slide, {
+        width: 1080,
+        height: 1080,
+        scale: 1,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#060918',
+        logging: false,
+      });
+      canvases.push(canvas);
+    }
+
+    // Create PDF — 1080×1080 px at 72 DPI = 1080 points
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'px',
+      format: [1080, 1080],
+      hotfixes: ['px_scaling'],
+    });
+
+    canvases.forEach((canvas, i) => {
+      if (i > 0) pdf.addPage([1080, 1080]);
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 1080, 1080);
+    });
+
+    pdf.save(`carousel_${carouselId}.pdf`);
+
+    // Cleanup
+    document.body.removeChild(container);
+  } catch (err) {
+    console.error('PDF generation failed:', err);
+    alert('PDF generation failed. Please try downloading as HTML instead.');
+  } finally {
+    pdfGenerating = false;
+    pdfBtns.forEach((btn, i) => {
+      btn.innerHTML = origTexts[i];
+      btn.disabled = false;
+    });
+  }
+}
+
 // ===== CAROUSEL MODAL =====
 function openCarouselModal() {
   if (!carouselId) return;
@@ -2427,7 +2617,7 @@ function openCarouselModal() {
   document.body.style.overflow = 'hidden';
 
   // Set download link
-  document.getElementById('modal-download-btn').href = `/api/carousel/download/${carouselId}`;
+  document.getElementById('modal-html-link').href = `/api/carousel/download/${carouselId}`;
 
   // Render dots
   renderModalDots();
@@ -2556,12 +2746,25 @@ function copyVariant(index) {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
       </svg>
     </button>
-    <a id="modal-download-btn" class="btn-primary" href="#" download style="text-decoration:none;">
-      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-      </svg>
-      Download HTML
-    </a>
+    <div class="download-dropdown" id="modal-download-dropdown">
+      <button class="btn-primary" onclick="toggleDownloadDropdown('modal-download-dropdown')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Download
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left:-2px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div class="download-dropdown__menu">
+        <button class="download-dropdown__item" onclick="generateCarouselPDF()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          Download PDF
+          <span class="download-dropdown__badge">PDF</span>
+        </button>
+        <a class="download-dropdown__item" id="modal-html-link" href="#" download>
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          Download HTML
+          <span class="download-dropdown__badge">HTML</span>
+        </a>
+      </div>
+    </div>
   </div>
 
   <div class="carousel-modal__content" onclick="event.stopPropagation()">

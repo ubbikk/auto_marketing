@@ -544,8 +544,10 @@ async def generate(request: GenerateRequest, user: User = Depends(require_approv
 
 
 @app.get("/api/carousel/download/{carousel_id}")
-async def download_carousel_html(carousel_id: str, user: User = Depends(require_auth)):
-    """Serve print-ready carousel HTML for download."""
+async def download_carousel_html(
+    carousel_id: str, inline: bool = False, user: User = Depends(require_auth)
+):
+    """Serve print-ready carousel HTML for download or inline viewing."""
     from fastapi.responses import Response
     from ..carousel.service import get_printable_html
 
@@ -553,12 +555,16 @@ async def download_carousel_html(carousel_id: str, user: User = Depends(require_
     if html is None:
         raise HTTPException(status_code=404, detail="Carousel not found")
 
+    headers = {}
+    if not inline:
+        headers["Content-Disposition"] = (
+            f'attachment; filename="carousel_{carousel_id}.html"'
+        )
+
     return Response(
         content=html,
         media_type="text/html",
-        headers={
-            "Content-Disposition": f'attachment; filename="carousel_{carousel_id}.html"',
-        },
+        headers=headers,
     )
 
 

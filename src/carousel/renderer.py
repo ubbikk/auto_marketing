@@ -554,6 +554,11 @@ def build_printable_html(html_content: str) -> str:
     body { margin: 0; padding: 0; background: #060918; }
     .slide { page-break-after: always; page-break-inside: avoid; }
     .slide:last-child { page-break-after: auto; }
+    /* Disable expensive effects that bloat PDF (180MB -> ~5MB) */
+    .glow { display: none !important; }
+    .slide::after { display: none !important; }
+    .slide::before { opacity: 0.1 !important; }
+    .glass-card { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   }
   @page { size: 1080px 1080px; margin: 0; }
 </style>

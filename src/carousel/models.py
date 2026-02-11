@@ -1,5 +1,7 @@
 """Pydantic models for carousel slide content."""
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -72,3 +74,40 @@ class CarouselContent(BaseModel):
     numbered: NumberedSlide
     stats: StatsSlide
     cta: CTASlide
+
+
+# --- Explanatory mode carousel models ---
+
+
+class ExplanatoryContentSlide(BaseModel):
+    """A single content slide with flexible type for explanatory carousels."""
+
+    type: Literal["bullet", "numbered", "quote", "stats"]
+    heading: str = Field(description="Section heading, 3-6 words")
+    badge: str = Field(default="Insight", description="Badge text (one word)")
+    # Type-specific fields (all optional; prompt ensures correct ones per type)
+    bullets: list[str] = Field(default_factory=list, description="Bullet points (for bullet type)")
+    items: list[dict[str, str]] = Field(default_factory=list, description="Numbered items (for numbered type)")
+    quote_text: str = Field(default="", description="Quote text (for quote type)")
+    quote_attribution: str = Field(default="", description="Quote attribution (for quote type)")
+    stats: list[StatItem] = Field(default_factory=list, description="Stat items (for stats type)")
+
+
+class ExplanatoryClosingSlide(BaseModel):
+    """Closing slide with key takeaway and source attribution."""
+
+    takeaway: str = Field(description="One-sentence key takeaway")
+    source_title: str = Field(default="", description="Source article/video title")
+    source_author: str = Field(default="", description="Author name if known")
+
+
+class ExplanatoryCarouselContent(BaseModel):
+    """Full explanatory carousel content with flexible slide count."""
+
+    cover: CoverSlide  # Reuse existing cover slide model
+    slides: list[ExplanatoryContentSlide] = Field(
+        description="Content slides (3-8)",
+        min_length=1,
+        max_length=10,
+    )
+    closing: ExplanatoryClosingSlide

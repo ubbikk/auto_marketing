@@ -30,10 +30,12 @@ class LiteLLMJudgeAgent:
         model_id: str,
         anti_slop_rules: str,
         max_tokens: int = 16384,
+        explanatory_mode: bool = False,
     ):
         self.model_id = model_id
         self.anti_slop_rules = anti_slop_rules
         self.max_tokens = max_tokens
+        self.explanatory_mode = explanatory_mode
 
     async def execute(
         self,
@@ -98,8 +100,9 @@ CONTENT:
 
 """
 
+        template = "judge_explanatory" if self.explanatory_mode else "judge"
         return render(
-            "judge",
+            template,
             anti_slop_rules=self.anti_slop_rules,
             news_context=news_context,
             num_variants=str(len(variants)),

@@ -1,6 +1,6 @@
 """Pydantic request/response models for the web API."""
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, model_validator
 from typing import Optional
 
 
@@ -56,7 +56,7 @@ class CompanyProfileResponse(BaseModel):
 class GenerateRequest(BaseModel):
     """Request body for the /api/generate endpoint."""
 
-    target_url: str
+    target_url: str = ""
     message: str = ""
     source_text: str = "auto"
     persona: str = "professional"
@@ -64,6 +64,7 @@ class GenerateRequest(BaseModel):
     generation_model: str = "gemini/gemini-3-pro-preview"
     auto_summarize: bool = True
     company_profile: Optional[CompanyProfile] = None
+    explanatory_mode: bool = False
 
     @field_validator("num_generators")
     @classmethod
@@ -71,6 +72,16 @@ class GenerateRequest(BaseModel):
         if not 3 <= v <= 10:
             raise ValueError("num_generators must be between 3 and 10")
         return v
+
+    @model_validator(mode="after")
+    def validate_mode_constraints(self) -> "GenerateRequest":
+        if self.explanatory_mode:
+            if self.source_text.strip().lower() == "auto":
+                raise ValueError("Explanatory mode requires pasted source content")
+        else:
+            if not self.target_url:
+                raise ValueError("target_url is required in marketing mode")
+        return self
 
 
 class VariantData(BaseModel):

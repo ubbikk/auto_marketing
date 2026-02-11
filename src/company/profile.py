@@ -166,11 +166,11 @@ async def scrape_website_content(url: str) -> Optional[str]:
         from firecrawl import FirecrawlApp
 
         app = FirecrawlApp(api_key=api_key)
-        result = app.scrape_url(url, params={"formats": ["markdown"]})
+        result = app.scrape(url, formats=["markdown"])
 
-        if result and isinstance(result, dict):
-            return result.get("markdown", result.get("content", ""))
-        return str(result) if result else None
+        if result:
+            return result.markdown or str(result)
+        return None
 
     except ImportError:
         logger.error("firecrawl-py not installed. Run: pip install firecrawl-py")

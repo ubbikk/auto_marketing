@@ -20,7 +20,7 @@ from ..agents.generator_agent import GeneratedVariant, GeneratorAgent, Generator
 from ..agents.litellm_generator import LiteLLMGeneratorAgent
 from ..agents.litellm_judge import LiteLLMJudgeAgent
 from ..agents.judge_agent import JudgeAgent, JudgmentResult
-from ..carousel.service import generate_carousel_html
+from ..carousel.service import generate_carousel_html, generate_carousel_html_explanatory
 from ..creativity.anti_slop import AntiSlopValidator
 from ..creativity.engine import CreativityEngine
 from ..news.fetcher import NewsFetcher
@@ -121,6 +121,60 @@ async def analyze_source_text(
     data = json.loads(raw)
     return SourceAnalysisResult(
         content=SourceContent(**data),
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        model=model,
+    )
+
+
+async def analyze_source_text_explanatory(
+    client: anthropic.Anthropic,
+    text: str,
+    message: str = "",
+) -> SourceAnalysisResult:
+    """Use Claude Sonnet to extract structured context for explanatory mode."""
+    from ..prompts import render
+
+    message_hint = f"\nFOCUS AREA: {message}" if message else ""
+    prompt = render("source_analysis_explanatory", text=text[:5000], message_hint=message_hint)
+
+    model = "claude-sonnet-4-20250514"
+    response = client.messages.create(
+        model=model,
+        max_tokens=800,
+        temperature=0.3,
+        messages=[{"role": "user", "content": prompt}],
+    )
+
+    input_tokens = response.usage.input_tokens
+    output_tokens = response.usage.output_tokens
+
+    raw = response.content[0].text.strip()
+    if "```" in raw:
+        start = raw.find("```")
+        end = raw.rfind("```")
+        if start != end:
+            inner = raw[start:end]
+            first_nl = inner.find("\n")
+            raw = inner[first_nl + 1:] if first_nl != -1 else inner[3:]
+        else:
+            lines = raw.split("\n")
+            raw = "\n".join(l for l in lines if not l.strip().startswith("```"))
+    brace_start = raw.find("{")
+    brace_end = raw.rfind("}")
+    if brace_start != -1 and brace_end != -1:
+        raw = raw[brace_start : brace_end + 1]
+
+    data = json.loads(raw)
+    # Map explanatory fields to SourceContent
+    key_insights = data.pop("key_insights", [])
+    # Explanatory mode doesn't have these fields
+    data.setdefault("suggested_angle", "")
+    data.setdefault("company_connection", "")
+    data.setdefault("target_icp", "")
+    content = SourceContent(**data, key_insights=key_insights)
+    return SourceAnalysisResult(
+        content=content,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
         model=model,
@@ -564,7 +618,7 @@ def _save_run_artifacts(
 
 
 async def run_pipeline(
-    target_url: str,
+    target_url: str = "",
     message: str = "",
     source_text: str = "auto",
     persona: str = "professional",
@@ -573,6 +627,7 @@ async def run_pipeline(
     auto_summarize: bool = True,
     company_context: Optional[CompanyContext] = None,
     exclude_urls: Optional[set[str]] = None,
+    explanatory_mode: bool = False,
 ) -> WebPipelineResult:
     """Run the full web generation pipeline.
 
@@ -602,20 +657,26 @@ async def run_pipeline(
     _resolved_source_text = None  # URL-resolved content for carousel (Step 9)
     _source_mode = "auto"  # Will be updated in Step 2
 
-    # Load default company context if not provided
-    if company_context is None:
+    # Load default company context if not provided (skip in explanatory mode)
+    if company_context is None and not explanatory_mode:
         company_context = load_default_context()
 
     logger.info("=" * 60)
-    logger.info("[PIPELINE] Starting generation for persona=%s, model=%s, generators=%d, company=%s",
-                persona, generation_model, num_generators, company_context.name)
+    mode_label = "EXPLANATORY" if explanatory_mode else "MARKETING"
+    logger.info("[PIPELINE] Starting %s generation for persona=%s, model=%s, generators=%d",
+                mode_label, persona, generation_model, num_generators)
 
     # Step 1: Scrape target website metadata (logo, domain)
     t0 = time.time()
-    logger.info("[STEP 1] Scraping website metadata from %s", target_url)
-    website_metadata = await scrape_website_metadata(target_url)
-    timings["scrape_metadata"] = round(time.time() - t0, 2)
-    logger.info("[STEP 1] Done in %.1fs — domain=%s", time.time() - t0, website_metadata.domain)
+    if explanatory_mode:
+        logger.info("[STEP 1] Skipping metadata scrape (explanatory mode)")
+        website_metadata = WebsiteMetadata(domain="", logo_data_url=None)
+        timings["scrape_metadata"] = 0
+    else:
+        logger.info("[STEP 1] Scraping website metadata from %s", target_url)
+        website_metadata = await scrape_website_metadata(target_url)
+        timings["scrape_metadata"] = round(time.time() - t0, 2)
+        logger.info("[STEP 1] Done in %.1fs — domain=%s", time.time() - t0, website_metadata.domain)
 
     # Step 2: Resolve source content
     t0 = time.time()
@@ -687,12 +748,15 @@ async def run_pipeline(
                 # Use resolved content for analysis
                 analysis_text = url_result.content
             else:
-                logger.warning("[STEP 2] URL resolution failed: %s — falling back to raw text", url_result.error)
-                analysis_text = source_text
+                logger.warning("[STEP 2] URL resolution failed: %s", url_result.error)
+                raise ValueError(f"Failed to resolve URL content: {url_result.error}")
         else:
             analysis_text = source_text
 
-        analysis_result = await analyze_source_text(client, analysis_text, message)
+        if explanatory_mode:
+            analysis_result = await analyze_source_text_explanatory(client, analysis_text, message)
+        else:
+            analysis_result = await analyze_source_text(client, analysis_text, message)
         source = analysis_result.content
 
         # Set source URL if we detected one
@@ -761,7 +825,7 @@ async def run_pipeline(
     # Step 4: Load configs
     t0 = time.time()
     personas_data = _load_personas()
-    company_profile = company_context.to_generator_prompt()
+    company_profile = "" if explanatory_mode else company_context.to_generator_prompt()
     anti_slop = AntiSlopValidator()
 
     creativity_engine = CreativityEngine(
@@ -797,14 +861,16 @@ async def run_pipeline(
             "mutation_seed": creativity_ctx.mutation_seed,
         })
 
+        _company_name = "" if explanatory_mode else company_context.name
         if use_litellm:
             # Use LiteLLM for Gemini and other non-Anthropic models
             generator = LiteLLMGeneratorAgent(
                 model_id=generation_model,
                 generator_id=i,
                 persona_config=persona_config,
-                company_name=company_context.name,
+                company_name=_company_name,
                 company_profile=company_profile,
+                explanatory_mode=explanatory_mode,
             )
         else:
             # Use Anthropic SDK for Claude models
@@ -812,9 +878,10 @@ async def run_pipeline(
                 client=client,
                 generator_id=i,
                 persona_config=persona_config,
-                company_name=company_context.name,
+                company_name=_company_name,
                 company_profile=company_profile,
                 model_id=generation_model,
+                explanatory_mode=explanatory_mode,
             )
 
         logger.info("[STEP 5]   Generator %d: hook=%s, structure=%s",
@@ -896,12 +963,14 @@ async def run_pipeline(
         judge = LiteLLMJudgeAgent(
             model_id=judge_model,
             anti_slop_rules=anti_slop.get_rules_for_prompt(),
+            explanatory_mode=explanatory_mode,
         )
     else:
         judge = JudgeAgent(
             client=client,
             anti_slop_rules=anti_slop.get_rules_for_prompt(),
             model_id=judge_model,
+            explanatory_mode=explanatory_mode,
         )
 
     judgment = await judge.execute(filtered_variants, source_context)
@@ -962,13 +1031,22 @@ Business Connection: {source.company_connection}
 
 Target Audience: {source.target_icp}"""
     logger.info("[STEP 9] Carousel source length: %d chars", len(carousel_source))
-    carousel_result = await generate_carousel_html(
-        text=carousel_source,
-        client=client,
-        message=effective_message,
-        logo_data_url=website_metadata.logo_data_url,
-        footer_domain=website_metadata.domain,
-    )
+    if explanatory_mode:
+        carousel_result = await generate_carousel_html_explanatory(
+            text=carousel_source,
+            client=client,
+            message=effective_message,
+            source_title=source.title,
+            source_url=source.url,
+        )
+    else:
+        carousel_result = await generate_carousel_html(
+            text=carousel_source,
+            client=client,
+            message=effective_message,
+            logo_data_url=website_metadata.logo_data_url,
+            footer_domain=website_metadata.domain,
+        )
     # Track carousel costs
     cost = calculate_cost(
         carousel_result.model,

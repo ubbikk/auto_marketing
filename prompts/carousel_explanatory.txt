@@ -1,0 +1,79 @@
+This carousel accompanies a LinkedIn post from an educational content system.
+The post explains technical insights from source material for developers, AI
+engineers, and programmers. The carousel should match that standard: clear,
+specific, information-dense. No marketing, no company promotion, no CTA.
+
+YOUR ROLE:
+Extract the most compelling insights from the source text into a LinkedIn
+carousel. Determine the number of slides based on content depth — simple
+topics need fewer slides, complex topics with multiple dimensions need more.
+Every word earns its place or gets cut. Do NOT pad with filler.
+
+The carousel has this structure:
+1. COVER — An attention-grabbing title (max ~10 words) + one-line subtitle + badge.
+2-N. CONTENT SLIDES (between 3 and 8 slides) — Each slide is one of these types:
+   - "bullet": heading + badge + 3-4 bullet points with concrete facts/insights
+   - "numbered": heading + badge + 2-4 numbered items, each with a bold title and description
+   - "quote": heading + badge + a memorable quote from the source + attribution
+   - "stats": heading + badge + 2-3 stat cards (short value + label)
+LAST. CLOSING — A key takeaway sentence + source attribution (title, author if known).
+
+Rules:
+- Keep language punchy. No filler words, no corporate speak.
+- Use specific numbers and data from the source text whenever possible.
+- If the source lacks exact stats, use qualitative insights — do NOT invent statistics.
+- Vary the slide types — don't use the same type for every content slide.
+- All content should relate to the source text's core topic.
+- NO call-to-action. NO company branding. This is purely educational.
+
+Extract carousel content from this text. Return ONLY valid JSON matching the schema below.
+
+Schema:
+{
+  "cover": {
+    "title": "string (max ~10 words)",
+    "subtitle": "string (one sentence)",
+    "badge": "string (one word)"
+  },
+  "slides": [
+    {
+      "type": "bullet",
+      "heading": "string (3-6 words)",
+      "badge": "string (one word)",
+      "bullets": ["string", "string", "string"]
+    },
+    {
+      "type": "numbered",
+      "heading": "string (3-6 words)",
+      "badge": "string (one word)",
+      "items": [
+        {"title": "string", "description": "string"},
+        {"title": "string", "description": "string"}
+      ]
+    },
+    {
+      "type": "quote",
+      "heading": "string (3-6 words)",
+      "badge": "string (one word)",
+      "quote_text": "string (1-2 sentences)",
+      "quote_attribution": "string (e.g. '— Author Name')"
+    },
+    {
+      "type": "stats",
+      "heading": "string (3-6 words)",
+      "badge": "string (one word)",
+      "stats": [
+        {"value": "string (MAX 4 chars, e.g. '3x', '87%', '14h')", "label": "string"},
+        {"value": "string (MAX 4 chars)", "label": "string"}
+      ]
+    }
+  ],
+  "closing": {
+    "takeaway": "string (one-sentence key takeaway)",
+    "source_title": "string (title of the source article/video)",
+    "source_author": "string (author name if known, empty string if not)"
+  }
+}
+
+${message_section}SOURCE TEXT:
+$text

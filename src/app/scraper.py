@@ -223,11 +223,12 @@ async def scrape_article_content(url: str, timeout: int = 30) -> ArticleContent:
             raise ValueError("FIRECRAWL_API_KEY environment variable is required")
 
         app = FirecrawlApp(api_key=api_key)
-        result = app.scrape_url(url, params={
-            "formats": ["markdown"],
-            "timeout": timeout * 1000,
-            "onlyMainContent": True,
-        })
+        result = app.scrape(
+            url,
+            formats=["markdown"],
+            timeout=timeout * 1000,
+            only_main_content=True,
+        )
 
         if not result:
             return ArticleContent(
@@ -235,10 +236,10 @@ async def scrape_article_content(url: str, timeout: int = 30) -> ArticleContent:
                 error="Firecrawl returned empty result",
             )
 
-        # Extract content and metadata
-        content = result.get("markdown", "") or ""
-        metadata = result.get("metadata", {}) or {}
-        title = metadata.get("title", "") or metadata.get("ogTitle", "") or ""
+        # Extract content and metadata (v4 SDK returns Document object)
+        content = result.markdown or ""
+        meta = result.metadata_dict if result.metadata else {}
+        title = meta.get("title", "") or meta.get("ogTitle", "") or ""
 
         content = _clean_article_content(content)
 

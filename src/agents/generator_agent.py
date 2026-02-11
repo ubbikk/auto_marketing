@@ -5,7 +5,7 @@ using persona-specific voice and creativity context.
 """
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 import anthropic
@@ -25,6 +25,7 @@ class SourceContent:
     company_connection: str
     target_icp: str
     url: str = ""  # Article URL for scraping full content
+    key_insights: list[str] = field(default_factory=list)  # For explanatory mode
 
 
 @dataclass
@@ -66,6 +67,7 @@ class GeneratorAgent(BaseAgent):
         persona_config: dict,
         company_name: str,
         company_profile: str,
+        explanatory_mode: bool = False,
         **kwargs,
     ):
         """
@@ -77,12 +79,14 @@ class GeneratorAgent(BaseAgent):
             persona_config: Persona configuration dict
             company_name: Company name for prompt context
             company_profile: Company description for context
+            explanatory_mode: If True, use explanatory prompts (no company context)
         """
         super().__init__(client, **kwargs)
         self.generator_id = generator_id
         self.persona = persona_config
         self.company_name = company_name
         self.company_profile = company_profile
+        self.explanatory_mode = explanatory_mode
 
     async def execute(
         self,
@@ -100,12 +104,17 @@ class GeneratorAgent(BaseAgent):
         Returns:
             GeneratorResult with variants and usage data.
         """
-        from ._prompt_helpers import build_generator_prompt
-
-        prompt = build_generator_prompt(
-            source, self.persona, self.company_name, self.company_profile,
-            creativity_ctx, num_variants,
-        )
+        if self.explanatory_mode:
+            from ._prompt_helpers import build_generator_prompt_explanatory
+            prompt = build_generator_prompt_explanatory(
+                source, self.persona, creativity_ctx, num_variants,
+            )
+        else:
+            from ._prompt_helpers import build_generator_prompt
+            prompt = build_generator_prompt(
+                source, self.persona, self.company_name, self.company_profile,
+                creativity_ctx, num_variants,
+            )
 
         response = self._create_message(prompt)
         variants = self._parse_response(response, creativity_ctx)

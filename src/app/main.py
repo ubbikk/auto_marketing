@@ -411,9 +411,9 @@ async def generate(request: GenerateRequest, user: User = Depends(require_approv
                 detail="No generations remaining. Contact admin for more credits."
             )
 
-    # Convert company_profile to CompanyContext if provided
+    # Convert company_profile to CompanyContext if provided (skip in explanatory mode)
     company_context = None
-    if request.company_profile:
+    if request.company_profile and not request.explanatory_mode:
         company_context = CompanyContext(
             name=request.company_profile.name,
             tagline=request.company_profile.tagline,
@@ -461,6 +461,7 @@ async def generate(request: GenerateRequest, user: User = Depends(require_approv
                     auto_summarize=request.auto_summarize,
                     company_context=company_context,
                     exclude_urls=exclude_urls,
+                    explanatory_mode=request.explanatory_mode,
                 )
             ),
         )

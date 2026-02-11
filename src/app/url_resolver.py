@@ -100,7 +100,7 @@ async def resolve_youtube_url(url: str) -> UrlResolveResult:
     from ..prompts import render
 
     logger.info("[URL_RESOLVER] Summarizing YouTube video: %s", url)
-    model_name = "gemini-2.5-flash-preview-05-20"
+    model_name = "gemini-3-flash-preview"
 
     try:
         import google.generativeai as genai

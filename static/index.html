@@ -1249,15 +1249,25 @@ footer a:hover { color: var(--primary-300); }
     </div>
 
     <div id="form-section">
-      <h2 class="heading-display" style="font-size:28px;color:#fff;margin-bottom:32px;">
+      <h2 id="form-heading" class="heading-display" style="font-size:28px;color:#fff;margin-bottom:32px;">
         Generate Marketing Materials
       </h2>
 
       <div class="card" style="padding:32px;">
         <div style="display:flex;flex-direction:column;gap:28px;">
 
-          <!-- Target Website -->
+          <!-- Mode Toggle -->
           <div>
+            <label class="form-label">Mode</label>
+            <div class="source-toggle" style="margin-bottom:0;">
+              <button id="mode-marketing-btn" class="source-toggle__btn source-toggle__btn--active" type="button" onclick="setGenerationMode('marketing')">Marketing</button>
+              <button id="mode-explanatory-btn" class="source-toggle__btn" type="button" onclick="setGenerationMode('explanatory')">Explanatory</button>
+            </div>
+            <p id="mode-hint" class="form-hint">Generate content that promotes a target company.</p>
+          </div>
+
+          <!-- Target Website -->
+          <div id="target-website-section">
             <label class="form-label">Target Website</label>
             <div class="url-input-wrap">
               <input id="target-url" type="url" class="form-input" value="https://afta.systems" autocomplete="url">
@@ -1301,7 +1311,7 @@ footer a:hover { color: var(--primary-300); }
           </div>
 
           <!-- Message -->
-          <div>
+          <div id="message-section">
             <label class="form-label">Message</label>
             <textarea id="message" class="form-textarea" rows="2" placeholder="What message should be conveyed? Leave empty to use source summary"></textarea>
             <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
@@ -1487,7 +1497,7 @@ footer a:hover { color: var(--primary-300); }
             <div class="carousel-section__header">
               <div>
                 <div class="carousel-section__title">LinkedIn Carousel</div>
-                <div class="carousel-section__subtitle">5-slide branded carousel</div>
+                <div id="carousel-subtitle" class="carousel-section__subtitle">5-slide branded carousel</div>
               </div>
               <div class="carousel-actions">
                 <button class="btn-ghost" onclick="openCarouselModal()">
@@ -1612,6 +1622,7 @@ let generationsRemaining = null;
 let accessRequestStatus = null;
 
 // ===== STATE =====
+let currentMode = 'marketing';
 let selectedPersona = 'professional';
 let sourceMode = 'auto';
 let personas = [];
@@ -1625,7 +1636,7 @@ let lastProfileUrl = null;
 let carouselModalOpen = false;
 let currentCarouselSlide = 0;
 let carouselId = null;
-const TOTAL_SLIDES = 5;
+let totalSlides = 5;
 
 // ===== AUTH FUNCTIONS =====
 async function initFirebase() {
@@ -1943,6 +1954,38 @@ function setSourceMode(mode) {
   document.getElementById('source-paste').classList.toggle('hidden', mode !== 'paste');
 }
 
+function setGenerationMode(mode) {
+  currentMode = mode;
+  document.getElementById('mode-marketing-btn').classList.toggle('source-toggle__btn--active', mode === 'marketing');
+  document.getElementById('mode-explanatory-btn').classList.toggle('source-toggle__btn--active', mode === 'explanatory');
+
+  const isExplanatory = mode === 'explanatory';
+
+  // Toggle visibility of marketing-only sections
+  document.getElementById('target-website-section').classList.toggle('hidden', isExplanatory);
+  document.getElementById('message-section').classList.toggle('hidden', isExplanatory);
+
+  // Force paste mode in explanatory (no auto-fetch)
+  if (isExplanatory) {
+    setSourceMode('paste');
+    document.getElementById('source-auto-btn').disabled = true;
+    document.getElementById('source-auto-btn').style.opacity = '0.35';
+    document.getElementById('source-paste').placeholder = 'Paste article URL, YouTube link, or text to summarize...';
+  } else {
+    document.getElementById('source-auto-btn').disabled = false;
+    document.getElementById('source-auto-btn').style.opacity = '';
+    document.getElementById('source-paste').placeholder = 'Paste your blog post, news article, or any text here...';
+  }
+
+  // Update heading and hint
+  document.getElementById('form-heading').textContent = isExplanatory
+    ? 'Generate Explanatory Content'
+    : 'Generate Marketing Materials';
+  document.getElementById('mode-hint').textContent = isExplanatory
+    ? 'Summarize key insights from source material for a technical audience.'
+    : 'Generate content that promotes a target company.';
+}
+
 // ===== COMPANY PROFILE HELPERS =====
 function isDefaultCompany(url) {
   if (!url) return true;
@@ -2061,18 +2104,28 @@ async function handleGenerate() {
     return;
   }
 
-  const targetUrl = document.getElementById('target-url').value.trim();
-  if (!targetUrl) {
+  const isExplanatory = currentMode === 'explanatory';
+  const targetUrl = isExplanatory ? '' : document.getElementById('target-url').value.trim();
+
+  if (!isExplanatory && !targetUrl) {
     document.getElementById('target-url').focus();
     document.getElementById('target-url').style.borderColor = 'rgba(236,72,153,0.5)';
     setTimeout(() => document.getElementById('target-url').style.borderColor = '', 2000);
     return;
   }
 
-  const message = document.getElementById('message').value.trim();
+  const message = isExplanatory ? '' : document.getElementById('message').value.trim();
   const sourceText = sourceMode === 'paste'
     ? document.getElementById('source-paste').value.trim() || 'auto'
     : 'auto';
+
+  // Explanatory mode requires pasted source
+  if (isExplanatory && (!sourceText || sourceText === 'auto')) {
+    document.getElementById('source-paste').focus();
+    document.getElementById('source-paste').style.borderColor = 'rgba(236,72,153,0.5)';
+    setTimeout(() => document.getElementById('source-paste').style.borderColor = '', 2000);
+    return;
+  }
   const numGenerators = parseInt(document.getElementById('num-generators').value);
   const generationModel = document.getElementById('generation-model').value;
   const autoSummarize = document.getElementById('auto-summarize').checked;
@@ -2090,7 +2143,7 @@ async function handleGenerate() {
     // Determine which company profile to use
     let companyProfile = null;  // null = use default on server (afta.systems)
 
-    if (!isDefaultCompany(targetUrl)) {
+    if (!isExplanatory && !isDefaultCompany(targetUrl)) {
       // Reuse cached profile if same URL, otherwise generate new one
       if (generatedCompanyProfile && lastProfileUrl === targetUrl) {
         companyProfile = generatedCompanyProfile;
@@ -2130,7 +2183,8 @@ async function handleGenerate() {
         num_generators: numGenerators,
         generation_model: generationModel,
         auto_summarize: autoSummarize,
-        company_profile: companyProfile,
+        company_profile: isExplanatory ? null : companyProfile,
+        explanatory_mode: isExplanatory,
       }),
     });
 
@@ -2223,14 +2277,21 @@ function showResults(data) {
     expandBtn.style.display = 'none';
   }
 
+  // Hide company context card in explanatory mode
+  const companySection = document.getElementById('result-company-card')?.closest('.result-section');
+  if (companySection) {
+    companySection.classList.toggle('hidden', currentMode === 'explanatory');
+  }
+
   // Score breakdown
   if (data.score_breakdown) {
     const sb = data.score_breakdown;
+    const relevanceLabel = currentMode === 'explanatory' ? 'Insight' : 'Relevance';
     const scores = [
       { label: 'Hook', value: sb.hook_strength, weight: '30%' },
       { label: 'Anti-Slop', value: sb.anti_slop, weight: '25%' },
       { label: 'Distinct', value: sb.distinctiveness, weight: '20%' },
-      { label: 'Relevance', value: sb.relevance, weight: '15%' },
+      { label: relevanceLabel, value: sb.relevance, weight: '15%' },
       { label: 'Persona', value: sb.persona_fit, weight: '10%' },
     ];
     document.getElementById('scores-grid').innerHTML = scores.map(s => `
@@ -2257,6 +2318,16 @@ function showResults(data) {
   const carouselPreviewUrl = `/api/carousel/preview/${data.carousel_id}`;
   document.getElementById('carousel-iframe').src = carouselPreviewUrl;
   document.getElementById('carousel-html-link').href = data.carousel_pdf_url;
+
+  // Count slides from carousel HTML to handle dynamic slide count
+  const slideCount = (data.carousel_html.match(/class="slide/g) || []).length;
+  totalSlides = slideCount > 0 ? slideCount : 5;
+  const subtitleEl = document.getElementById('carousel-subtitle');
+  if (subtitleEl) {
+    subtitleEl.textContent = currentMode === 'explanatory'
+      ? `${totalSlides}-slide explanatory carousel`
+      : `${totalSlides}-slide branded carousel`;
+  }
 
   // Variants - full content with copy buttons
   const variants = data.all_variants || [];
@@ -2288,22 +2359,26 @@ function showResults(data) {
   // Format cost with dollar sign
   const formatCost = (cost) => cost != null ? `$${cost.toFixed(4)}` : '—';
 
-  // Show which company profile was used in results
-  const activeProfile = generatedCompanyProfile || defaultCompanyProfile;
-  const companyName = activeProfile?.name || 'AFTA Systems';
-  const companyBadge = generatedCompanyProfile ? 'Generated Profile' : 'Default Profile';
-  document.getElementById('result-company-badge').textContent = companyBadge;
-  document.getElementById('result-company-name').textContent = companyName;
-  document.getElementById('result-company-tagline').textContent = activeProfile?.tagline || '';
-  document.getElementById('result-cp-offering').textContent = activeProfile?.core_offering || '';
-  document.getElementById('result-cp-diff').textContent = activeProfile?.differentiator || '';
-  document.getElementById('result-cp-audience').textContent = (activeProfile?.target_audience || []).join(', ');
-  document.getElementById('result-cp-services').textContent = (activeProfile?.key_services || []).join(', ');
-  document.getElementById('result-cp-pains').textContent = (activeProfile?.pain_points_solved || []).join(', ');
-  document.getElementById('result-cp-keywords').textContent = (activeProfile?.industry_keywords || []).join(', ');
+  // Show which company profile was used in results (skip in explanatory mode)
+  if (currentMode !== 'explanatory') {
+    const activeProfile = generatedCompanyProfile || defaultCompanyProfile;
+    const companyName = activeProfile?.name || 'AFTA Systems';
+    const companyBadge = generatedCompanyProfile ? 'Generated Profile' : 'Default Profile';
+    document.getElementById('result-company-badge').textContent = companyBadge;
+    document.getElementById('result-company-name').textContent = companyName;
+    document.getElementById('result-company-tagline').textContent = activeProfile?.tagline || '';
+    document.getElementById('result-cp-offering').textContent = activeProfile?.core_offering || '';
+    document.getElementById('result-cp-diff').textContent = activeProfile?.differentiator || '';
+    document.getElementById('result-cp-audience').textContent = (activeProfile?.target_audience || []).join(', ');
+    document.getElementById('result-cp-services').textContent = (activeProfile?.key_services || []).join(', ');
+    document.getElementById('result-cp-pains').textContent = (activeProfile?.pain_points_solved || []).join(', ');
+    document.getElementById('result-cp-keywords').textContent = (activeProfile?.industry_keywords || []).join(', ');
+  }
+
+  const statsCompanyName = currentMode === 'explanatory' ? null : (generatedCompanyProfile || defaultCompanyProfile)?.name || 'AFTA Systems';
 
   document.getElementById('result-stats').innerHTML = [
-    `<strong style="color:var(--electric-purple);">Company: ${escapeHtml(companyName)}</strong>`,
+    statsCompanyName ? `<strong style="color:var(--electric-purple);">Company: ${escapeHtml(statsCompanyName)}</strong>` : `<strong style="color:var(--electric-purple);">Mode: Explanatory</strong>`,
     `Model: ${modelDisplayName}`,
     `Generators: ${stats.total_generators || '—'}`,
     `Total variants: ${stats.total_variants || '—'}`,
@@ -2676,7 +2751,7 @@ function closeCarouselModal() {
 
 function modalNavigate(direction) {
   const newSlide = currentCarouselSlide + direction;
-  if (newSlide < 0 || newSlide >= TOTAL_SLIDES) return;
+  if (newSlide < 0 || newSlide >= totalSlides) return;
   currentCarouselSlide = newSlide;
   loadModalSlide(newSlide);
   updateModalDots();
@@ -2690,7 +2765,7 @@ function loadModalSlide(slideIndex) {
 
 function renderModalDots() {
   const dotsContainer = document.getElementById('modal-dots');
-  dotsContainer.innerHTML = Array.from({ length: TOTAL_SLIDES }, (_, i) => `
+  dotsContainer.innerHTML = Array.from({ length: totalSlides }, (_, i) => `
     <button class="carousel-modal__dot ${i === 0 ? 'carousel-modal__dot--active' : ''}"
             onclick="goToSlide(${i})" title="Slide ${i + 1}"></button>
   `).join('');
@@ -2706,7 +2781,7 @@ function updateModalDots() {
 
 function updateNavButtons() {
   document.getElementById('modal-prev-btn').disabled = currentCarouselSlide === 0;
-  document.getElementById('modal-next-btn').disabled = currentCarouselSlide === TOTAL_SLIDES - 1;
+  document.getElementById('modal-next-btn').disabled = currentCarouselSlide === totalSlides - 1;
 }
 
 function goToSlide(index) {

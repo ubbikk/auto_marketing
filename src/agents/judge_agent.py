@@ -66,6 +66,7 @@ class JudgeAgent(BaseAgent):
         self,
         client: anthropic.Anthropic,
         anti_slop_rules: str,
+        explanatory_mode: bool = False,
         **kwargs,
     ):
         """
@@ -74,9 +75,11 @@ class JudgeAgent(BaseAgent):
         Args:
             client: Anthropic API client
             anti_slop_rules: Anti-slop rules for reference
+            explanatory_mode: If True, use explanatory judge prompt
         """
         super().__init__(client, **kwargs)
         self.anti_slop_rules = anti_slop_rules
+        self.explanatory_mode = explanatory_mode
 
     async def execute(
         self,
@@ -127,8 +130,9 @@ CONTENT:
 
 """
 
+        template = "judge_explanatory" if self.explanatory_mode else "judge"
         return render(
-            "judge",
+            template,
             anti_slop_rules=self.anti_slop_rules,
             news_context=news_context,
             num_variants=str(len(variants)),

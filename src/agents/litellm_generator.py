@@ -33,6 +33,7 @@ class LiteLLMGeneratorAgent:
         company_name: str,
         company_profile: str,
         max_tokens: int = 16384,
+        explanatory_mode: bool = False,
     ):
         """
         Initialize LiteLLM generator agent.
@@ -44,6 +45,7 @@ class LiteLLMGeneratorAgent:
             company_name: Company name for prompt context
             company_profile: Company description for context
             max_tokens: Maximum tokens for response
+            explanatory_mode: If True, use explanatory prompts (no company context)
         """
         self.model_id = model_id
         self.generator_id = generator_id
@@ -51,6 +53,7 @@ class LiteLLMGeneratorAgent:
         self.company_name = company_name
         self.company_profile = company_profile
         self.max_tokens = max_tokens
+        self.explanatory_mode = explanatory_mode
 
     async def execute(
         self,
@@ -69,12 +72,17 @@ class LiteLLMGeneratorAgent:
         Returns:
             GeneratorResult with variants and usage data.
         """
-        from ._prompt_helpers import build_generator_prompt
-
-        prompt = build_generator_prompt(
-            source, self.persona, self.company_name, self.company_profile,
-            creativity_ctx, num_variants,
-        )
+        if self.explanatory_mode:
+            from ._prompt_helpers import build_generator_prompt_explanatory
+            prompt = build_generator_prompt_explanatory(
+                source, self.persona, creativity_ctx, num_variants,
+            )
+        else:
+            from ._prompt_helpers import build_generator_prompt
+            prompt = build_generator_prompt(
+                source, self.persona, self.company_name, self.company_profile,
+                creativity_ctx, num_variants,
+            )
 
         logger.info(
             "[LITELLM_GEN] Generator %d calling %s...",

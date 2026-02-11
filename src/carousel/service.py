@@ -7,8 +7,8 @@ from typing import Optional
 
 import anthropic
 
-from .extractor import extract_carousel_content
-from .renderer import build_html, build_printable_html
+from .extractor import extract_carousel_content, extract_carousel_content_explanatory
+from .renderer import build_html, build_html_explanatory, build_printable_html
 
 _PROJECT_ROOT = Path(__file__).parent.parent.parent
 _OUTPUT_DIR = _PROJECT_ROOT / "data" / "carousels"
@@ -60,6 +60,50 @@ async def generate_carousel_html(
     carousel_id = hashlib.md5(html_doc.encode()).hexdigest()[:12]
 
     # Save HTML for later download
+    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    html_path = _OUTPUT_DIR / f"{carousel_id}.html"
+    html_path.write_text(html_doc, encoding="utf-8")
+
+    return CarouselGenerationResult(
+        html=html_doc,
+        carousel_id=carousel_id,
+        input_tokens=extraction_result.input_tokens,
+        output_tokens=extraction_result.output_tokens,
+        model=extraction_result.model,
+    )
+
+
+async def generate_carousel_html_explanatory(
+    text: str,
+    client: Optional[anthropic.Anthropic] = None,
+    message: str = "",
+    source_title: str = "",
+    source_url: str = "",
+) -> CarouselGenerationResult:
+    """Generate explanatory carousel HTML (no branding, flexible slides).
+
+    Args:
+        text: Source text to extract insights from.
+        client: Optional Anthropic client.
+        message: Optional focus area to guide content direction.
+        source_title: Title of the source material (for closing slide).
+        source_url: URL of the source material.
+
+    Returns:
+        CarouselGenerationResult with HTML, carousel_id, and usage data.
+    """
+    extraction_result = await extract_carousel_content_explanatory(
+        text, client=client, message=message
+    )
+
+    # Inject source info into closing slide if not already set
+    if source_title and not extraction_result.content.closing.source_title:
+        extraction_result.content.closing.source_title = source_title
+
+    html_doc = build_html_explanatory(extraction_result.content)
+
+    carousel_id = hashlib.md5(html_doc.encode()).hexdigest()[:12]
+
     _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     html_path = _OUTPUT_DIR / f"{carousel_id}.html"
     html_path.write_text(html_doc, encoding="utf-8")

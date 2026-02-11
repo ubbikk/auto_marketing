@@ -670,7 +670,7 @@ async def run_pipeline(
     t0 = time.time()
     if explanatory_mode:
         logger.info("[STEP 1] Skipping metadata scrape (explanatory mode)")
-        website_metadata = WebsiteMetadata(domain="", logo_data_url=None)
+        website_metadata = WebsiteMetadata(domain="", logo_data_url=None, brand_color=None)
         timings["scrape_metadata"] = 0
     else:
         logger.info("[STEP 1] Scraping website metadata from %s", target_url)

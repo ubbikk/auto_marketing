@@ -87,16 +87,22 @@ async def extract_carousel_content(
     brace_end = stripped.rfind("}")
     if brace_start != -1 and brace_end != -1:
         stripped = stripped[brace_start : brace_end + 1]
-
-    if not stripped:
-        logger.error("Carousel extraction returned empty content. Raw response: %s", raw)
-        raise ValueError(f"Failed to extract JSON from carousel response. Raw: {raw[:200]}")
+    else:
+        # No JSON at all — Claude returned a text refusal
+        logger.error("Carousel extraction returned no JSON. Raw response: %s", raw[:500])
+        raise ValueError(
+            "Could not generate carousel — the source text may be too short or incomplete. "
+            "Try providing more detailed content."
+        )
 
     try:
         data = json.loads(stripped)
     except json.JSONDecodeError as e:
         logger.error("JSON parse error in carousel extraction: %s. Content: %s", e, stripped[:500])
-        raise ValueError(f"Invalid JSON in carousel response: {e}. Content: {stripped[:200]}")
+        raise ValueError(
+            "Could not generate carousel — the AI returned an unexpected format. "
+            "Try again or use different source text."
+        )
 
     content = CarouselContent.model_validate(data)
     return CarouselExtractionResult(

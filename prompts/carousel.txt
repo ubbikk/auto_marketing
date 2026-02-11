@@ -24,6 +24,7 @@ Rules:
 - All content should relate to the source text's core topic.
 
 Extract carousel content from this text. Return ONLY valid JSON matching the schema below.
+IMPORTANT: Always return valid JSON. Never refuse, explain, or apologize — work with whatever text is available, even if it seems incomplete. Fill gaps with reasonable inferences from context.
 
 Schema:
 {

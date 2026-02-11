@@ -2534,6 +2534,47 @@ async function generateCarouselPDF() {
     doc.querySelectorAll('style').forEach(s => { styleEl.textContent += s.textContent; });
     wrapper.appendChild(styleEl);
 
+    // Override gradient-text CSS (html2canvas doesn't support background-clip: text)
+    const fixStyle = document.createElement('style');
+    fixStyle.textContent = `
+      .gradient-text {
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
+        -webkit-text-fill-color: #80ebff !important;
+        color: #80ebff !important;
+      }
+      .gradient-text--warm {
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
+        -webkit-text-fill-color: #1adbff !important;
+        color: #1adbff !important;
+      }
+      .stat-value {
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
+        -webkit-text-fill-color: #4de3ff !important;
+        color: #4de3ff !important;
+      }
+      .quote-mark {
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
+        -webkit-text-fill-color: #00d4ff !important;
+        color: #00d4ff !important;
+      }
+      .number-list li::before {
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
+        -webkit-text-fill-color: #4de3ff !important;
+        color: #4de3ff !important;
+      }
+    `;
+    wrapper.appendChild(fixStyle);
+
     // Copy the font link
     const fontLink = document.createElement('link');
     fontLink.rel = 'stylesheet';

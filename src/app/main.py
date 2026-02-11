@@ -23,6 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from .models import (
+    AccessRequestResponse,
     AuthResponse,
     CompanyProfile,
     CompanyProfileRequest,
@@ -45,6 +46,7 @@ from .auth import (
     User,
     get_current_user,
     require_auth,
+    require_approved,
 )
 from .pipeline import run_pipeline
 from .scraper import scrape_website_metadata
@@ -129,14 +131,17 @@ async def firebase_auth(request: Request, auth_request: FirebaseAuthRequest):
             auth_provider=provider
         )
 
-    # Store in session
+    # Store in session (include approval fields)
     request.session['user'] = {
         'id': user_data['id'],
         'firebase_uid': firebase_uid,
         'email': email,
         'display_name': user_data.get('display_name', email.split('@')[0]),
         'photo_url': picture,
-        'auth_provider': provider
+        'auth_provider': provider,
+        'approved': user_data.get('approved', False),
+        'generation_limit': user_data.get('generation_limit'),
+        'is_admin': user_data.get('is_admin', False),
     }
 
     logger.info("User logged in: %s (%s)", email, provider)
@@ -153,17 +158,49 @@ async def firebase_auth(request: Request, auth_request: FirebaseAuthRequest):
 
 
 @app.get("/api/auth/me")
-async def get_me(user: User | None = Depends(get_current_user)):
-    """Get current user info."""
+async def get_me(request: Request, user: User | None = Depends(get_current_user)):
+    """Get current user info with approval status (always re-fetched from Firestore)."""
     if not user:
         return {"authenticated": False}
+
+    # Re-fetch from Firestore to get latest approval status
+    fs = get_firestore()
+    approved = user.approved
+    is_admin = user.is_admin
+    generation_limit = user.generation_limit
+    generations_remaining = None
+    access_request_status = None
+
+    if fs:
+        fresh = fs.get_user_by_id(user.id)
+        if fresh:
+            approved = fresh.get('approved', False)
+            is_admin = fresh.get('is_admin', False)
+            generation_limit = fresh.get('generation_limit')
+
+            # Update session with fresh data
+            session_user = request.session.get('user', {})
+            session_user['approved'] = approved
+            session_user['is_admin'] = is_admin
+            session_user['generation_limit'] = generation_limit
+            request.session['user'] = session_user
+
+        generations_remaining = fs.get_generations_remaining(user.id)
+        access_req = fs.get_user_access_request(user.id)
+        if access_req:
+            access_request_status = access_req.get('status')
+
     return {
         "authenticated": True,
         "user": {
             "name": user.display_name,
             "email": user.email,
-            "photo_url": user.photo_url
-        }
+            "photo_url": user.photo_url,
+        },
+        "approved": approved or is_admin,
+        "is_admin": is_admin,
+        "generations_remaining": generations_remaining,
+        "access_request_status": access_request_status,
     }
 
 
@@ -172,6 +209,89 @@ async def logout(request: Request):
     """Log out current user."""
     request.session.clear()
     return {"success": True}
+
+
+# ============================================================================
+# Access Request
+# ============================================================================
+
+
+def send_access_request_notification(email: str, display_name: str):
+    """Send email notification about new access request (runs in background thread)."""
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    smtp_email = settings.smtp_email
+    smtp_password = settings.smtp_password
+    notify_email = settings.notify_email
+
+    if not smtp_email or not smtp_password or not notify_email:
+        logger.warning("SMTP not configured, skipping access request notification")
+        return
+
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['From'] = smtp_email
+        msg['To'] = notify_email
+        msg['Subject'] = f'[Auto Marketing] New Access Request from {display_name}'
+
+        html = f"""\
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px;">
+  <div style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+    <h2 style="color: #1a1a2e; margin: 0 0 16px;">New Access Request</h2>
+    <p style="color: #555; line-height: 1.6;">
+      <strong>{display_name}</strong> ({email}) has requested access to Auto Marketing.
+    </p>
+    <p style="color: #888; font-size: 13px; margin-top: 24px;">
+      Approve or reject in the Firestore console.
+    </p>
+  </div>
+</body>
+</html>"""
+
+        msg.attach(MIMEText(html, 'html'))
+
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(smtp_email, smtp_password)
+            server.sendmail(smtp_email, notify_email, msg.as_string())
+
+        logger.info("Access request notification sent for %s", email)
+    except Exception as e:
+        logger.error("Failed to send access request notification: %s", e)
+
+
+@app.post("/api/request-access", response_model=AccessRequestResponse)
+async def request_access(user: User = Depends(require_auth)):
+    """Request access to the application."""
+    firestore = get_firestore()
+    if not firestore:
+        raise HTTPException(status_code=503, detail="Service unavailable")
+
+    # Check if already approved
+    fresh = firestore.get_user_by_id(user.id)
+    if fresh and (fresh.get('approved', False) or fresh.get('is_admin', False)):
+        return AccessRequestResponse(success=True, status="approved", message="Already approved")
+
+    # Check if request already exists
+    existing = firestore.get_user_access_request(user.id)
+    if existing and existing.get('status') == 'pending':
+        return AccessRequestResponse(success=True, status="pending", message="Request already submitted")
+
+    # Create new request
+    firestore.create_access_request(user.id, user.email, user.display_name)
+
+    # Send email notification in background thread
+    import threading
+    threading.Thread(
+        target=send_access_request_notification,
+        args=(user.email, user.display_name),
+        daemon=True,
+    ).start()
+
+    logger.info("Access request created for %s", user.email)
+    return AccessRequestResponse(success=True, status="pending", message="Access request submitted")
 
 
 # ============================================================================
@@ -277,9 +397,20 @@ async def generate_profile(
 
 
 @app.post("/api/generate", response_model=GenerateResponse)
-async def generate(request: GenerateRequest, user: User = Depends(require_auth)):
+async def generate(request: GenerateRequest, user: User = Depends(require_approved)):
     """Run the full generation pipeline."""
     logger.info("Generation requested by user: %s", user.email)
+
+    # Check credits before running
+    fs = get_firestore()
+    if fs:
+        remaining = fs.get_generations_remaining(user.id)
+        if remaining is not None and remaining <= 0:
+            raise HTTPException(
+                status_code=403,
+                detail="No generations remaining. Contact admin for more credits."
+            )
+
     # Convert company_profile to CompanyContext if provided
     company_context = None
     if request.company_profile:
@@ -303,6 +434,16 @@ async def generate(request: GenerateRequest, user: User = Depends(require_auth))
         request.target_url,
         company_context.name if company_context else "default",
     )
+    # Fetch previously used article URLs to avoid repeating
+    exclude_urls = None
+    if fs and request.source_text.strip().lower() == "auto":
+        try:
+            exclude_urls = fs.get_used_article_urls(days_back=30)
+            if exclude_urls:
+                logger.info("Excluding %d previously used article URLs", len(exclude_urls))
+        except Exception as e:
+            logger.warning("Failed to fetch used article URLs: %s", e)
+
     try:
         # run_pipeline uses sync anthropic client internally, so run in a
         # thread pool to avoid blocking the event loop.
@@ -319,12 +460,18 @@ async def generate(request: GenerateRequest, user: User = Depends(require_auth))
                     generation_model=request.generation_model,
                     auto_summarize=request.auto_summarize,
                     company_context=company_context,
+                    exclude_urls=exclude_urls,
                 )
             ),
         )
     except Exception as e:
         logger.exception("Generation failed")
         raise HTTPException(status_code=500, detail=str(e))
+
+    # Record successful generation (with source URL for future exclusion)
+    if fs:
+        source_url = getattr(result.source_content, 'url', None) if result.source_content else None
+        fs.record_generation(user.id, user.email, source_url=source_url)
 
     # Build response
     carousel_url = f"/api/carousel/download/{result.carousel_id}"

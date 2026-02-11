@@ -176,6 +176,7 @@ class AutoSourceResult:
 async def fetch_auto_source(
     client: anthropic.Anthropic,
     company_context: Optional[CompanyContext] = None,
+    exclude_urls: Optional[set[str]] = None,
 ) -> AutoSourceResult:
     """Fetch relevant news using RSS and return as SourceContent with usage data.
 
@@ -243,6 +244,17 @@ async def fetch_auto_source(
             time.time() - t1,
             len(articles),
         )
+
+    # Step 2.5: Exclude previously used article URLs
+    if exclude_urls and articles:
+        articles_before_exclusion = articles
+        articles = [a for a in articles if a.link not in exclude_urls]
+        excluded_count = len(articles_before_exclusion) - len(articles)
+        if excluded_count > 0:
+            logger.info("[NEWS] Excluded %d previously used articles, %d remaining", excluded_count, len(articles))
+        if not articles:
+            logger.warning("[NEWS] All articles were previously used — re-including them as fallback")
+            articles = articles_before_exclusion
 
     # Step 3: AI filter (Gemini Flash) to pick the most relevant article
     t2 = time.time()
@@ -560,6 +572,7 @@ async def run_pipeline(
     generation_model: str = "gemini/gemini-3-pro-preview",
     auto_summarize: bool = True,
     company_context: Optional[CompanyContext] = None,
+    exclude_urls: Optional[set[str]] = None,
 ) -> WebPipelineResult:
     """Run the full web generation pipeline.
 
@@ -608,7 +621,7 @@ async def run_pipeline(
     t0 = time.time()
     logger.info("[STEP 2] Resolving source content (mode=%s)", "auto" if source_text.strip().lower() == "auto" else "pasted")
     if source_text.strip().lower() == "auto":
-        auto_result = await fetch_auto_source(client, company_context=company_context)
+        auto_result = await fetch_auto_source(client, company_context=company_context, exclude_urls=exclude_urls)
         source = auto_result.content
         timings.update(auto_result.timings)
         # Capture raw source artifact
